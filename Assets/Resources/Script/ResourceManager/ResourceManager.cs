@@ -18,7 +18,7 @@ public class ResourceManager : MonoBehaviour
         foreach (Object obj in Resources.LoadAll("UnitSO/Unit", typeof(UnitScriptableObject)).ToList())
         {
             UnitScriptableObject unitSO = (UnitScriptableObject)obj;
-            _mapUnitSO.Add(unitSO.unitName, unitSO);
+            _mapUnitSO.Add(obj.name, unitSO);
         }
         Global.DEBUG_PRINT("[Resources] Loaded PlayerUnits: " + _mapUnitSO.Count());
     }
