@@ -6,16 +6,18 @@ public class RandomSpinButton : MonoBehaviour
 {
     [SerializeField] private Button button;
     
-    void Awake() {
+    void Awake()
+    {
         button = GetComponent<Button>();
     }
     
-    void Start() {
+    void Start()
+    {
         button.onClick.AddListener(OnButtonClick);
     }
     
-    public void OnButtonClick() {
-        
+    public void OnButtonClick()
+    {
         if (SpinController.instance == null || SymbolGenerator.instance == null) return;
         
         SlotGridUI gridUI = FindObjectOfType<SlotGridUI>();
@@ -26,7 +28,8 @@ public class RandomSpinButton : MonoBehaviour
         SpinController.instance.FillGridWithRandomSymbols();
     }
     
-    public void TriggerRandomSpin() {
+    public void TriggerRandomSpin()
+    {
         OnButtonClick();
     }
 } 

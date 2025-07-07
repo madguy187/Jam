@@ -13,7 +13,6 @@ public class SymbolGenerator : MonoBehaviour
     void Awake()
     {
         instance = this;   
-        ValidateProbabilities();
     }
     
     // Generates a random symbol based on the probability settings
@@ -43,22 +42,27 @@ public class SymbolGenerator : MonoBehaviour
         grid.ClearGrid();
         
         // Fill each slot with a random symbol
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
+        for (int row = 0; row < 3; row++) 
+        {
+            for (int col = 0; col < 3; col++) 
+            {
                 grid.SetSlot(row, col, GenerateRandomSymbol());
             }
         }
     }
     
-    public void SetAttackProbability(float probability) {
+    public void SetAttackProbability(float probability) 
+    {
         attackProbability = Mathf.Clamp01(probability);
     }
     
-    public void SetDefenseProbability(float probability) {
+    public void SetDefenseProbability(float probability) 
+    {
         defenseProbability = Mathf.Clamp01(probability);
     }
     
-    public void SetSpecialProbability(float probability) {
+    public void SetSpecialProbability(float probability) 
+    {
         specialProbability = Mathf.Clamp01(probability);
     }
 } 

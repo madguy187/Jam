@@ -25,23 +25,28 @@ public class SlotGridUI : MonoBehaviour
     private SymbolType[] finalResults = new SymbolType[9];
     private SymbolType[,] symbolCache = new SymbolType[3, 3];
     
-    void Start() {
+    void Start()
+    {
         InitializeSymbolCache();
         SubscribeToEvents();
     }
     
     // Create empty symbol grid for animation
-    private void InitializeSymbolCache() {
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
+    private void InitializeSymbolCache()
+    {
+        for (int row = 0; row < 3; row++)
+        {
+            for (int col = 0; col < 3; col++)
+            {
                 symbolCache[row, col] = SymbolType.Empty;
             }
         }
     }
     
-    private void SubscribeToEvents() {
-        
-        if (SpinController.instance != null) {
+    private void SubscribeToEvents()
+    {
+        if (SpinController.instance != null)
+        {
             SpinController.instance.OnGridUpdated += UpdateGridDisplay;
             UpdateGridDisplay();
         }
@@ -62,13 +67,15 @@ public class SlotGridUI : MonoBehaviour
     // Update each slot sprite based on its symbol type
     private void UpdateAllSlots(SlotGrid grid)
     {
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-
+        for (int row = 0; row < 3; row++)
+        {
+            for (int col = 0; col < 3; col++)
+            {
                 int index = row * 3 + col;
                 GridSlot slot = grid.GetSlot(row, col);
                 
-                if (slot != null && index < slotImages.Length && slotImages[index] != null) {
+                if (slot != null && index < slotImages.Length && slotImages[index] != null)
+                {
                     SetSlotImage(slotImages[index], slot.symbolType);
                 }
             }
@@ -78,7 +85,8 @@ public class SlotGridUI : MonoBehaviour
     void SetSlotImage(Image slotImage, SymbolType symbolType)
     {
         slotImage.color = Color.white;
-        switch (symbolType) {
+        switch (symbolType)
+        {
             case SymbolType.Attack:
                 slotImage.sprite = attackSprite;
                 break;
@@ -95,8 +103,8 @@ public class SlotGridUI : MonoBehaviour
     }
     
     // Start the spinning animation with the given final symbol arrangement
-    public void StartSpinAnimation(SymbolType[] finalResult) {
-        
+    public void StartSpinAnimation(SymbolType[] finalResult)
+    {
         if (isSpinning) return;
         
         if (finalResult.Length != 9) return;
@@ -114,11 +122,10 @@ public class SlotGridUI : MonoBehaviour
         float currentSpeed = spinSpeed;
         float nextUpdateTime = 0f;
         
-        // Main spin phase
-        while (elapsedTime < spinDuration) {
-
-            if (Time.time >= nextUpdateTime) {
-                
+        while (elapsedTime < spinDuration)
+        {
+            if (Time.time >= nextUpdateTime)
+            {
                 UpdateSpinningSymbols();
                 nextUpdateTime = Time.time + (1f / currentSpeed);
             }
@@ -127,17 +134,15 @@ public class SlotGridUI : MonoBehaviour
             yield return null;
         }
         
-        // Slowdown phase
         elapsedTime = 0f;
-        while (elapsedTime < slowdownDuration) {
-
-            if (Time.time >= nextUpdateTime) {
-
+        while (elapsedTime < slowdownDuration)
+        {
+            if (Time.time >= nextUpdateTime)
+            {
                 float t = elapsedTime / slowdownDuration;
                 currentSpeed = Mathf.Lerp(spinSpeed, minSpinSpeed, t);
                 
                 UpdateSpinningSymbols();
-
                 nextUpdateTime = Time.time + (1f / currentSpeed);
             }
             
@@ -149,45 +154,46 @@ public class SlotGridUI : MonoBehaviour
         isSpinning = false;
     }
     
-    // Update the symbols during the spinning animation
     private void UpdateSpinningSymbols()
     {
-        // Move existing symbols down
-        for (int row = 2; row > 0; row--) {
-            for (int col = 0; col < 3; col++) {
+        for (int row = 2; row > 0; row--)
+        {
+            for (int col = 0; col < 3; col++)
+            {
                 symbolCache[row, col] = symbolCache[row - 1, col];
             }
         }
         
-        // Generate new symbols for top row
-        for (int col = 0; col < 3; col++) {
+        for (int col = 0; col < 3; col++)
+        {
             int randomIndex = Random.Range(0, 3);
             symbolCache[0, col] = (SymbolType)randomIndex;
         }
         
-        // Update visuals
-        for (int row = 0; row < 3; row++) {
-            for (int col = 0; col < 3; col++) {
-
+        for (int row = 0; row < 3; row++)
+        {
+            for (int col = 0; col < 3; col++)
+            {
                 int index = row * 3 + col;
-
-                if (slotImages[index] != null) {
+                if (slotImages[index] != null)
+                {
                     SetSlotImage(slotImages[index], symbolCache[row, col]);
                 }
             }
         }
     }
     
-    // Show the final symbol arrangement after spinning
-    private void DisplayFinalResults() {
-        for (int i = 0; i < 9; i++) {
-            if (slotImages[i] != null) {
+    private void DisplayFinalResults()
+    {
+        for (int i = 0; i < 9; i++)
+        {
+            if (slotImages[i] != null)
+            {
                 SetSlotImage(slotImages[i], finalResults[i]);
             }
         }
     }
     
-    // Check if the slot machine is currently spinning
     public bool IsSpinning()
     {
         return isSpinning;
