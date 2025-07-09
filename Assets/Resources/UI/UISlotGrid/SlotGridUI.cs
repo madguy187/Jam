@@ -105,7 +105,7 @@ public class SlotGridUI : MonoBehaviour
         float elapsedTime = 0f;
         float spinningPhaseTime = spinDuration * finalSymbolsStartTime;
         
-        Global.DEBUG_PRINT($"Starting spin animation. Duration: {spinDuration}, Spinning phase: {spinningPhaseTime}");
+        //Global.DEBUG_PRINT($"Starting spin animation. Duration: {spinDuration}, Spinning phase: {spinningPhaseTime}");
         
         // Fast spinning phase
         while (elapsedTime < spinningPhaseTime)
@@ -122,19 +122,16 @@ public class SlotGridUI : MonoBehaviour
             yield return new WaitForSeconds(0.05f);
             elapsedTime += 0.05f;
         }
-
-        Global.DEBUG_PRINT("Spin phase complete, showing final symbols");
         
         // Show final symbols
         UpdateGrid(finalSymbols);
         
         // Wait for the remaining duration
         float remainingTime = spinDuration * (1 - finalSymbolsStartTime);
-        Global.DEBUG_PRINT($"Waiting remaining time: {remainingTime}");
         yield return new WaitForSeconds(remainingTime);
         
         isSpinning = false;
-        Global.DEBUG_PRINT("Spin animation complete");
+        Global.DEBUG_PRINT("Spin complete");
     }
     
     public bool IsSpinning()

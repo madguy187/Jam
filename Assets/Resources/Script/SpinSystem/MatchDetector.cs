@@ -19,6 +19,9 @@ public class Match
 
     // we return position for now first and see do we need to use next time
     // if animations and all need then ok , if not we remove it
+
+    // use dict if can 
+    // save as a dict as matches
     public Match(MatchType type, List<Vector2Int> positions, SymbolType symbol)
     {
         Type = type;
@@ -110,23 +113,17 @@ public class MatchDetector
         List<Match> matches = new List<Match>();
         matchedPositions.Clear();
         
-        Global.DEBUG_PRINT("=== Starting Match Detection ===");
-        
         // Detect patterns first
         var horizontalMatches = DetectHorizontalMatches();
-        Global.DEBUG_PRINT($"Found {horizontalMatches.Count} horizontal matches");
         matches.AddRange(horizontalMatches);
         
         var diagonalMatches = DetectDiagonalMatches();
-        Global.DEBUG_PRINT($"Found {diagonalMatches.Count} diagonal matches");
         matches.AddRange(diagonalMatches);
         
         var zigzagMatches = DetectZigzagMatches();
-        Global.DEBUG_PRINT($"Found {zigzagMatches.Count} zigzag matches");
         matches.AddRange(zigzagMatches);
         
         var xShapeMatches = DetectXShapeMatches();
-        Global.DEBUG_PRINT($"Found {xShapeMatches.Count} X-shape matches");
         matches.AddRange(xShapeMatches);
         
         Match fullGridMatch = DetectFullGridMatch();
@@ -136,7 +133,13 @@ public class MatchDetector
             matches.Add(fullGridMatch);
         }
 
+/*
+        Global.DEBUG_PRINT($"Found {horizontalMatches.Count} horizontal matches");
+        Global.DEBUG_PRINT($"Found {diagonalMatches.Count} diagonal matches");
+        Global.DEBUG_PRINT($"Found {zigzagMatches.Count} zigzag matches");
+        Global.DEBUG_PRINT($"Found {xShapeMatches.Count} X-shape matches");
         Global.DEBUG_PRINT($"Matched positions before singles: {matchedPositions.Count}");
+        */
         
         // Then detect single matches for any unmatched positions
         var singleMatches = DetectSingleMatches();
@@ -178,7 +181,7 @@ public class MatchDetector
                     new List<Vector2Int> { pos },
                     symbol
                 ));
-                Global.DEBUG_PRINT($"Found single match for symbol {symbol}");
+                // Global.DEBUG_PRINT($"Found single match for symbol {symbol}");
             }
         }
         

@@ -1,29 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class SpinController : MonoBehaviour
 {
     public static SpinController instance;
+    
     private SlotGrid slotGrid;
     private MatchDetector matchDetector;
     private int spinsThisTurn = 0;
     private const int FREE_SPINS_PER_TURN = 1;
     private const int BASE_SPIN_COST = 2;
-    private List<Match> lastMatches;
-    private int lastSpinCost;
     private bool isSpinning;
+    private SpinResult spinResult;
+    private int currentSpinCost;
     
     public bool IsSpinning => isSpinning;
     public int CurrentSpinCost => GetNextSpinCost();
     public bool HasFreeSpinsRemaining => spinsThisTurn < FREE_SPINS_PER_TURN;
-    
-    /* ====== NOTESSSSS ======
-    - First spin each turn is free
-    - Additional spins cost gold (increases with each spin)
-    - Matches trigger rewards 
-    - Different match types have different rewards
-    */
     
     private void Awake()
     {
@@ -31,15 +26,25 @@ public class SpinController : MonoBehaviour
         {
             instance = this;
         }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
         
+        // Create new instances since these are regular classes, not MonoBehaviours
         slotGrid = new SlotGrid();
         matchDetector = new MatchDetector(slotGrid);
+        spinResult = new SpinResult(new List<Match>(), 0);  // Initialize with empty matches
     }
     
     public void FillGridWithRandomSymbols(bool autoSpendGold = true)
     {
-        if (isSpinning) return;
-        
+        if (isSpinning) 
+        {
+            return;
+        }
+
         SlotGridUI gridUI = FindObjectOfType<SlotGridUI>();
         if (gridUI == null || gridUI.IsSpinning())
         {
@@ -51,8 +56,8 @@ public class SpinController : MonoBehaviour
         // Check if we need to spend gold
         if (spinsThisTurn >= FREE_SPINS_PER_TURN)
         {
-            lastSpinCost = GetNextSpinCost();
-            if (!GoldManager.instance.SpendGold(lastSpinCost))
+            currentSpinCost = GetNextSpinCost();
+            if (!GoldManager.instance.SpendGold(currentSpinCost))
             {
                 isSpinning = false;
                 return;
@@ -60,7 +65,7 @@ public class SpinController : MonoBehaviour
         }
         else
         {
-            lastSpinCost = 0;
+            currentSpinCost = 0;
         }
         
         spinsThisTurn++;
@@ -74,7 +79,6 @@ public class SpinController : MonoBehaviour
         
         if (finalSymbols == null || finalSymbols.Length != 9)
         {
-            Global.DEBUG_PRINT("Failed to generate symbols!");
             isSpinning = false;
             return;
         }
@@ -95,28 +99,58 @@ public class SpinController : MonoBehaviour
         }
 
         // After grid is filled and animation is complete, check for matches
-        lastMatches = CheckForMatches();
+        List<Match> matches = CheckForMatches();
         
-        if (autoSpendGold && lastMatches.Count > 0)
+        // Calculate total gold earned
+        int totalGold = 0;
+        if (autoSpendGold && matches.Count > 0)
         {
-            foreach (Match match in lastMatches)
+            foreach (Match match in matches)
             {
-                // Skip adding gold for single matches
                 if (match.Type != MatchType.SINGLE)
                 {
-                    GoldManager.instance.AddGold(GetGoldRewardForMatch(match.Type));
+                    int goldReward = GetGoldRewardForMatch(match.Type);
+                    totalGold += goldReward;
+                    GoldManager.instance.AddGold(goldReward);
                 }
             }
         }
         
+        // Save matches to our SpinResult
+        spinResult.SetMatches(matches, totalGold);
+
+        // for demo purposes
+        PrintSpinResults();
+        
         isSpinning = false;
+    }
+
+    private void PrintSpinResults()
+    {
+        Global.DEBUG_PRINT("=== SPIN RESULT ===");
+        
+        // Print exactly what GetAllMatches() returns
+        List<Match> allMatches = spinResult.GetAllMatches();
+        if (allMatches.Count == 0)
+        {
+            Global.DEBUG_PRINT("No matches found!");
+        }
+        else 
+        {
+            foreach (Match match in allMatches)
+            {
+                string positions = string.Join(", ", match.Positions.Select(p => $"({p.x},{p.y})"));
+                Global.DEBUG_PRINT($"Match: Type={match.Type}, Symbol={match.Symbol}, Positions={positions}");
+            }
+        }
+        
+        Global.DEBUG_PRINT("==================");
     }
     
     public void SpinForUnit(UnitObject unit)
     {
         if (unit == null)
         {
-            Global.DEBUG_PRINT("Cannot spin for null unit!");
             return;
         }
         
@@ -131,7 +165,6 @@ public class SpinController : MonoBehaviour
         SymbolType[] finalSymbols = SymbolGenerator.instance.GenerateSymbolsForUnit(unit);
         if (finalSymbols == null || finalSymbols.Length != 9)
         {
-            Global.DEBUG_PRINT("Failed to generate symbols for unit!");
             isSpinning = false;
             return;
         }
@@ -143,27 +176,15 @@ public class SpinController : MonoBehaviour
         StartCoroutine(WaitForSpinComplete(gridUI, true));
     }
     
-    public SpinResult GetLastSpinResult()
+    public SpinResult GetSpinResult()
     {
-        if (lastMatches == null) 
-        {
-            return null;
-        }
-        
-        return new SpinResult
-        {
-            Matches = ConvertMatchesToMatchData(lastMatches),
-            Grid = slotGrid.GetGridCopy(),
-            SpinCost = lastSpinCost
-        };
+        return spinResult;
     }
     
     public void StartNewTurn()
     {
         spinsThisTurn = 0;
-        lastMatches = null;
-        lastSpinCost = 0;
-        Global.DEBUG_PRINT("New turn started - next spin is FREE!");
+        spinResult.Clear();
     }
     
     public bool CanSpin()
@@ -205,7 +226,8 @@ public class SpinController : MonoBehaviour
     {
         List<Match> matches = matchDetector.DetectAllMatches();
         
-        Global.DEBUG_PRINT("=== Match Types Found ===");
+        // Debugging function , can comment out
+        /*Global.DEBUG_PRINT("=== Match Types Found ===");
         if (matches.Count > 0)
         {
             foreach (Match match in matches)
@@ -218,6 +240,7 @@ public class SpinController : MonoBehaviour
             Global.DEBUG_PRINT("No matches");
         }
         Global.DEBUG_PRINT("=====================");
+        */
         
         return matches;
     }
@@ -257,26 +280,6 @@ public class SpinController : MonoBehaviour
         }
     }
     
-    private List<MatchData> ConvertMatchesToMatchData(List<Match> matches)
-    {
-        if (matches == null) return null;
-        
-        var matchDataList = new List<MatchData>();
-
-        foreach (var match in matches)
-        {
-            matchDataList.Add(new MatchData
-            {
-                Type = match.Type,
-                Positions = match.Positions,
-                MatchedSymbol = match.Symbol,
-                GoldReward = GetGoldRewardForMatch(match.Type)
-            });
-        }
-
-        return matchDataList;
-    }
-    
     private int GetGoldRewardForMatch(MatchType type)
     {
         switch(type)
@@ -296,5 +299,14 @@ public class SpinController : MonoBehaviour
             default:
                 return 0;
         }
+    }
+
+    // Helper method to get current spin state
+    public bool HasActiveSpinResult() => spinResult != null;
+    
+    // Clear spin result (e.g., when starting new turn)
+    public void ClearSpinResult()
+    {
+        spinResult.Clear();
     }
 } 
