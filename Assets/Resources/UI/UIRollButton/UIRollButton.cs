@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RandomSpinButton : MonoBehaviour
+public class UIRollButton : MonoBehaviour
 {
     private Button button;
     
@@ -27,7 +27,7 @@ public class RandomSpinButton : MonoBehaviour
         SlotController.instance.FillGridWithRandomSymbols();
     }
     
-    public void TriggerRandomSpin()
+    public void TriggerRoll()
     {
         OnClick();
     }
