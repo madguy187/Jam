@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class Global {
 
-    public static bool IS_DEBUG = false;
+    public static bool IS_DEBUG = true;
 
     static public void DEBUG_PRINT(string strMessage) {
         if (!IS_DEBUG) {

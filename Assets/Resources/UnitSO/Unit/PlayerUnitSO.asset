@@ -14,4 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: test
   hp: 200
-  damage: 2
+  attack: 20
+  shield: 0
+  res: 0
+  critRate: 0
+  critMulti: 0
