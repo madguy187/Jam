@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
-public class SpinController : MonoBehaviour
+public class SlotController : MonoBehaviour
 {
-    public static SpinController instance;
+    public static SlotController instance;
     
     private SlotGrid slotGrid;
     private MatchDetector matchDetector;

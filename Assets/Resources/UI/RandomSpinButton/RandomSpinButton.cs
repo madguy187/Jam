@@ -24,7 +24,7 @@ public class RandomSpinButton : MonoBehaviour
     
     private void OnClick()
     {
-        SpinController.instance.FillGridWithRandomSymbols();
+        SlotController.instance.FillGridWithRandomSymbols();
     }
     
     public void TriggerRandomSpin()
