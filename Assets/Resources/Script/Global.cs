@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public static class Global {
 
@@ -11,5 +12,19 @@ public static class Global {
 
         Debug.Log(strMessage);
     }
+}
 
+public class SpinResult
+{
+    public List<MatchData> Matches;
+    public SymbolType[,] Grid;
+    public int SpinCost;
+}
+
+public class MatchData
+{
+    public MatchType Type;
+    public List<Vector2Int> Positions;
+    public SymbolType MatchedSymbol;
+    public int GoldReward;
 }

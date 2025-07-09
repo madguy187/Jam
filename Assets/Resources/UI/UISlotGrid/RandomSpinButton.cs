@@ -1,35 +1,34 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-// Handles the spin button click and triggerrs the spin
 public class RandomSpinButton : MonoBehaviour
 {
-    [SerializeField] private Button button;
-    
-    void Awake()
-    {
-        button = GetComponent<Button>();
-    }
+    private Button button;
     
     void Start()
     {
-        button.onClick.AddListener(OnButtonClick);
+        button = GetComponent<Button>();
+        if (button != null)
+        {
+            button.onClick.AddListener(OnClick);
+        }
     }
     
-    public void OnButtonClick()
+    void OnDestroy()
     {
-        if (SpinController.instance == null || SymbolGenerator.instance == null) return;
-        
-        SlotGridUI gridUI = FindObjectOfType<SlotGridUI>();
-        if (gridUI == null) return;
-        
-        if (gridUI.IsSpinning()) return;
-        
+        if (button != null)
+        {
+            button.onClick.RemoveListener(OnClick);
+        }
+    }
+    
+    private void OnClick()
+    {
         SpinController.instance.FillGridWithRandomSymbols();
     }
     
     public void TriggerRandomSpin()
     {
-        OnButtonClick();
+        OnClick();
     }
 } 

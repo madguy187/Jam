@@ -5,197 +5,170 @@ using System.Collections;
 public class SlotGridUI : MonoBehaviour
 {
     [Header("Slot Images")]
-    [SerializeField] private Image[] slotImages = new Image[9];
-    
+    [SerializeField] private Image slot0;
+    [SerializeField] private Image slot1;
+    [SerializeField] private Image slot2;
+    [SerializeField] private Image slot3;
+    [SerializeField] private Image slot4;
+    [SerializeField] private Image slot5;
+    [SerializeField] private Image slot6;
+    [SerializeField] private Image slot7;
+    [SerializeField] private Image slot8;
+
     [Header("Symbol Sprites")]
     [SerializeField] private Sprite attackSprite;
     [SerializeField] private Sprite defenseSprite;
     [SerializeField] private Sprite specialSprite;
     [SerializeField] private Sprite emptySprite;
-    
+
     [Header("Animation Settings")]
-    [SerializeField] [Range(1f, 10f)] private float spinDuration = 3f;
-    [SerializeField] [Range(0.2f, 2f)] private float slowdownDuration = 0.5f;
-    [SerializeField] [Range(1f, 10f)] private float spinSpeed = 5f;
-    [SerializeField] [Range(0.2f, 2f)] private float minSpinSpeed = 0.5f;
-    
-    public float TotalDuration => spinDuration + slowdownDuration;
-    
+    [SerializeField] [Range(0.5f, 5f)] private float spinDuration = 2f;
+    [SerializeField] [Range(0.1f, 1f)] private float symbolDropDelay = 0.1f;
+    [SerializeField] [Range(0.6f, 0.9f)] private float finalSymbolsStartTime = 0.7f;
+
+    private Image[] slots = new Image[9];
     private bool isSpinning = false;
-    private SymbolType[] finalResults = new SymbolType[9];
     private SymbolType[,] symbolCache = new SymbolType[3, 3];
-    
-    void Start()
+
+    private void Awake()
     {
-        InitializeSymbolCache();
-        SubscribeToEvents();
-    }
-    
-    // Create empty symbol grid for animation
-    private void InitializeSymbolCache()
-    {
+        slots[0] = slot0;
+        slots[1] = slot1;
+        slots[2] = slot2;
+        slots[3] = slot3;
+        slots[4] = slot4;
+        slots[5] = slot5;
+        slots[6] = slot6;
+        slots[7] = slot7;
+        slots[8] = slot8;
+
         for (int row = 0; row < 3; row++)
         {
             for (int col = 0; col < 3; col++)
             {
-                symbolCache[row, col] = SymbolType.Empty;
+                symbolCache[row, col] = SymbolType.EMPTY;
             }
         }
     }
-    
-    private void SubscribeToEvents()
+
+    private void UpdateSlotSymbol(int row, int col, SymbolType symbolType)
     {
-        if (SpinController.instance != null)
+        symbolCache[row, col] = symbolType;
+        int index = row * 3 + col;
+    
+        if (slots[index] != null)
         {
-            SpinController.instance.OnGridUpdated += UpdateGridDisplay;
-            UpdateGridDisplay();
+            slots[index].sprite = GetSpriteForSymbol(symbolType);
         }
     }
-    
-    // Update the visual state of all grid slots
-    public void UpdateGridDisplay()
+
+    private Sprite GetSpriteForSymbol(SymbolType symbolType)
     {
-        if (SpinController.instance == null) return;
-        
-        SlotGrid grid = SpinController.instance.GetSlotGrid();
-        
-        if (grid == null) return;
-        
-        UpdateAllSlots(grid);
-    }
-    
-    // Update each slot sprite based on its symbol type
-    private void UpdateAllSlots(SlotGrid grid)
-    {
-        for (int row = 0; row < 3; row++)
-        {
-            for (int col = 0; col < 3; col++)
-            {
-                int index = row * 3 + col;
-                GridSlot slot = grid.GetSlot(row, col);
-                
-                if (slot != null && index < slotImages.Length && slotImages[index] != null)
-                {
-                    SetSlotImage(slotImages[index], slot.symbolType);
-                }
-            }
-        }
-    }
-    
-    void SetSlotImage(Image slotImage, SymbolType symbolType)
-    {
-        slotImage.color = Color.white;
+        // Map each symbol type to its corresponding sprite
         switch (symbolType)
         {
-            case SymbolType.Attack:
-                slotImage.sprite = attackSprite;
-                break;
-            case SymbolType.Defense:
-                slotImage.sprite = defenseSprite;
-                break;
-            case SymbolType.Special:
-                slotImage.sprite = specialSprite;
-                break;
-            case SymbolType.Empty:
-                slotImage.sprite = emptySprite;
-                break;
+            case SymbolType.ATTACK:
+                return attackSprite;
+            case SymbolType.DEFENSE:
+                return defenseSprite;
+            case SymbolType.SPECIAL:
+                return specialSprite;
+            case SymbolType.EMPTY:
+            default:
+                return emptySprite;
         }
     }
     
-    // Start the spinning animation with the given final symbol arrangement
-    public void StartSpinAnimation(SymbolType[] finalResult)
+    public void UpdateGrid(SymbolType[] symbols)
     {
-        if (isSpinning) return;
+        if (symbols.Length != 9) return;
         
-        if (finalResult.Length != 9) return;
-        
-        isSpinning = true;
-        finalResults = finalResult;
-        
-        StartCoroutine(SpinAnimationCoroutine());
-    }
-    
-    // Handle the spinning animation sequence
-    private IEnumerator SpinAnimationCoroutine()
-    {
-        float elapsedTime = 0f;
-        float currentSpeed = spinSpeed;
-        float nextUpdateTime = 0f;
-        
-        while (elapsedTime < spinDuration)
-        {
-            if (Time.time >= nextUpdateTime)
-            {
-                UpdateSpinningSymbols();
-                nextUpdateTime = Time.time + (1f / currentSpeed);
-            }
-            
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-        
-        elapsedTime = 0f;
-        while (elapsedTime < slowdownDuration)
-        {
-            if (Time.time >= nextUpdateTime)
-            {
-                float t = elapsedTime / slowdownDuration;
-                currentSpeed = Mathf.Lerp(spinSpeed, minSpinSpeed, t);
-                
-                UpdateSpinningSymbols();
-                nextUpdateTime = Time.time + (1f / currentSpeed);
-            }
-            
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-        
-        DisplayFinalResults();
-        isSpinning = false;
-    }
-    
-    private void UpdateSpinningSymbols()
-    {
-        for (int row = 2; row > 0; row--)
-        {
-            for (int col = 0; col < 3; col++)
-            {
-                symbolCache[row, col] = symbolCache[row - 1, col];
-            }
-        }
-        
-        for (int col = 0; col < 3; col++)
-        {
-            int randomIndex = Random.Range(0, 3);
-            symbolCache[0, col] = (SymbolType)randomIndex;
-        }
-        
-        for (int row = 0; row < 3; row++)
-        {
-            for (int col = 0; col < 3; col++)
-            {
-                int index = row * 3 + col;
-                if (slotImages[index] != null)
-                {
-                    SetSlotImage(slotImages[index], symbolCache[row, col]);
-                }
-            }
-        }
-    }
-    
-    private void DisplayFinalResults()
-    {
         for (int i = 0; i < 9; i++)
         {
-            if (slotImages[i] != null)
+            if (slots[i] != null)
             {
-                SetSlotImage(slotImages[i], finalResults[i]);
+                slots[i].sprite = GetSpriteForSymbol(symbols[i]);
+                slots[i].color = Color.white;
             }
         }
+    }
+
+    public void StartSpinAnimation(SymbolType[] finalSymbols)
+    {
+        if (isSpinning) return;
+        isSpinning = true;
+        StartCoroutine(SpinAnimationCoroutine(finalSymbols));
+    }
+
+    private IEnumerator SpinAnimationCoroutine(SymbolType[] finalSymbols)
+    {
+        float elapsedTime = 0f;
+        float spinningPhaseTime = spinDuration * finalSymbolsStartTime;
+        
+        Global.DEBUG_PRINT($"Starting spin animation. Duration: {spinDuration}, Spinning phase: {spinningPhaseTime}");
+        
+        // Fast spinning phase
+        while (elapsedTime < spinningPhaseTime)
+        {
+            // Generate random temporary symbols for spin effect
+            for (int row = 0; row < 3; row++)
+            {
+                for (int col = 0; col < 3; col++)
+                {
+                    UpdateSlotSymbol(row, col, SymbolGenerator.instance.GenerateRandomSymbol());
+                }
+            }
+            
+            yield return new WaitForSeconds(0.05f);
+            elapsedTime += 0.05f;
+        }
+
+        Global.DEBUG_PRINT("Spin phase complete, showing final symbols");
+        
+        // Show final symbols
+        UpdateGrid(finalSymbols);
+        
+        // Wait for the remaining duration
+        float remainingTime = spinDuration * (1 - finalSymbolsStartTime);
+        Global.DEBUG_PRINT($"Waiting remaining time: {remainingTime}");
+        yield return new WaitForSeconds(remainingTime);
+        
+        isSpinning = false;
+        Global.DEBUG_PRINT("Spin animation complete");
     }
     
     public bool IsSpinning()
     {
         return isSpinning;
     }
+
+    public float GetSpinDuration()
+    { 
+        return spinDuration; 
+    }
+
+    public float GetSymbolDropDelay()
+    { 
+        return symbolDropDelay; 
+    }
+
+    public float GetFinalSymbolsStartTime()
+    { 
+        return finalSymbolsStartTime; 
+    }
+
+    public void SetSpinDuration(float duration) 
+    { 
+        spinDuration = Mathf.Clamp(duration, 0.5f, 5f); 
+    }
+
+    public void SetSymbolDropDelay(float delay) 
+    { 
+        symbolDropDelay = Mathf.Clamp(delay, 0.1f, 1f); 
+    }
+
+    public void SetFinalSymbolsStartTime(float time) 
+    { 
+        finalSymbolsStartTime = Mathf.Clamp(time, 0.6f, 0.9f); 
+        }
 } 
