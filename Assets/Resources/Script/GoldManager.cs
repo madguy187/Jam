@@ -2,11 +2,11 @@ using UnityEngine;
 
 public static class GoldConstants
 {
-    public const int HORIZONTAL_REWARD = 2;
-    public const int DIAGONAL_REWARD = 3;
-    public const int ZIGZAG_REWARD = 4;
-    public const int XSHAPE_REWARD = 5;
-    public const int FULL_GRID_REWARD = 10;
+    public const int HORIZONTAL_REWARD = 3; 
+    public const int DIAGONAL_REWARD = 4;   
+    public const int ZIGZAG_REWARD = 5;  
+    public const int XSHAPE_REWARD = 6;      
+    public const int FULL_GRID_REWARD = 10; 
 
     public const int BASE_INCOME_PER_ROUND = 5;
     public const int WIN_ROUND_BONUS = 3;

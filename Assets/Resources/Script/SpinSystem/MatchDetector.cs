@@ -113,7 +113,10 @@ public class MatchDetector
         List<Match> matches = new List<Match>();
         matchedPositions.Clear();
         
-        // Detect patterns first
+        // Detect single matches FIRST (according to GDD)
+        var singleMatches = DetectSingleMatches();
+        matches.AddRange(singleMatches);
+        
         var horizontalMatches = DetectHorizontalMatches();
         matches.AddRange(horizontalMatches);
         
@@ -129,22 +132,8 @@ public class MatchDetector
         Match fullGridMatch = DetectFullGridMatch();
         if (fullGridMatch != null)
         {
-            Global.DEBUG_PRINT("Found full grid match");
             matches.Add(fullGridMatch);
         }
-
-/*
-        Global.DEBUG_PRINT($"Found {horizontalMatches.Count} horizontal matches");
-        Global.DEBUG_PRINT($"Found {diagonalMatches.Count} diagonal matches");
-        Global.DEBUG_PRINT($"Found {zigzagMatches.Count} zigzag matches");
-        Global.DEBUG_PRINT($"Found {xShapeMatches.Count} X-shape matches");
-        Global.DEBUG_PRINT($"Matched positions before singles: {matchedPositions.Count}");
-        */
-        
-        // Then detect single matches for any unmatched positions
-        var singleMatches = DetectSingleMatches();
-        Global.DEBUG_PRINT($"Found {singleMatches.Count} single matches");
-        matches.AddRange(singleMatches);
         
         return matches;
     }
