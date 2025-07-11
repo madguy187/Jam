@@ -16,9 +16,17 @@ public class SlotController : MonoBehaviour
     private SpinResult spinResult;
     private int currentSpinCost;
     
-    public bool IsSpinning => isSpinning;
-    public int CurrentSpinCost => GetNextSpinCost();
-    public bool HasFreeSpinsRemaining => spinsThisTurn < FREE_SPINS_PER_TURN;
+    public bool GetIsSpinning() {
+        return isSpinning;
+    }
+    
+    public int GetCurrentSpinCost() {
+        return GetNextSpinCost();
+    }
+    
+    public bool GetHasFreeSpinsRemaining() {
+        return spinsThisTurn < FREE_SPINS_PER_TURN;
+    }
     
     private void Awake()
     {
@@ -32,10 +40,9 @@ public class SlotController : MonoBehaviour
             return;
         }
         
-        // Create new instances since these are regular classes, not MonoBehaviours
         slotGrid = new SlotGrid();
         matchDetector = new MatchDetector(slotGrid);
-        spinResult = new SpinResult(new List<Match>(), 0);  // Initialize with empty matches
+        spinResult = new SpinResult(new List<Match>(), 0); 
     }
     
     public void FillGridWithRandomSymbols(bool autoSpendGold = true)
@@ -46,7 +53,7 @@ public class SlotController : MonoBehaviour
         }
 
         SlotGridUI gridUI = FindObjectOfType<SlotGridUI>();
-        if (gridUI == null || gridUI.IsSpinning())
+        if (gridUI == null || gridUI.GetIsSpinning())
         {
             return;
         }
@@ -93,7 +100,7 @@ public class SlotController : MonoBehaviour
     private IEnumerator WaitForSpinComplete(SlotGridUI gridUI, bool autoSpendGold)
     {
         // Wait for spin animation to complete
-        while (gridUI.IsSpinning())
+        while (gridUI.GetIsSpinning())
         {
             yield return null;
         }
@@ -107,9 +114,9 @@ public class SlotController : MonoBehaviour
         {
             foreach (Match match in matches)
             {
-                if (match.Type != MatchType.SINGLE)
+                if (match.GetMatchType() != MatchType.SINGLE)
                 {
-                    int goldReward = GetGoldRewardForMatch(match.Type);
+                    int goldReward = GetGoldRewardForMatch(match.GetMatchType());
                     totalGold += goldReward;
                     GoldManager.instance.AddGold(goldReward);
                 }
@@ -129,7 +136,6 @@ public class SlotController : MonoBehaviour
     {
         Global.DEBUG_PRINT("=== SPIN RESULT ===");
         
-        // Print exactly what GetAllMatches() returns
         List<Match> allMatches = spinResult.GetAllMatches();
         if (allMatches.Count == 0)
         {
@@ -137,10 +143,16 @@ public class SlotController : MonoBehaviour
         }
         else 
         {
-            foreach (Match match in allMatches)
+            // Group matches by type
+            var matchesByType = allMatches.GroupBy(m => m.GetMatchType());
+            
+            foreach (var group in matchesByType)
             {
-                string positions = string.Join(", ", match.Positions.Select(p => $"({p.x},{p.y})"));
-                Global.DEBUG_PRINT($"Match: Type={match.Type}, Symbol={match.Symbol}, Positions={positions}");
+                Global.DEBUG_PRINT($"\n{group.Key} Matches:");
+                foreach (var match in group)
+                {
+                    Global.DEBUG_PRINT($"  - {match.GetSymbol()} at positions: {string.Join(", ", match.GetReadablePositions())}");
+                }
             }
         }
         
@@ -155,7 +167,7 @@ public class SlotController : MonoBehaviour
         }
         
         SlotGridUI gridUI = FindObjectOfType<SlotGridUI>();
-        if (gridUI == null || gridUI.IsSpinning() || isSpinning)
+        if (gridUI == null || gridUI.GetIsSpinning() || isSpinning)
         {
             return;
         } 
@@ -224,24 +236,7 @@ public class SlotController : MonoBehaviour
     
     private List<Match> CheckForMatches()
     {
-        List<Match> matches = matchDetector.DetectAllMatches();
-        
-        // Debugging function , can comment out
-        /*Global.DEBUG_PRINT("=== Match Types Found ===");
-        if (matches.Count > 0)
-        {
-            foreach (Match match in matches)
-            {
-                Global.DEBUG_PRINT($"Match: {match.Type} with symbol: {match.Symbol}");
-            }
-        }
-        else
-        {
-            Global.DEBUG_PRINT("No matches");
-        }
-        Global.DEBUG_PRINT("=====================");
-        */
-        
+        List<Match> matches = matchDetector.DetectMatches();
         return matches;
     }
     
@@ -260,34 +255,16 @@ public class SlotController : MonoBehaviour
         }
     }
     
-    private string GetMatchDescription(MatchType type)
-    {
-        switch(type) {
-            case MatchType.SINGLE:
-                return "Single Symbol";
-            case MatchType.HORIZONTAL:
-                return "Row Match";
-            case MatchType.DIAGONAL:
-                return "Diagonal Match";
-            case MatchType.XSHAPE:
-                return "X-Shape Match";
-            case MatchType.FULLGRID:
-                return "Full Grid Match";
-            case MatchType.ZIGZAG:
-                return "Zigzag Match";
-            default:
-                return "Unknown Match";
-        }
-    }
-    
     private int GetGoldRewardForMatch(MatchType type)
     {
         switch(type)
         {
             case MatchType.SINGLE:
-                return 0;  // Single matches don't give gold rewards
+                return 0;
             case MatchType.HORIZONTAL:
                 return GoldConstants.HORIZONTAL_REWARD;
+            case MatchType.VERTICAL:
+                return GoldConstants.VERTICAL_REWARD;
             case MatchType.DIAGONAL:
                 return GoldConstants.DIAGONAL_REWARD;
             case MatchType.ZIGZAG:
@@ -301,10 +278,11 @@ public class SlotController : MonoBehaviour
         }
     }
 
-    // Helper method to get current spin state
-    public bool HasActiveSpinResult() => spinResult != null;
+    public bool GetHasActiveSpinResult() 
+    {
+        return spinResult != null;
+    }
     
-    // Clear spin result (e.g., when starting new turn)
     public void ClearSpinResult()
     {
         spinResult.Clear();

@@ -134,7 +134,7 @@ public class SlotGridUI : MonoBehaviour
         Global.DEBUG_PRINT("Spin complete");
     }
     
-    public bool IsSpinning()
+    public bool GetIsSpinning()
     {
         return isSpinning;
     }

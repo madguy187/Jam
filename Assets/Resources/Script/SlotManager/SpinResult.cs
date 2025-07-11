@@ -20,13 +20,8 @@ public class SpinResult
         allMatches = matches ?? new List<Match>();
         totalGoldEarned = goldEarned;
         
-        // Sort matches by type
-        matchesByType = allMatches.GroupBy(m => m.Type)
-                                 .ToDictionary(g => g.Key, g => g.ToList());
-        
-        // Sort single matches by symbol for easy access
-        singleMatches = allMatches.Where(m => m.Type == MatchType.SINGLE)
-                                 .ToDictionary(m => m.Symbol, m => m);
+        matchesByType = allMatches.GroupBy(m => m.GetMatchType()).ToDictionary(g => g.Key, g => g.ToList());
+        singleMatches = allMatches.Where(m => m.GetMatchType() == MatchType.SINGLE).ToDictionary(m => m.GetSymbol(), m => m);
     }
 
     public void Clear()

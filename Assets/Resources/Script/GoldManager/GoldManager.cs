@@ -3,6 +3,7 @@ using UnityEngine;
 public static class GoldConstants
 {
     public const int HORIZONTAL_REWARD = 3; 
+    public const int VERTICAL_REWARD = 3;   
     public const int DIAGONAL_REWARD = 4;   
     public const int ZIGZAG_REWARD = 5;  
     public const int XSHAPE_REWARD = 6;      
