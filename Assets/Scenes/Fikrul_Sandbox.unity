@@ -187,7 +187,7 @@ MonoBehaviour:
   allMapConfigs:
   - {fileID: 11400000, guid: 85443045eb1eb0446bc8e30eef1e3e56, type: 2}
   nodePrefab: {fileID: 6746199761131337685, guid: 923b2cff3cdf6db478949840b0db04e6, type: 3}
-  orientationOffset: -4
+  orientationOffset: 0
   background: {fileID: 4828770799117906769, guid: 4970d3754d5e9f948a61f8133f598ad1, type: 3}
   backgroundColor:
     serializedVersion: 2
@@ -414,7 +414,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 7
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

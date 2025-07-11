@@ -9,23 +9,26 @@ namespace Map {
         public Map CurrentMap { get; private set; }
 
         private void Start() {
-            if (PlayerPrefs.HasKey("Map")) {
-                string mapJson = PlayerPrefs.GetString("Map");
-                // Deserialize using DTO
-                MapDTO mapDTO = JsonUtility.FromJson<MapDTO>(mapJson);
-                Map map = Map.FromDTO(mapDTO);
-
-                if (map.path.Any(p => p.Equals(map.GetBossNode().point))) {
-                    // player has already reached the boss, generate a new map
-                    GenerateNewMap();
-                } else {
-                    CurrentMap = map;
-                    // player has not reached the boss yet, load the current map
-                    view.ShowMap(map);
-                }
-            } else {
-                GenerateNewMap();
-            }
+            // PlayerPrefs.DeleteKey("Map");
+            // PlayerPrefs.Save();
+            // if (PlayerPrefs.HasKey("Map")) {
+            //     string mapJson = PlayerPrefs.GetString("Map");
+            //     // Deserialize using DTO
+            //     MapDTO mapDTO = JsonUtility.FromJson<MapDTO>(mapJson);
+            //     Map map = Map.FromDTO(mapDTO);
+            // 
+            //     if (map.path.Any(p => p.Equals(map.GetBossNode().point))) {
+            //         // player has already reached the boss, generate a new map
+            //         GenerateNewMap();
+            //     } else {
+            //         CurrentMap = map;
+            //         // player has not reached the boss yet, load the current map
+            //         view.ShowMap(map);
+            //     }
+            // } else {
+            //     GenerateNewMap();
+            // }
+            GenerateNewMap();
         }
 
         public void GenerateNewMap() {
@@ -46,7 +49,7 @@ namespace Map {
         }
 
         private void OnApplicationQuit() {
-            SaveMap();
+            // SaveMap();
         }
     }
 }

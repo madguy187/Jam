@@ -7,7 +7,7 @@ namespace Map {
         public List<NodeBlueprint> nodeBlueprints;
         [Tooltip("Nodes that will be used on layers with Randomize Nodes > 0")]
         public List<NodeType> randomNodes = new List<NodeType>
-            {NodeType.Enemy, NodeType.MiniBoss, NodeType.Encounter, NodeType.Shop, NodeType.MajorBoss};
+            {NodeType.Enemy, NodeType.MiniBoss, NodeType.Encounter, NodeType.Shop};
         public int GridWidth => Mathf.Max(numOfPreBossNodes.max, numOfStartingNodes.max);
 
         [Header("Pre Boss Nodes")]

@@ -107,6 +107,7 @@ namespace Map {
             backgroundObject.transform.localPosition = new Vector3(bossNode.transform.localPosition.x, span / 2f, 0f);
             backgroundObject.transform.localRotation = Quaternion.identity;
             SpriteRenderer sr = backgroundObject.AddComponent<SpriteRenderer>();
+            sr.sortingOrder = 0;
             sr.color = backgroundColor;
             sr.drawMode = SpriteDrawMode.Sliced;
             sr.sprite = background;
@@ -267,6 +268,7 @@ namespace Map {
 
             GameObject lineObject = Instantiate(linePrefab, mapParent.transform);
             LineRenderer lineRenderer = lineObject.GetComponent<LineRenderer>();
+            lineRenderer.sortingOrder = 10;
             Vector3 fromPoint = from.transform.position +
                                 (to.transform.position - from.transform.position).normalized * offsetFromNodes;
 
