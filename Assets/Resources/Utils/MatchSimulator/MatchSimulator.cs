@@ -19,9 +19,7 @@ namespace Utils.Tests
             {
                 return;
             }
-
-            Global.DEBUG_PRINT("Starting Test Scenarios Run - check match_test file for detailed results");
-            
+                        
             grid = new SlotGrid();
             detector = new MatchDetector(grid);
             InitializeLogFile();
@@ -199,7 +197,6 @@ namespace Utils.Tests
             sb.AppendLine("-------------");
             LogMessage(sb.ToString());
 
-            // Print matches
             var matches = detector.DetectMatches();
             LogMessage("\n=== Raw Detector Output ===");
             LogMessage($"Total Raw Matches Found: {matches.Count}");
