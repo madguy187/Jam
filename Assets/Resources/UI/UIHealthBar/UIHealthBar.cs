@@ -19,6 +19,6 @@ public class UIHealthBar : MonoBehaviour
         pos.y += 0.8f;
         rect.position = pos;
 
-        //_slider.value = _unit.GetHealthPercentage();
+        _slider.value = _unit.GetHealthPercentage();
     }
 }
