@@ -1,0 +1,581 @@
+=== Starting Match Simulation Tests ===
+
+
+Scenario 1: Full Grid Pattern
+----------------------------------------
+
+Current Grid State:
+-------------
+| A A A |
+| A A A |
+| A A A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 12
+
+SINGLE Matches:
+
+HORIZONTAL Matches:
+  - ATTACK at positions: TOPLEFT, TOPMIDDLE, TOPRIGHT
+  - ATTACK at positions: MIDDLELEFT, CENTER, MIDDLERIGHT
+  - ATTACK at positions: BOTTOMLEFT, BOTTOMMIDDLE, BOTTOMRIGHT
+
+VERTICAL Matches:
+  - ATTACK at positions: TOPLEFT, MIDDLELEFT, BOTTOMLEFT
+  - ATTACK at positions: TOPMIDDLE, CENTER, BOTTOMMIDDLE
+  - ATTACK at positions: TOPRIGHT, MIDDLERIGHT, BOTTOMRIGHT
+
+DIAGONAL Matches:
+  - ATTACK at positions: TOPLEFT, CENTER, BOTTOMRIGHT
+  - ATTACK at positions: TOPRIGHT, CENTER, BOTTOMLEFT
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 2: X-Shape with Center
+----------------------------------------
+
+Current Grid State:
+-------------
+| A - A |
+| - D - |
+| A - A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 2
+
+SINGLE Matches:
+  - ATTACK at positions: TOPLEFT
+  - DEFENSE at positions: CENTER
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 3: Alternating Pattern
+----------------------------------------
+
+Current Grid State:
+-------------
+| A D A |
+| D A D |
+| A D A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 4
+
+SINGLE Matches:
+  - DEFENSE at positions: TOPMIDDLE
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+  - ATTACK at positions: TOPLEFT, CENTER, BOTTOMRIGHT
+  - ATTACK at positions: TOPRIGHT, CENTER, BOTTOMLEFT
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 4: Triple Symbol Mix
+----------------------------------------
+
+Current Grid State:
+-------------
+| A D S |
+| D S A |
+| S A D |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 3
+
+SINGLE Matches:
+  - ATTACK at positions: TOPLEFT
+  - DEFENSE at positions: TOPMIDDLE
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+  - SPECIAL at positions: TOPRIGHT, CENTER, BOTTOMLEFT
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 5: Enclosed Pattern
+----------------------------------------
+
+Current Grid State:
+-------------
+| D D D |
+| D A D |
+| D D D |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 5
+
+SINGLE Matches:
+  - ATTACK at positions: CENTER
+
+HORIZONTAL Matches:
+  - DEFENSE at positions: TOPLEFT, TOPMIDDLE, TOPRIGHT
+  - DEFENSE at positions: BOTTOMLEFT, BOTTOMMIDDLE, BOTTOMRIGHT
+
+VERTICAL Matches:
+  - DEFENSE at positions: TOPLEFT, MIDDLELEFT, BOTTOMLEFT
+  - DEFENSE at positions: TOPRIGHT, MIDDLERIGHT, BOTTOMRIGHT
+
+DIAGONAL Matches:
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 6: Diagonal Chain
+----------------------------------------
+
+Current Grid State:
+-------------
+| A - - |
+| - A - |
+| - - A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 1
+
+SINGLE Matches:
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+  - ATTACK at positions: TOPLEFT, CENTER, BOTTOMRIGHT
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 7: Mixed Complex
+----------------------------------------
+
+Current Grid State:
+-------------
+| A D S |
+| S A D |
+| D S A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 3
+
+SINGLE Matches:
+  - DEFENSE at positions: TOPMIDDLE
+  - SPECIAL at positions: TOPRIGHT
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+  - ATTACK at positions: TOPLEFT, CENTER, BOTTOMRIGHT
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 8: Double X-Shape
+----------------------------------------
+
+Current Grid State:
+-------------
+| A S A |
+| S D S |
+| A S A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 3
+
+SINGLE Matches:
+  - ATTACK at positions: TOPLEFT
+  - SPECIAL at positions: TOPMIDDLE
+  - DEFENSE at positions: CENTER
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 9: Horizontal-Vertical Mix
+----------------------------------------
+
+Current Grid State:
+-------------
+| A A A |
+| D A S |
+| D A S |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 4
+
+SINGLE Matches:
+  - DEFENSE at positions: MIDDLELEFT
+  - SPECIAL at positions: MIDDLERIGHT
+
+HORIZONTAL Matches:
+  - ATTACK at positions: TOPLEFT, TOPMIDDLE, TOPRIGHT
+
+VERTICAL Matches:
+  - ATTACK at positions: TOPMIDDLE, CENTER, BOTTOMMIDDLE
+
+DIAGONAL Matches:
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 10: Complex Distribution
+----------------------------------------
+
+Current Grid State:
+-------------
+| A S D |
+| D A S |
+| S D A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 3
+
+SINGLE Matches:
+  - SPECIAL at positions: TOPMIDDLE
+  - DEFENSE at positions: TOPRIGHT
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+  - ATTACK at positions: TOPLEFT, CENTER, BOTTOMRIGHT
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 11: Nested X Pattern
+----------------------------------------
+
+Current Grid State:
+-------------
+| A D A |
+| D A D |
+| A D A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 4
+
+SINGLE Matches:
+  - DEFENSE at positions: TOPMIDDLE
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+  - ATTACK at positions: TOPLEFT, CENTER, BOTTOMRIGHT
+  - ATTACK at positions: TOPRIGHT, CENTER, BOTTOMLEFT
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 12: Triple Diagonal Intersection
+----------------------------------------
+
+Current Grid State:
+-------------
+| A S D |
+| S A S |
+| D S A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 3
+
+SINGLE Matches:
+  - SPECIAL at positions: TOPMIDDLE
+  - DEFENSE at positions: TOPRIGHT
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+  - ATTACK at positions: TOPLEFT, CENTER, BOTTOMRIGHT
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 13: Spiral Pattern
+----------------------------------------
+
+Current Grid State:
+-------------
+| A A A |
+| S A D |
+| S S D |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 4
+
+SINGLE Matches:
+  - ATTACK at positions: CENTER
+  - SPECIAL at positions: MIDDLELEFT
+  - DEFENSE at positions: MIDDLERIGHT
+
+HORIZONTAL Matches:
+  - ATTACK at positions: TOPLEFT, TOPMIDDLE, TOPRIGHT
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 14: Alternating Corners
+----------------------------------------
+
+Current Grid State:
+-------------
+| A D S |
+| D - D |
+| S D A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 3
+
+SINGLE Matches:
+  - ATTACK at positions: TOPLEFT
+  - DEFENSE at positions: TOPMIDDLE
+  - SPECIAL at positions: TOPRIGHT
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 15: Double Diagonal Cross
+----------------------------------------
+
+Current Grid State:
+-------------
+| A S A |
+| D A D |
+| A S A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 5
+
+SINGLE Matches:
+  - SPECIAL at positions: TOPMIDDLE
+  - DEFENSE at positions: MIDDLELEFT
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+  - ATTACK at positions: TOPLEFT, CENTER, BOTTOMRIGHT
+  - ATTACK at positions: TOPRIGHT, CENTER, BOTTOMLEFT
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 16: Zigzag Chain
+----------------------------------------
+
+Current Grid State:
+-------------
+| A D - |
+| - A D |
+| - - A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 2
+
+SINGLE Matches:
+  - DEFENSE at positions: TOPMIDDLE
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+  - ATTACK at positions: TOPLEFT, CENTER, BOTTOMRIGHT
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 17: Symmetrical Distribution
+----------------------------------------
+
+Current Grid State:
+-------------
+| A S A |
+| D D D |
+| A S A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 3
+
+SINGLE Matches:
+  - ATTACK at positions: TOPLEFT
+  - SPECIAL at positions: TOPMIDDLE
+
+HORIZONTAL Matches:
+  - DEFENSE at positions: MIDDLELEFT, CENTER, MIDDLERIGHT
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 18: Triple Symbol Cascade
+----------------------------------------
+
+Current Grid State:
+-------------
+| A D S |
+| D S A |
+| S A D |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 3
+
+SINGLE Matches:
+  - ATTACK at positions: TOPLEFT
+  - DEFENSE at positions: TOPMIDDLE
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+  - SPECIAL at positions: TOPRIGHT, CENTER, BOTTOMLEFT
+
+>>> End of Scenario <<<
+
+========================================
+
+
+Scenario 19: Complex Corner Connection
+----------------------------------------
+
+Current Grid State:
+-------------
+| A - A |
+| S D S |
+| A - A |
+-------------
+
+
+=== Raw Detector Output ===
+Total Raw Matches Found: 3
+
+SINGLE Matches:
+  - ATTACK at positions: TOPLEFT
+  - SPECIAL at positions: MIDDLELEFT
+  - DEFENSE at positions: CENTER
+
+HORIZONTAL Matches:
+
+VERTICAL Matches:
+
+DIAGONAL Matches:
+
+>>> End of Scenario <<<
+
+========================================
+
+
+=== Match Simulation Tests Complete ===
+Total Scenarios Run: 19
