@@ -289,7 +289,7 @@ namespace Map {
             DottedLineRenderer dottedLine = lineObject.GetComponent<DottedLineRenderer>();
             if (dottedLine != null) dottedLine.ScaleMaterial();
 
-            lineConnections.Add(new LineConnection(lineRenderer, null, from, to));
+            lineConnections.Add(new LineConnection(lineRenderer, from, to));
         }
 
         protected MapNode GetNode(Vector2Int p) {

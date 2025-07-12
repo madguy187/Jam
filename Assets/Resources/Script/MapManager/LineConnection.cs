@@ -1,17 +1,17 @@
 using UnityEngine;
-using UnityEngine.UI.Extensions;
+// using UnityEngine.UI.Extensions;
 
 namespace Map {
     [System.Serializable]
     public class LineConnection {
         public LineRenderer lr;
-        public UILineRenderer uilr;
+        // public UILineRenderer uilr;
         public MapNode from;
         public MapNode to;
 
-        public LineConnection(LineRenderer lr, UILineRenderer uilr, MapNode from, MapNode to) {
+        public LineConnection(LineRenderer lr, MapNode from, MapNode to) {
             this.lr = lr;
-            this.uilr = uilr;
+            // this.uilr = uilr;
             this.from = from;
             this.to = to;
         }
@@ -28,7 +28,7 @@ namespace Map {
                 lr.colorGradient = gradient;
             }
 
-            if (uilr != null) uilr.color = color;
+            // if (uilr != null) uilr.color = color;
         }
     }
 }

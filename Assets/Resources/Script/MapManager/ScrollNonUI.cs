@@ -2,36 +2,48 @@ using System.Collections;
 using UnityEngine;
 
 namespace Map {
+    /// Allows a non-UI GameObject to be dragged with the mouse and 
+    /// snapped back within specified constraints
     public class ScrollNonUI : MonoBehaviour {
-        // Tween -> In-between for interpolating animations
-        public float tweenBackDuration = 0.3f;
+        /// Duration (in seconds) for the snap-back animation when the object is
+        /// released outside constraints
+        public float snapBackDuration = 0.3f;
+        /// If true, disables movement along the X axis
         public bool freezeX;
+        /// Minimum and maximum allowed X positions (used if freezeY is true)
         public FloatMinMax xConstraints = new FloatMinMax();
+        /// If true, disables movement along the Y axis
         public bool freezeY;
+        /// Minimum and maximum allowed Y positions (used if freezeX is true)
         public FloatMinMax yConstraints = new FloatMinMax();
+
         private Vector2 offset;
         private Vector3 pointerDisplacement;
         private float zDisplacement;
         private bool dragging;
         private Camera mainCamera;
 
-        // Coroutine for tweening
-        private Coroutine tweenCoroutine;
+        // Coroutine for snapping back
+        private Coroutine snapBackCoroutine;
 
+        ///  Initializes the main camera reference and calculates the Z displacement 
+        ///  for mouse world position
         private void Awake() {
             mainCamera = Camera.main;
             zDisplacement = -mainCamera.transform.position.z + transform.position.z;
         }
 
+        /// Begins dragging and stops any ongoing snap-back animation
         public void OnMouseDown() {
             pointerDisplacement = -transform.position + MouseInWorldCoords();
-            StopTween();
+            StopSnapBack();
             dragging = true;
         }
 
+        /// Ends dragging and checks if the object needs to snap back to constraints
         public void OnMouseUp() {
             dragging = false;
-            TweenBack();
+            SnapBackToConstraints();
         }
 
         private void Update() {
@@ -44,40 +56,44 @@ namespace Map {
                 transform.position.z);
         }
 
-        // returns mouse position in World coordinates for our GameObject to follow. 
+        // Returns mouse position in World coordinates for our GameObject to follow. 
         private Vector3 MouseInWorldCoords() {
             Vector3 screenMousePos = Input.mousePosition;
             screenMousePos.z = zDisplacement;
             return mainCamera.ScreenToWorldPoint(screenMousePos);
         }
 
-        private void TweenBack() {
+        /// Updates the GameObject's position to follow the mouse while dragging
+        private void SnapBackToConstraints() {
             if (freezeY) {
                 if (transform.localPosition.x >= xConstraints.min && transform.localPosition.x <= xConstraints.max)
                     return;
 
                 float targetX = transform.localPosition.x < xConstraints.min ? xConstraints.min : xConstraints.max;
-                StartTweenLocalPositionX(targetX, tweenBackDuration);
+                StartSnapBackLocalPositionX(targetX, snapBackDuration);
             } else if (freezeX) {
                 if (transform.localPosition.y >= yConstraints.min && transform.localPosition.y <= yConstraints.max)
                     return;
 
                 float targetY = transform.localPosition.y < yConstraints.min ? yConstraints.min : yConstraints.max;
-                StartTweenLocalPositionY(targetY, tweenBackDuration);
+                StartSnapBackLocalPositionY(targetY, snapBackDuration);
             }
         }
 
-        private void StartTweenLocalPositionX(float targetX, float duration) {
-            StopTween();
-            tweenCoroutine = StartCoroutine(TweenLocalPositionX(targetX, duration));
+        /// Returns the mouse position in world coordinates at the object's Z depth
+        private void StartSnapBackLocalPositionX(float targetX, float duration) {
+            StopSnapBack();
+            snapBackCoroutine = StartCoroutine(AnimateLocalPositionX(targetX, duration));
         }
 
-        private void StartTweenLocalPositionY(float targetY, float duration) {
-            StopTween();
-            tweenCoroutine = StartCoroutine(TweenLocalPositionY(targetY, duration));
+        /// If the object is outside its allowed constraints, animates it back within bounds
+        private void StartSnapBackLocalPositionY(float targetY, float duration) {
+            StopSnapBack();
+            snapBackCoroutine = StartCoroutine(AnimateLocalPositionY(targetY, duration));
         }
 
-        private IEnumerator TweenLocalPositionX(float targetX, float duration) {
+        /// Starts the coroutine to animate the object's local X position back to the target value
+        private IEnumerator AnimateLocalPositionX(float targetX, float duration) {
             float startX = transform.localPosition.x;
             float elapsed = 0f;
             Vector3 startPos = transform.localPosition;
@@ -91,10 +107,11 @@ namespace Map {
                 yield return null;
             }
             transform.localPosition = endPos;
-            tweenCoroutine = null;
+            snapBackCoroutine = null;
         }
 
-        private IEnumerator TweenLocalPositionY(float targetY, float duration) {
+        /// Starts the coroutine to animate the object's local Y position back to the target value
+        private IEnumerator AnimateLocalPositionY(float targetY, float duration) {
             float startY = transform.localPosition.y;
             float elapsed = 0f;
             Vector3 startPos = transform.localPosition;
@@ -108,13 +125,14 @@ namespace Map {
                 yield return null;
             }
             transform.localPosition = endPos;
-            tweenCoroutine = null;
+            snapBackCoroutine = null;
         }
 
-        private void StopTween() {
-            if (tweenCoroutine != null) {
-                StopCoroutine(tweenCoroutine);
-                tweenCoroutine = null;
+        /// Coroutine that animates the object's local Y position to the target value over the given duration
+        private void StopSnapBack() {
+            if (snapBackCoroutine != null) {
+                StopCoroutine(snapBackCoroutine);
+                snapBackCoroutine = null;
             }
         }
     }
