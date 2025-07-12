@@ -1,10 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
-namespace Map {
+namespace Map 
+{
     /// Allows a non-UI GameObject to be dragged with the mouse and 
     /// snapped back within specified constraints
-    public class ScrollNonUI : MonoBehaviour {
+    public class ScrollNonUI : MonoBehaviour 
+    {
         /// Duration (in seconds) for the snap-back animation when the object is
         /// released outside constraints
         public float snapBackDuration = 0.3f;
@@ -28,26 +30,30 @@ namespace Map {
 
         ///  Initializes the main camera reference and calculates the Z displacement 
         ///  for mouse world position
-        private void Awake() {
+        private void Awake() 
+        {
             mainCamera = Camera.main;
             zDisplacement = -mainCamera.transform.position.z + transform.position.z;
         }
 
         /// Begins dragging and stops any ongoing snap-back animation
-        public void OnMouseDown() {
+        public void OnMouseDown() 
+        {
             pointerDisplacement = -transform.position + MouseInWorldCoords();
             StopSnapBack();
             dragging = true;
         }
 
         /// Ends dragging and checks if the object needs to snap back to constraints
-        public void OnMouseUp() {
+        public void OnMouseUp() 
+        {
             dragging = false;
             SnapBackToConstraints();
         }
 
-        private void Update() {
-            if (!dragging) return;
+        private void Update()
+        {
+            if (!dragging) { return; }
 
             Vector3 mousePos = MouseInWorldCoords();
             transform.position = new Vector3(
@@ -57,43 +63,48 @@ namespace Map {
         }
 
         // Returns mouse position in World coordinates for our GameObject to follow. 
-        private Vector3 MouseInWorldCoords() {
+        private Vector3 MouseInWorldCoords() 
+        {
             Vector3 screenMousePos = Input.mousePosition;
             screenMousePos.z = zDisplacement;
             return mainCamera.ScreenToWorldPoint(screenMousePos);
         }
 
         /// Updates the GameObject's position to follow the mouse while dragging
-        private void SnapBackToConstraints() {
+        private void SnapBackToConstraints() 
+        {
             if (freezeY) {
-                if (transform.localPosition.x >= xConstraints.min && transform.localPosition.x <= xConstraints.max)
+                if (transform.localPosition.x >= xConstraints.min && transform.localPosition.x <= xConstraints.max) {
                     return;
-
+                }
                 float targetX = transform.localPosition.x < xConstraints.min ? xConstraints.min : xConstraints.max;
                 StartSnapBackLocalPositionX(targetX, snapBackDuration);
             } else if (freezeX) {
-                if (transform.localPosition.y >= yConstraints.min && transform.localPosition.y <= yConstraints.max)
+                if (transform.localPosition.y >= yConstraints.min && transform.localPosition.y <= yConstraints.max) {
                     return;
-
+                }
                 float targetY = transform.localPosition.y < yConstraints.min ? yConstraints.min : yConstraints.max;
                 StartSnapBackLocalPositionY(targetY, snapBackDuration);
             }
         }
 
         /// Returns the mouse position in world coordinates at the object's Z depth
-        private void StartSnapBackLocalPositionX(float targetX, float duration) {
+        private void StartSnapBackLocalPositionX(float targetX, float duration) 
+        {
             StopSnapBack();
             snapBackCoroutine = StartCoroutine(AnimateLocalPositionX(targetX, duration));
         }
 
         /// If the object is outside its allowed constraints, animates it back within bounds
-        private void StartSnapBackLocalPositionY(float targetY, float duration) {
+        private void StartSnapBackLocalPositionY(float targetY, float duration) 
+        {
             StopSnapBack();
             snapBackCoroutine = StartCoroutine(AnimateLocalPositionY(targetY, duration));
         }
 
         /// Starts the coroutine to animate the object's local X position back to the target value
-        private IEnumerator AnimateLocalPositionX(float targetX, float duration) {
+        private IEnumerator AnimateLocalPositionX(float targetX, float duration) 
+        {
             float startX = transform.localPosition.x;
             float elapsed = 0f;
             Vector3 startPos = transform.localPosition;
@@ -111,7 +122,8 @@ namespace Map {
         }
 
         /// Starts the coroutine to animate the object's local Y position back to the target value
-        private IEnumerator AnimateLocalPositionY(float targetY, float duration) {
+        private IEnumerator AnimateLocalPositionY(float targetY, float duration) 
+        {
             float startY = transform.localPosition.y;
             float elapsed = 0f;
             Vector3 startPos = transform.localPosition;
@@ -129,7 +141,8 @@ namespace Map {
         }
 
         /// Coroutine that animates the object's local Y position to the target value over the given duration
-        private void StopSnapBack() {
+        private void StopSnapBack() 
+        {
             if (snapBackCoroutine != null) {
                 StopCoroutine(snapBackCoroutine);
                 snapBackCoroutine = null;

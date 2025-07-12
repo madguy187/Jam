@@ -1,13 +1,20 @@
 using System.Linq;
 using UnityEngine;
 
-namespace Map {
-    public class MapManager : MonoBehaviour {
+namespace Map 
+{
+    /// Manages the lifecycle and persistence of the map in the game
+    public class MapManager : MonoBehaviour 
+    {
+        /// The configuration used for map generation
         public MapConfig config;
+        /// The view component responsible for displaying the map
         public MapView view;
 
+        /// The currently active map instance
         public Map CurrentMap { get; private set; }
 
+        /// Initializes the map manager and generates a new map at startu
         private void Start() {
             // PlayerPrefs.DeleteKey("Map");
             // PlayerPrefs.Save();
@@ -31,14 +38,18 @@ namespace Map {
             GenerateNewMap();
         }
 
-        public void GenerateNewMap() {
+        /// Generates a new map using the current configuration and displays it
+        public void GenerateNewMap() 
+        {
             Map map = MapGenerator.GetMap(config);
             CurrentMap = map;
             Debug.Log(map.ToJson());
             view.ShowMap(map);
         }
 
-        public void SaveMap() {
+        /// Saves the current map to PlayerPrefs as a JSON string
+        public void SaveMap() 
+        {
             if (CurrentMap == null) return;
 
             // Convert to DTO and serialize
@@ -48,7 +59,8 @@ namespace Map {
             PlayerPrefs.Save();
         }
 
-        private void OnApplicationQuit() {
+        private void OnApplicationQuit() 
+        {
             // SaveMap();
         }
     }

@@ -20,8 +20,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: f7cbb00b19185fc4884bd71b2b4926a6, type: 2}
   randomNodes: 01000000020000000300000004000000
   numOfPreBossNodes:
-    min: 4
-    max: 5
+    min: 3
+    max: 4
   numOfStartingNodes:
     min: 3
     max: 4

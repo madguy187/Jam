@@ -1,8 +1,10 @@
 using UnityEngine;
 
-namespace Map {
+namespace Map 
+{
     [System.Serializable]
-    public class MapLayer {
+    public class MapLayer 
+    {
         [Tooltip("Default node for this map layer. If Randomize Nodes is 0, you will get this node 100% of the time")]
         public NodeType nodeType;
 
