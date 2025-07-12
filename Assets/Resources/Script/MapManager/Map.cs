@@ -9,7 +9,7 @@ namespace Map {
         public List<Node> nodes;
         public List<Vector2Int> path;
         public string bossNodeName;
-        public string configName; // similar to the act name in Slay the Spire
+        public string configName;
 
         public Map() { }
 
