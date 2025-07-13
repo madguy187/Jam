@@ -4,7 +4,4 @@
 *.mat merge=unityyamlmerge
 *.meta merge=unityyamlmerge
 
-# Also merge files with no extension (Unity YAML temp files)
-merge_file* merge=unityyamlmerge
-
 *.txt merge=text
