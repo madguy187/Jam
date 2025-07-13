@@ -3,3 +3,4 @@
 *.asset merge=unityyamlmerge
 *.mat merge=unityyamlmerge
 *.meta merge=unityyamlmerge
+*.txt merge=text
