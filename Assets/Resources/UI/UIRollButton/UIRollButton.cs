@@ -1,0 +1,34 @@
+using UnityEngine;
+using UnityEngine.UI;
+
+public class UIRollButton : MonoBehaviour
+{
+    private Button button;
+    
+    void Start()
+    {
+        button = GetComponent<Button>();
+        if (button != null)
+        {
+            button.onClick.AddListener(OnClick);
+        }
+    }
+    
+    void OnDestroy()
+    {
+        if (button != null)
+        {
+            button.onClick.RemoveListener(OnClick);
+        }
+    }
+    
+    private void OnClick()
+    {
+        SlotController.instance.FillGridWithRandomSymbols();
+    }
+    
+    public void TriggerRoll()
+    {
+        OnClick();
+    }
+} 
