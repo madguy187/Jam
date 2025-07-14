@@ -67,7 +67,7 @@ namespace Map
         /// All instantiated MapNode components for the current map
         public readonly List<MapNode> MapNodes = new List<MapNode>();
         /// All line connections between nodes for the current map
-        public List<LineConnection> lineConnections = new List<LineConnection>();
+        protected readonly List<LineConnection> lineConnections = new List<LineConnection>();
 
         /// Singleton instance for global access
         public static MapView Instance;

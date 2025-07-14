@@ -96,9 +96,9 @@ namespace Map
                     break;
                 case NodeType.MiniBoss:
                     // Save map state before leaving
-                    MapPlayerTracker.Instance.mapManager.SaveMap();
+                    // MapPlayerTracker.Instance.mapManager.SaveMap();
                     // Load new scene for mini-boss encounter
-                    SceneManager.LoadScene("Fikrul_TestMiniBossEncounter");
+                    // SceneManager.LoadScene("Fikrul_TestMiniBossEncounter");
                     break;
                 case NodeType.MajorBoss:
                     // ADDED: Trigger major boss fight, then call some function to handle the result
