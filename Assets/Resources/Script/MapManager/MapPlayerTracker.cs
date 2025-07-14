@@ -67,6 +67,9 @@ namespace Map
             view.SetAttainableNodes();
             view.SetLineColors();
             mapNode.ShowSwirlAnimation();
+            // foreach (var line in view.lineConnections) {
+            //     line.SetHighlight(view.lineVisitedColor, line.from == mapNode);
+            // }
 
             // Use coroutine for delay
             StartCoroutine(EnterNodeAfterDelay(mapNode, enterNodeDelay));

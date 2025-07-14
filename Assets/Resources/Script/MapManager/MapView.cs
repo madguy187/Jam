@@ -67,7 +67,7 @@ namespace Map
         /// All instantiated MapNode components for the current map
         public readonly List<MapNode> MapNodes = new List<MapNode>();
         /// All line connections between nodes for the current map
-        protected readonly List<LineConnection> lineConnections = new List<LineConnection>();
+        public List<LineConnection> lineConnections = new List<LineConnection>();
 
         /// Singleton instance for global access
         public static MapView Instance;
@@ -199,7 +199,7 @@ namespace Map
         /// Updates the color of all lines to reflect which are available, visited, or locked
         public virtual void SetLineColors() 
         {
-            // set all lines to grayed out first:
+            Debug.Log("Setting line colors for map: " + mapManager.CurrentMap.configName);
             foreach (LineConnection connection in lineConnections)
                 connection.SetColor(lineLockedColor);
 
