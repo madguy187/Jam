@@ -15,8 +15,8 @@ namespace Map
         public Map CurrentMap { get; private set; }
 
         /// Initializes the map manager and generates a new map at start
-        private void Start() {
-            // PlayerPrefs.DeleteKey("Map");
+        private void Start() 
+        {
             if (PlayerPrefs.HasKey("Map")) {
                 string mapJson = PlayerPrefs.GetString("Map");
                 // Deserialize using DTO
@@ -34,7 +34,6 @@ namespace Map
             } else {
                 GenerateNewMap();
             }
-            // GenerateNewMap();
         }
 
         /// Generates a new map using the current configuration and displays it
@@ -53,7 +52,7 @@ namespace Map
                 config = newConfig;
                 GenerateNewMap();
             } else {
-                Debug.LogError($"MapConfig with name '{newConfigName}' not found in Resources.");
+                Debug.LogError($"MapConfig with name '{newConfigName}' not found in MapConfigs. Add it to allMapConfigs in MapView script");
             }
         }
 
@@ -71,7 +70,7 @@ namespace Map
 
         private void OnApplicationQuit() 
         {
-            // SaveMap();
+            PlayerPrefs.DeleteKey("Map");
         }
     }
 }
