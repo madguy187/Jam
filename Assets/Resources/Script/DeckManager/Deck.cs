@@ -11,12 +11,12 @@ public class Deck : IEnumerable<UnitObject> {
     }
 
     public UnitObject AddUnit(string unitName) {
-        UnitScriptableObject unitSO = ResourceManager.instance.GetUnit(unitName);
-        if (unitSO == null) {
+        GameObject objUnitPrefab = ResourceManager.instance.GetUnit(unitName);
+        if (objUnitPrefab == null) {
             return null;
         }
 
-        UnitObject unit = ResourceManager.instance.CreateUnit(unitSO);
+        UnitObject unit = ResourceManager.instance.CreateUnit(objUnitPrefab);
         if (unit == null) {
             return null;
         }
@@ -55,7 +55,7 @@ public class Deck : IEnumerable<UnitObject> {
         return _vecPosition[nIndex - 1];
     }
 
-    // For IEnumerable<Car>
+    // For IEnumerable<UnitObject>
     public IEnumerator<UnitObject> GetEnumerator() { return _vecUnit.GetEnumerator(); }
     
     // For IEnumerable

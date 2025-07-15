@@ -1,8 +1,22 @@
 using System;
 using UnityEngine;
 
+public enum eRollType {
+    SINGLE,
+    DIAGONAL,
+    ZIGZAG,
+    XSHAPE,
+    FULLGRID
+}
+
 public class UnitObject : MonoBehaviour {
     [field: SerializeField] public UnitScriptableObject unitSO { get; private set; }
+    [SerializeField] EffectList _listEffect;
+    [SerializeField] EffectList _listSingleEffect;
+    [SerializeField] EffectList _listDiagonalEffect;
+    [SerializeField] EffectList _listZigZagEffect;
+    [SerializeField] EffectList _listXShapeEffect;
+    [SerializeField] EffectList _listFullGridEffect;
 
     public int index { get; set; }
 
@@ -19,10 +33,6 @@ public class UnitObject : MonoBehaviour {
         _currentShield = unitSO.shield;
     }
 
-    public void SetUnitSO(UnitScriptableObject _unitSO) {
-        unitSO = _unitSO;
-    }
-
     public float GetHealth() {
         return _currentHealth;
     }
@@ -33,6 +43,10 @@ public class UnitObject : MonoBehaviour {
 
     public float GetShield() {
         return _currentShield;
+    }
+
+    public void AddShield(float shield) {
+        _currentShield += shield;
     }
 
     public float GetRes() {
@@ -66,6 +80,23 @@ public class UnitObject : MonoBehaviour {
 
     public float GetHealthPercentage() {
         return _currentHealth / unitSO.hp;
+    }
+
+    public EffectList GetEffectList(eRollType eType) {
+        switch (eType) {
+        case eRollType.SINGLE:
+            return _listSingleEffect;
+        case eRollType.DIAGONAL:
+            return _listDiagonalEffect;
+        case eRollType.ZIGZAG:
+            return _listZigZagEffect;
+        case eRollType.XSHAPE:
+            return _listXShapeEffect;
+        case eRollType.FULLGRID:
+            return _listFullGridEffect;
+        }
+        
+        return null;
     }
 
     void _TriggerDeath() {
