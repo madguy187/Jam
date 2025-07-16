@@ -199,7 +199,7 @@ namespace Map
         /// Updates the color of all lines to reflect which are available, visited, or locked
         public virtual void SetLineColors() 
         {
-            // set all lines to grayed out first:
+            Debug.Log("Setting line colors for map: " + mapManager.CurrentMap.configName);
             foreach (LineConnection connection in lineConnections)
                 connection.SetColor(lineLockedColor);
 

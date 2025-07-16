@@ -164,10 +164,13 @@ namespace Map
         /// Plays a swirl fill animation on the visited circle image
         public void ShowSwirlAnimation() 
         {
-            if (visitedCircleImage == null) { return; }
+            if (visitedCircleImage == null) return;
 
             const float fillDuration = 0.3f;
-            if (fillCoroutine != null) { StopCoroutine(fillCoroutine); }
+            if (fillCoroutine != null) StopCoroutine(fillCoroutine);
+
+            // Reset fillAmount to 0 before starting the animation
+            visitedCircleImage.fillAmount = 0f;
             fillCoroutine = StartCoroutine(FillTo(visitedCircleImage, 1f, fillDuration));
         }
 
