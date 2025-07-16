@@ -23,7 +23,7 @@ namespace Utils.Tests
 
             if (slotConfig == null)
             {
-                Debug.LogError("[MatchSimulator] SlotConfig is missing! Please assign it in the inspector.");
+                Debug.LogWarning("[MatchSimulator] SlotConfig is missin");
                 return;
             }
                         
@@ -265,7 +265,7 @@ namespace Utils.Tests
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"Failed to create log file: {e.Message}");
+                Debug.LogWarning($"[MatchSimulator] Failed to create log file: {e.Message}");
             }
         }
 

@@ -171,27 +171,28 @@ public class MatchDetector
         return allMatches;
     }
 
+    private bool IsMatchingPattern(List<Vector2Int> pattern, out SymbolType symbol)
+    {
+        symbol = grid.GetSlot(pattern[0].x, pattern[0].y);
+        if (symbol == SymbolType.EMPTY)
+            return false;
+
+        foreach (var pos in pattern)
+        {
+            if (grid.GetSlot(pos.x, pos.y) != symbol)
+                return false;
+        }
+
+        return true;
+    }
+
     private List<Match> DetectFullGridMatches()
     {
         List<Match> matches = new List<Match>();
-        SymbolType firstSymbol = grid.GetSlot(0, 0);
         
-        if (firstSymbol == SymbolType.EMPTY)
-            return matches;
-
-        bool isMatch = true;
-        foreach (var pos in fullGridPattern)
+        if (IsMatchingPattern(fullGridPattern, out SymbolType symbol))
         {
-            if (grid.GetSlot(pos.x, pos.y) != firstSymbol)
-            {
-                isMatch = false;
-                break;
-            }
-        }
-
-        if (isMatch)
-        {
-            matches.Add(new Match(MatchType.FULLGRID, new List<Vector2Int>(fullGridPattern), firstSymbol));
+            matches.Add(new Match(MatchType.FULLGRID, new List<Vector2Int>(fullGridPattern), symbol));
         }
 
         return matches;
@@ -200,24 +201,10 @@ public class MatchDetector
     private List<Match> DetectXShapeMatches()
     {
         List<Match> matches = new List<Match>();
-        SymbolType centerSymbol = grid.GetSlot(1, 1);
         
-        if (centerSymbol == SymbolType.EMPTY)
-            return matches;
-
-        bool isMatch = true;
-        foreach (var pos in xShapePattern)
+        if (IsMatchingPattern(xShapePattern, out SymbolType symbol))
         {
-            if (grid.GetSlot(pos.x, pos.y) != centerSymbol)
-            {
-                isMatch = false;
-                break;
-            }
-        }
-
-        if (isMatch)
-        {
-            matches.Add(new Match(MatchType.XSHAPE, new List<Vector2Int>(xShapePattern), centerSymbol));
+            matches.Add(new Match(MatchType.XSHAPE, new List<Vector2Int>(xShapePattern), symbol));
         }
 
         return matches;
@@ -229,23 +216,9 @@ public class MatchDetector
 
         foreach (var pattern in zigzagPatterns)
         {
-            SymbolType firstSymbol = grid.GetSlot(pattern[0].x, pattern[0].y);
-            if (firstSymbol == SymbolType.EMPTY)
-                continue;
-
-            bool isMatch = true;
-            foreach (var pos in pattern)
+            if (IsMatchingPattern(pattern, out SymbolType symbol))
             {
-                if (grid.GetSlot(pos.x, pos.y) != firstSymbol)
-                {
-                    isMatch = false;
-                    break;
-                }
-            }
-
-            if (isMatch)
-            {
-                matches.Add(new Match(MatchType.ZIGZAG, new List<Vector2Int>(pattern), firstSymbol));
+                matches.Add(new Match(MatchType.ZIGZAG, new List<Vector2Int>(pattern), symbol));
             }
         }
 
@@ -258,23 +231,9 @@ public class MatchDetector
 
         foreach (var pattern in diagonalPatterns)
         {
-            SymbolType firstSymbol = grid.GetSlot(pattern[0].x, pattern[0].y);
-            if (firstSymbol == SymbolType.EMPTY)
-                continue;
-
-            bool isMatch = true;
-            foreach (var pos in pattern)
+            if (IsMatchingPattern(pattern, out SymbolType symbol))
             {
-                if (grid.GetSlot(pos.x, pos.y) != firstSymbol)
-                {
-                    isMatch = false;
-                    break;
-                }
-            }
-
-            if (isMatch)
-            {
-                matches.Add(new Match(MatchType.DIAGONAL, new List<Vector2Int>(pattern), firstSymbol));
+                matches.Add(new Match(MatchType.DIAGONAL, new List<Vector2Int>(pattern), symbol));
             }
         }
 
@@ -287,23 +246,9 @@ public class MatchDetector
 
         foreach (var pattern in horizontalPatterns)
         {
-            SymbolType firstSymbol = grid.GetSlot(pattern[0].x, pattern[0].y);
-            if (firstSymbol == SymbolType.EMPTY)
-                continue;
-
-            bool isMatch = true;
-            foreach (var pos in pattern)
+            if (IsMatchingPattern(pattern, out SymbolType symbol))
             {
-                if (grid.GetSlot(pos.x, pos.y) != firstSymbol)
-                {
-                    isMatch = false;
-                    break;
-                }
-            }
-
-            if (isMatch)
-            {
-                matches.Add(new Match(MatchType.HORIZONTAL, new List<Vector2Int>(pattern), firstSymbol));
+                matches.Add(new Match(MatchType.HORIZONTAL, new List<Vector2Int>(pattern), symbol));
             }
         }
 
@@ -316,23 +261,9 @@ public class MatchDetector
 
         foreach (var pattern in verticalPatterns)
         {
-            SymbolType firstSymbol = grid.GetSlot(pattern[0].x, pattern[0].y);
-            if (firstSymbol == SymbolType.EMPTY)
-                continue;
-
-            bool isMatch = true;
-            foreach (var pos in pattern)
+            if (IsMatchingPattern(pattern, out SymbolType symbol))
             {
-                if (grid.GetSlot(pos.x, pos.y) != firstSymbol)
-                {
-                    isMatch = false;
-                    break;
-                }
-            }
-
-            if (isMatch)
-            {
-                matches.Add(new Match(MatchType.VERTICAL, new List<Vector2Int>(pattern), firstSymbol));
+                matches.Add(new Match(MatchType.VERTICAL, new List<Vector2Int>(pattern), symbol));
             }
         }
 

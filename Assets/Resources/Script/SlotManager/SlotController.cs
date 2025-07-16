@@ -47,13 +47,13 @@ public class SlotController : MonoBehaviour
 
         if (slotConfig == null)
         {
-            Debug.LogError("[SlotController] Slot configuration is missing");
+            Debug.LogWarning("[SlotController] Slot configuration is missing");
             return;
         }
 
         if (gridUI == null)
         {
-            Debug.LogError("[SlotController] SlotGridUI reference is missing");
+            Debug.LogWarning("[SlotController] SlotGridUI reference is missing");
             return;
         }
         
@@ -273,7 +273,7 @@ public class SlotController : MonoBehaviour
     {
         if (goldConfig == null)
         {
-            Debug.LogError("[SlotController] Gold configuration is missing! Please assign it in the inspector.");
+            Debug.LogWarning("[SlotController] Gold configuration is missing! Please assign it in the inspector.");
             return 0;
         }
 

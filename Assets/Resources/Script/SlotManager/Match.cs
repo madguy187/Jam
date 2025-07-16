@@ -39,12 +39,12 @@ public class Match
 
     public List<Vector2Int> GetPositions() 
     {
-        return positions;
+        return new List<Vector2Int>(positions);
     }
 
     public List<GridPosition> GetReadablePositions() 
     {
-        return readablePositions;
+        return new List<GridPosition>(readablePositions);
     }
 
     public SymbolType GetSymbol() 
@@ -54,6 +54,12 @@ public class Match
 
     public Match(MatchType type, List<Vector2Int> positions, SymbolType symbol)
     {
+        if (positions == null)
+        {
+            Debug.LogWarning("[Match] Positions list cannot be null");
+            return;
+        }
+        
         this.type = type;
         this.positions = positions;
         this.symbol = symbol;
@@ -73,10 +79,10 @@ public class Match
             return false;
         }
 
-        // Check if any position in this match is part of the other match
-        foreach (var pos in GetPositions())
+        var otherPositions = new HashSet<Vector2Int>(match.GetPositions());
+        foreach (var pos in positions)
         {
-            if (match.GetPositions().Contains(pos))
+            if (otherPositions.Contains(pos))
             {
                 return true;
             }
@@ -84,33 +90,23 @@ public class Match
         return false;
     }
 
+    private static readonly GridPosition[] gridPositionMap = 
+    {
+        GridPosition.TOPLEFT,     GridPosition.TOPMIDDLE,    GridPosition.TOPRIGHT,
+        GridPosition.MIDDLELEFT,  GridPosition.CENTER,       GridPosition.MIDDLERIGHT,
+        GridPosition.BOTTOMLEFT,  GridPosition.BOTTOMMIDDLE, GridPosition.BOTTOMRIGHT
+    };
+
     private GridPosition GetGridPosition(Vector2Int pos)
     {
         int index = pos.x * 3 + pos.y;
         
-        switch (index)
+        if (index >= 0 && index < gridPositionMap.Length)
         {
-            case 0:
-                return GridPosition.TOPLEFT;
-            case 1:
-                return GridPosition.TOPMIDDLE;
-            case 2:
-                return GridPosition.TOPRIGHT;
-            case 3:
-                return GridPosition.MIDDLELEFT;
-            case 4:
-                return GridPosition.CENTER;
-            case 5:
-                return GridPosition.MIDDLERIGHT;
-            case 6:
-                return GridPosition.BOTTOMLEFT;
-            case 7:
-                return GridPosition.BOTTOMMIDDLE;
-            case 8:
-                return GridPosition.BOTTOMRIGHT;
-            default:
-                Global.DEBUG_PRINT($"[Match] Invalid grid position: ({pos.x}, {pos.y})");
-                return GridPosition.CENTER;
+            return gridPositionMap[index];
         }
+        
+        Global.DEBUG_PRINT($"[Match] Invalid grid position: ({pos.x}, {pos.y})");
+        return GridPosition.CENTER;
     }
 } 

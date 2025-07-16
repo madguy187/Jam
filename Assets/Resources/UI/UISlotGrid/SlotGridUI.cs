@@ -9,7 +9,7 @@ public class SlotGridUI : MonoBehaviour
     [SerializeField] private SlotConfig slotConfig;
 
     [Header("Slot Images")]
-    [SerializeField] private List<Image> slots = new List<Image>();
+    [SerializeField] private Image[] slots;
 
     [Header("Symbol Sprites")]
     [SerializeField] private Sprite attackSprite;
@@ -29,7 +29,7 @@ public class SlotGridUI : MonoBehaviour
     {
         if (slotConfig == null)
         {
-            Debug.LogError("[SlotGridUI] SlotConfig is missing! Please assign it in the inspector.");
+            Debug.LogWarning("[SlotGridUI] SlotConfig is missing");
             return;
         }
 
@@ -38,9 +38,9 @@ public class SlotGridUI : MonoBehaviour
         
         // Validate slot count matches grid size
         int requiredSlots = slotConfig.TotalGridSize;
-        if (slots.Count != requiredSlots)
+        if (slots == null || slots.Length != requiredSlots)
         {
-            Debug.LogError($"[SlotGridUI] Number of slot images ({slots.Count}) does not match grid size ({requiredSlots})!");
+            Debug.LogWarning($"[SlotGridUI] Number of slot images ({(slots == null ? 0 : slots.Length)}) does not match grid size ({requiredSlots})!");
             return;
         }
 
@@ -59,7 +59,7 @@ public class SlotGridUI : MonoBehaviour
         symbolCache[row, col] = symbolType;
         int index = row * slotConfig.gridColumns + col;
     
-        if (index < slots.Count && slots[index] != null)
+        if (index < slots.Length && slots[index] != null)
         {
             slots[index].sprite = GetSpriteForSymbol(symbolType);
         }
@@ -88,7 +88,7 @@ public class SlotGridUI : MonoBehaviour
         
         for (int i = 0; i < symbols.Length; i++)
         {
-            if (i < slots.Count && slots[i] != null)
+            if (i < slots.Length && slots[i] != null)
             {
                 slots[i].sprite = GetSpriteForSymbol(symbols[i]);
                 slots[i].color = Color.white;

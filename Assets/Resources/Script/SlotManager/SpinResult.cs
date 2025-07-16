@@ -5,9 +5,9 @@ using System.Linq;
 // Other systems can just use SpinResult.instance to access the latest spin results
 public class SpinResult
 {
-    private List<Match> allMatches;
-    private Dictionary<MatchType, List<Match>> matchesByType;
-    private Dictionary<SymbolType, Match> singleMatches;
+    private List<Match> allMatches = new List<Match>();
+    private Dictionary<MatchType, List<Match>> matchesByType = new Dictionary<MatchType, List<Match>>();
+    private Dictionary<SymbolType, Match> singleMatches = new Dictionary<SymbolType, Match>();
     private int totalGoldEarned;
 
     public SpinResult(List<Match> matches, int goldEarned)
@@ -17,18 +17,32 @@ public class SpinResult
 
     public void SetMatches(List<Match> matches, int goldEarned)
     {
-        allMatches = matches ?? new List<Match>();
+        allMatches.Clear();
+        if (matches != null)
+        {
+            allMatches.AddRange(matches);
+        }
         totalGoldEarned = goldEarned;
         
-        matchesByType = allMatches.GroupBy(m => m.GetMatchType()).ToDictionary(g => g.Key, g => g.ToList());
-        singleMatches = allMatches.Where(m => m.GetMatchType() == MatchType.SINGLE).ToDictionary(m => m.GetSymbol(), m => m);
+        matchesByType.Clear();
+        singleMatches.Clear();
+        
+        foreach (var group in allMatches.GroupBy(m => m.GetMatchType()))
+        {
+            matchesByType[group.Key] = group.ToList();
+        }
+        
+        foreach (var match in allMatches.Where(m => m.GetMatchType() == MatchType.SINGLE))
+        {
+            singleMatches[match.GetSymbol()] = match;
+        }
     }
 
     public void Clear()
     {
-        allMatches = new List<Match>();
-        matchesByType = new Dictionary<MatchType, List<Match>>();
-        singleMatches = new Dictionary<SymbolType, Match>();
+        allMatches.Clear();
+        matchesByType.Clear();
+        singleMatches.Clear();
         totalGoldEarned = 0;
     }
 

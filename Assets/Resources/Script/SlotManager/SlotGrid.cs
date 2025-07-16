@@ -16,9 +16,9 @@ public class SlotGrid
     
     public void SetSlot(int row, int col, SymbolType symbol)
     {
-        if (row < 0 || row >= rows || col < 0 || col >= columns)
+        if (!IsValidPosition(row, col))
         {
-            Debug.LogError($"[SlotGrid] Invalid grid position: ({row}, {col})");
+            Debug.LogWarning($"[SlotGrid] Invalid grid position: ({row}, {col})");
             return;
         }
         grid[row, col] = symbol;
@@ -26,9 +26,9 @@ public class SlotGrid
     
     public SymbolType GetSlot(int row, int col)
     {
-        if (row < 0 || row >= rows || col < 0 || col >= columns)
+        if (!IsValidPosition(row, col))
         {
-            Debug.LogError($"[SlotGrid] Invalid grid position: ({row}, {col})");
+            Debug.LogWarning($"[SlotGrid] Invalid grid position: ({row}, {col})");
             return SymbolType.EMPTY;
         }
         return grid[row, col];

@@ -16,7 +16,7 @@ public class GoldManager : MonoBehaviour
         
         if (config == null)
         {
-            Debug.LogError("[GoldManager] Gold configuration is missing");
+            Debug.LogWarning("[GoldManager] Gold configuration is missing");
         }
     }
 
