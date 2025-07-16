@@ -4,7 +4,12 @@ using System.Collections.Generic;
 public static class Global {
     public const int GRID_SIZE = 3; 
     public static bool IS_DEBUG = true;
+
+    // Simulation test for Darren&Tianyu to verify all kinds of complicated scenarios
     public static bool RUN_SIMULATION = false; 
+    // Discussed with Tianyu that there are 2 kinds of behavior, 
+    // So added a feature flag to control this behaviour
+    // If false= We only return UNIQUE matches
     public const bool EXCLUDE_SINGLES_IN_LARGER_PATTERNS = true;
 
     static public void DEBUG_PRINT(string strMessage) {

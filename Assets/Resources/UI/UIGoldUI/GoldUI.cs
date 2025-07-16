@@ -22,7 +22,7 @@ public class GoldUI : MonoBehaviour
         
         if (goldText == null)
         {
-            Debug.LogError("GoldUI: TextMeshProUGUI component not found!");
+            Debug.LogWarning("[GoldUI] TextMeshProUGUI component not found!");
             return;
         }
 
