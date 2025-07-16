@@ -14,28 +14,26 @@ namespace Map
         /// The currently active map instance
         public Map CurrentMap { get; private set; }
 
-        /// Initializes the map manager and generates a new map at startu
-        private void Start() {
-            // PlayerPrefs.DeleteKey("Map");
-            // PlayerPrefs.Save();
-            // if (PlayerPrefs.HasKey("Map")) {
-            //     string mapJson = PlayerPrefs.GetString("Map");
-            //     // Deserialize using DTO
-            //     MapDTO mapDTO = JsonUtility.FromJson<MapDTO>(mapJson);
-            //     Map map = Map.FromDTO(mapDTO);
-            // 
-            //     if (map.path.Any(p => p.Equals(map.GetBossNode().point))) {
-            //         // player has already reached the boss, generate a new map
-            //         GenerateNewMap();
-            //     } else {
-            //         CurrentMap = map;
-            //         // player has not reached the boss yet, load the current map
-            //         view.ShowMap(map);
-            //     }
-            // } else {
-            //     GenerateNewMap();
-            // }
-            GenerateNewMap();
+        /// Initializes the map manager and generates a new map at start
+        private void Start() 
+        {
+            if (PlayerPrefs.HasKey("Map")) {
+                string mapJson = PlayerPrefs.GetString("Map");
+                // Deserialize using DTO
+                MapDTO mapDTO = JsonUtility.FromJson<MapDTO>(mapJson);
+                Map map = Map.FromDTO(mapDTO);
+            
+                if (map.path.Any(p => p.Equals(map.GetBossNode().point))) {
+                    // player has already reached the boss, generate a new map
+                    GenerateNewMap();
+                } else {
+                    CurrentMap = map;
+                    // player has not reached the boss yet, load the current map
+                    view.ShowMap(map);
+                }
+            } else {
+                GenerateNewMap();
+            }
         }
 
         /// Generates a new map using the current configuration and displays it
@@ -45,6 +43,17 @@ namespace Map
             CurrentMap = map;
             Debug.Log(map.ToJson());
             view.ShowMap(map);
+        }
+
+        public void LoadNextConfig(string newConfigName) 
+        {
+            MapConfig newConfig = view.allMapConfigs.FirstOrDefault(c => c.name == newConfigName);
+            if (newConfig != null) {
+                config = newConfig;
+                GenerateNewMap();
+            } else {
+                Debug.LogError($"MapConfig with name '{newConfigName}' not found in MapConfigs. Add it to allMapConfigs in MapView script");
+            }
         }
 
         /// Saves the current map to PlayerPrefs as a JSON string
@@ -61,7 +70,7 @@ namespace Map
 
         private void OnApplicationQuit() 
         {
-            // SaveMap();
+            PlayerPrefs.DeleteKey("Map");
         }
     }
 }

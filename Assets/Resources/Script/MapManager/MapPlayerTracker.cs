@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Map 
 {
@@ -94,12 +95,27 @@ namespace Map
                 case NodeType.Shop:
                     break;
                 case NodeType.MiniBoss:
+                    // Save map state before leaving
+                    // MapPlayerTracker.Instance.mapManager.SaveMap();
+                    // Load new scene for mini-boss encounter
+                    // SceneManager.LoadScene("Fikrul_TestMiniBossEncounter");
                     break;
                 case NodeType.MajorBoss:
+                    // ADDED: Trigger major boss fight, then call some function to handle the result
+                    // Example: StartMajorBossFight(mapNode);
+                    // When the fight ends, call:
+                    // MapPlayerTracker.Instance.OnMajorBossResult(playerWon);
+                    // MapPlayerTracker.Instance.mapManager.LoadNextConfig("DefaultMapConfig2");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        // Example stub for starting the boss fight (implement as needed)
+        // private static void StartMajorBossFight(MapNode mapNode)
+        // {
+        //     // Start the fight, then call OnMajorBossResult(true/false) when done
+        // }
     }
 }
