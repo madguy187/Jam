@@ -52,7 +52,7 @@ namespace Map
                 config = newConfig;
                 GenerateNewMap();
             } else {
-                Debug.LogWarning($"[MapManager] MapConfig with name '{newConfigName}' not found in MapConfigs. Add it to allMapConfigs in MapView script");
+                Debug.LogError($"MapConfig with name '{newConfigName}' not found in MapConfigs. Add it to allMapConfigs in MapView script");
             }
         }
 
