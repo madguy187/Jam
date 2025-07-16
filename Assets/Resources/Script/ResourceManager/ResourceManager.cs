@@ -6,10 +6,7 @@ public class ResourceManager : MonoBehaviour
 {
     public static ResourceManager instance;
 
-    Dictionary<string, UnitScriptableObject> _mapUnitSO = new Dictionary<string, UnitScriptableObject>();
-
-    [Header("Unit Prefab")]
-    [SerializeField] private GameObject _objUnitPrefab;
+    Dictionary<string, GameObject> _mapUnitSO = new Dictionary<string, GameObject>();
 
     void Awake() {
         if (instance != null) {
@@ -18,16 +15,16 @@ public class ResourceManager : MonoBehaviour
 
         instance = this;
         
-        foreach (Object obj in Resources.LoadAll("UnitSO/Unit", typeof(UnitScriptableObject)).ToList())
+        foreach (Object obj in Resources.LoadAll("UnitSO/Unit", typeof(GameObject)).ToList())
         {
-            UnitScriptableObject unitSO = (UnitScriptableObject)obj;
+            GameObject unitSO = (GameObject)obj;
             _mapUnitSO.Add(obj.name, unitSO);
         }
         Global.DEBUG_PRINT("[Resources] Loaded PlayerUnits: " + _mapUnitSO.Count());
     }
     
-    public UnitObject CreateUnit(UnitScriptableObject unitSO) {
-        GameObject obj = Instantiate(_objUnitPrefab);
+    public UnitObject CreateUnit(GameObject objPrefab) {
+        GameObject obj = Instantiate(objPrefab);
         if (obj == null) {
             return null;
         }
@@ -38,13 +35,12 @@ public class ResourceManager : MonoBehaviour
             return null;
         }
 
-        unit.SetUnitSO(unitSO);
         unit.Init();
 
         return unit;
     }
 
-    public UnitScriptableObject GetUnit(string unitName) {
+    public GameObject GetUnit(string unitName) {
         if (_mapUnitSO.ContainsKey(unitName)) {
             return _mapUnitSO[unitName];
         }
