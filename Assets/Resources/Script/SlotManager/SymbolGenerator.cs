@@ -23,7 +23,7 @@ public class SymbolGenerator : MonoBehaviour
     {
         if (instance != null && instance != this)
         {
-            Global.LogWarning("Another instance exists");
+            Debug.LogWarning("Another instance exists");
             Destroy(gameObject);
             return;
         }
@@ -42,7 +42,7 @@ public class SymbolGenerator : MonoBehaviour
         float total = emptyProbability + attackProbability + defenseProbability + specialProbability;
         if (Mathf.Abs(total - 1f) > 0.01f)
         {
-            Global.LogWarning(TAG, $"Symbol probabilities sum to {total:F2} instead of 1.0!");
+            Debug.LogWarning("Symbol probabilities sum != 1.0!");
         }
     }
 

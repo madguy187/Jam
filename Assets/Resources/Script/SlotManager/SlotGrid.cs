@@ -14,6 +14,11 @@ public class SlotGrid
         ClearGrid();
     }
     
+    private bool IsValidPosition(int row, int col)
+    {
+        return row >= 0 && row < rows && col >= 0 && col < columns;
+    }
+
     public void SetSlot(int row, int col, SymbolType symbol)
     {
         if (!IsValidPosition(row, col))
