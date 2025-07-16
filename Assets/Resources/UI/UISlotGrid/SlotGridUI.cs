@@ -1,19 +1,15 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SlotGridUI : MonoBehaviour
 {
+    [Header("Configuration")]
+    [SerializeField] private SlotConfig slotConfig;
+
     [Header("Slot Images")]
-    [SerializeField] private Image slot0;
-    [SerializeField] private Image slot1;
-    [SerializeField] private Image slot2;
-    [SerializeField] private Image slot3;
-    [SerializeField] private Image slot4;
-    [SerializeField] private Image slot5;
-    [SerializeField] private Image slot6;
-    [SerializeField] private Image slot7;
-    [SerializeField] private Image slot8;
+    [SerializeField] private List<Image> slots = new List<Image>();
 
     [Header("Symbol Sprites")]
     [SerializeField] private Sprite attackSprite;
@@ -26,25 +22,32 @@ public class SlotGridUI : MonoBehaviour
     [SerializeField] [Range(0.1f, 1f)] private float symbolDropDelay = 0.1f;
     [SerializeField] [Range(0.6f, 0.9f)] private float finalSymbolsStartTime = 0.7f;
 
-    private Image[] slots = new Image[9];
     private bool isSpinning = false;
-    private SymbolType[,] symbolCache = new SymbolType[3, 3];
+    private SymbolType[,] symbolCache;
 
     private void Awake()
     {
-        slots[0] = slot0;
-        slots[1] = slot1;
-        slots[2] = slot2;
-        slots[3] = slot3;
-        slots[4] = slot4;
-        slots[5] = slot5;
-        slots[6] = slot6;
-        slots[7] = slot7;
-        slots[8] = slot8;
-
-        for (int row = 0; row < 3; row++)
+        if (slotConfig == null)
         {
-            for (int col = 0; col < 3; col++)
+            Debug.LogError("[SlotGridUI] SlotConfig is missing! Please assign it in the inspector.");
+            return;
+        }
+
+        // Initialize symbolCache with configured grid size
+        symbolCache = new SymbolType[slotConfig.gridRows, slotConfig.gridColumns];
+        
+        // Validate slot count matches grid size
+        int requiredSlots = slotConfig.TotalGridSize;
+        if (slots.Count != requiredSlots)
+        {
+            Debug.LogError($"[SlotGridUI] Number of slot images ({slots.Count}) does not match grid size ({requiredSlots})!");
+            return;
+        }
+
+        // Initialize symbolCache
+        for (int row = 0; row < slotConfig.gridRows; row++)
+        {
+            for (int col = 0; col < slotConfig.gridColumns; col++)
             {
                 symbolCache[row, col] = SymbolType.EMPTY;
             }
@@ -54,9 +57,9 @@ public class SlotGridUI : MonoBehaviour
     private void UpdateSlotSymbol(int row, int col, SymbolType symbolType)
     {
         symbolCache[row, col] = symbolType;
-        int index = row * 3 + col;
+        int index = row * slotConfig.gridColumns + col;
     
-        if (slots[index] != null)
+        if (index < slots.Count && slots[index] != null)
         {
             slots[index].sprite = GetSpriteForSymbol(symbolType);
         }
@@ -81,11 +84,11 @@ public class SlotGridUI : MonoBehaviour
     
     public void UpdateGrid(SymbolType[] symbols)
     {
-        if (symbols.Length != 9) return;
+        if (symbols.Length != slotConfig.TotalGridSize) return;
         
-        for (int i = 0; i < 9; i++)
+        for (int i = 0; i < symbols.Length; i++)
         {
-            if (slots[i] != null)
+            if (i < slots.Count && slots[i] != null)
             {
                 slots[i].sprite = GetSpriteForSymbol(symbols[i]);
                 slots[i].color = Color.white;
@@ -105,15 +108,13 @@ public class SlotGridUI : MonoBehaviour
         float elapsedTime = 0f;
         float spinningPhaseTime = spinDuration * finalSymbolsStartTime;
         
-        //Global.DEBUG_PRINT($"Starting spin animation. Duration: {spinDuration}, Spinning phase: {spinningPhaseTime}");
-        
         // Fast spinning phase
         while (elapsedTime < spinningPhaseTime)
         {
             // Generate random temporary symbols for spin effect
-            for (int row = 0; row < 3; row++)
+            for (int row = 0; row < slotConfig.gridRows; row++)
             {
-                for (int col = 0; col < 3; col++)
+                for (int col = 0; col < slotConfig.gridColumns; col++)
                 {
                     UpdateSlotSymbol(row, col, SymbolGenerator.instance.GenerateRandomSymbol());
                 }
@@ -167,5 +168,5 @@ public class SlotGridUI : MonoBehaviour
     public void SetFinalSymbolsStartTime(float time) 
     { 
         finalSymbolsStartTime = Mathf.Clamp(time, 0.6f, 0.9f); 
-        }
+    }
 } 

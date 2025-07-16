@@ -7,11 +7,16 @@ public class SlotController : MonoBehaviour
 {
     public static SlotController instance;
     
+    [Header("Configuration")]
+    [SerializeField] private GoldConfig goldConfig;
+    [SerializeField] private SlotConfig slotConfig;
+
+    [Header("References")]
+    [SerializeField] private SlotGridUI gridUI; 
+    
     private SlotGrid slotGrid;
     private MatchDetector matchDetector;
     private int spinsThisTurn = 0;
-    private const int FREE_SPINS_PER_TURN = 1;
-    private const int BASE_SPIN_COST = 2;
     private bool isSpinning;
     private SpinResult spinResult;
     private int currentSpinCost;
@@ -25,7 +30,7 @@ public class SlotController : MonoBehaviour
     }
     
     public bool GetHasFreeSpinsRemaining() {
-        return spinsThisTurn < FREE_SPINS_PER_TURN;
+        return spinsThisTurn < slotConfig.freeSpinsPerTurn;
     }
     
     private void Awake()
@@ -39,10 +44,22 @@ public class SlotController : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        if (slotConfig == null)
+        {
+            Debug.LogError("[SlotController] Slot configuration is missing");
+            return;
+        }
+
+        if (gridUI == null)
+        {
+            Debug.LogError("[SlotController] SlotGridUI reference is missing");
+            return;
+        }
         
-        slotGrid = new SlotGrid();
+        slotGrid = new SlotGrid(slotConfig.gridRows, slotConfig.gridColumns);
         matchDetector = new MatchDetector(slotGrid);
-        spinResult = new SpinResult(new List<Match>(), 0); 
+        spinResult = new SpinResult(new List<Match>(), 0);
     }
     
     public void FillGridWithRandomSymbols(bool autoSpendGold = true)
@@ -52,8 +69,7 @@ public class SlotController : MonoBehaviour
             return;
         }
 
-        SlotGridUI gridUI = FindObjectOfType<SlotGridUI>();
-        if (gridUI == null || gridUI.GetIsSpinning())
+        if (gridUI.GetIsSpinning())
         {
             return;
         }
@@ -61,7 +77,7 @@ public class SlotController : MonoBehaviour
         isSpinning = true;
         
         // Check if we need to spend gold
-        if (spinsThisTurn >= FREE_SPINS_PER_TURN)
+        if (spinsThisTurn >= slotConfig.freeSpinsPerTurn)
         {
             currentSpinCost = GetNextSpinCost();
             if (!GoldManager.instance.SpendGold(currentSpinCost))
@@ -78,13 +94,13 @@ public class SlotController : MonoBehaviour
         spinsThisTurn++;
         
         // Generate random symbols
-        SymbolType[] finalSymbols = new SymbolType[9];
-        for (int i = 0; i < 9; i++)
+        SymbolType[] finalSymbols = new SymbolType[slotConfig.TotalGridSize];
+        for (int i = 0; i < slotConfig.TotalGridSize; i++)
         {
             finalSymbols[i] = SymbolGenerator.instance.GenerateRandomSymbol();
         }
         
-        if (finalSymbols == null || finalSymbols.Length != 9)
+        if (finalSymbols == null || finalSymbols.Length != slotConfig.TotalGridSize)
         {
             isSpinning = false;
             return;
@@ -94,10 +110,10 @@ public class SlotController : MonoBehaviour
         gridUI.StartSpinAnimation(finalSymbols);
         FillGridWithSymbols(finalSymbols);
         
-        StartCoroutine(WaitForSpinComplete(gridUI, autoSpendGold));
+        StartCoroutine(WaitForSpinComplete(autoSpendGold));
     }
     
-    private IEnumerator WaitForSpinComplete(SlotGridUI gridUI, bool autoSpendGold)
+    private IEnumerator WaitForSpinComplete(bool autoSpendGold)
     {
         // Wait for spin animation to complete
         while (gridUI.GetIsSpinning())
@@ -166,8 +182,7 @@ public class SlotController : MonoBehaviour
             return;
         }
         
-        SlotGridUI gridUI = FindObjectOfType<SlotGridUI>();
-        if (gridUI == null || gridUI.GetIsSpinning() || isSpinning)
+        if (gridUI.GetIsSpinning() || isSpinning)
         {
             return;
         } 
@@ -184,8 +199,7 @@ public class SlotController : MonoBehaviour
         gridUI.StartSpinAnimation(finalSymbols);
         FillGridWithSymbols(finalSymbols);
         
-        // Use the same pattern as FillGridWithRandomSymbols
-        StartCoroutine(WaitForSpinComplete(gridUI, true));
+        StartCoroutine(WaitForSpinComplete(true));
     }
     
     public SpinResult GetSpinResult()
@@ -206,7 +220,7 @@ public class SlotController : MonoBehaviour
             return false;
         }
         
-        if (spinsThisTurn < FREE_SPINS_PER_TURN) 
+        if (spinsThisTurn < slotConfig.freeSpinsPerTurn) 
         {
             return true;
         }
@@ -216,12 +230,12 @@ public class SlotController : MonoBehaviour
     
     public int GetNextSpinCost()
     {
-        if (spinsThisTurn < FREE_SPINS_PER_TURN)
+        if (spinsThisTurn < slotConfig.freeSpinsPerTurn)
         {
             return 0;
         }
 
-        return BASE_SPIN_COST * (spinsThisTurn - FREE_SPINS_PER_TURN + 1);
+        return slotConfig.baseSpinCost * (spinsThisTurn - slotConfig.freeSpinsPerTurn + 1);
     }
     
     public int GetSpinsThisTurn()
@@ -242,14 +256,14 @@ public class SlotController : MonoBehaviour
     
     private void FillGridWithSymbols(SymbolType[] symbols)
     {
-        if (symbols == null || symbols.Length != 9) return;
+        if (symbols == null || symbols.Length != slotConfig.TotalGridSize) return;
         
         slotGrid.ClearGrid();
-        for (int row = 0; row < 3; row++)
+        for (int row = 0; row < slotConfig.gridRows; row++)
         {
-            for (int col = 0; col < 3; col++)
+            for (int col = 0; col < slotConfig.gridColumns; col++)
             {
-                int index = row * 3 + col;
+                int index = row * slotConfig.gridColumns + col;
                 slotGrid.SetSlot(row, col, symbols[index]);
             }
         }
@@ -257,22 +271,26 @@ public class SlotController : MonoBehaviour
     
     private int GetGoldRewardForMatch(MatchType type)
     {
-        switch(type)
+        if (goldConfig == null)
         {
-            case MatchType.SINGLE:
-                return 0;
+            Debug.LogError("[SlotController] Gold configuration is missing! Please assign it in the inspector.");
+            return 0;
+        }
+
+        switch (type)
+        {
             case MatchType.HORIZONTAL:
-                return GoldConstants.HORIZONTAL_REWARD;
+                return goldConfig.horizontalReward;
             case MatchType.VERTICAL:
-                return GoldConstants.VERTICAL_REWARD;
+                return goldConfig.verticalReward;
             case MatchType.DIAGONAL:
-                return GoldConstants.DIAGONAL_REWARD;
+                return goldConfig.diagonalReward;
             case MatchType.ZIGZAG:
-                return GoldConstants.ZIGZAG_REWARD;
+                return goldConfig.zigzagReward;
             case MatchType.XSHAPE:
-                return GoldConstants.XSHAPE_REWARD;
+                return goldConfig.xShapeReward;
             case MatchType.FULLGRID:
-                return GoldConstants.FULL_GRID_REWARD;
+                return goldConfig.fullGridReward;
             default:
                 return 0;
         }

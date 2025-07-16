@@ -8,6 +8,7 @@ namespace Utils.Tests
 {
     public class MatchSimulator : MonoBehaviour
     {
+        [SerializeField] private SlotConfig slotConfig;
         private SlotGrid grid;
         private MatchDetector detector;
         private StreamWriter logWriter;
@@ -19,14 +20,54 @@ namespace Utils.Tests
             {
                 return;
             }
+
+            if (slotConfig == null)
+            {
+                Debug.LogError("[MatchSimulator] SlotConfig is missing! Please assign it in the inspector.");
+                return;
+            }
                         
-            grid = new SlotGrid();
+            grid = new SlotGrid(slotConfig.gridRows, slotConfig.gridColumns);
             detector = new MatchDetector(grid);
             InitializeLogFile();
             
             LogMessage("=== Starting Match Simulation Tests ===\n");
 
-            // 1. Full Grid - Tests all possible patterns
+            if (slotConfig.gridRows == 3 && slotConfig.gridColumns == 3)
+            {
+                RunAllTests3x3();
+            }
+            else 
+            {
+
+                RunBasicTests();
+            }
+            
+            LogMessage("\n=== Match Simulation Tests Complete ===");
+            LogMessage($"Total Scenarios Run: {scenarioCount}");
+            
+            if (logWriter != null) logWriter.Close();
+        }
+
+        private void RunBasicTests()
+        {
+            SymbolType[,] fullGrid = new SymbolType[slotConfig.gridRows, slotConfig.gridColumns];
+            for (int row = 0; row < slotConfig.gridRows; row++)
+                for (int col = 0; col < slotConfig.gridColumns; col++)
+                    fullGrid[row, col] = SymbolType.ATTACK;
+            RunTest("Full Grid Pattern", fullGrid);
+
+            SymbolType[,] alternating = new SymbolType[slotConfig.gridRows, slotConfig.gridColumns];
+            for (int row = 0; row < slotConfig.gridRows; row++)
+                for (int col = 0; col < slotConfig.gridColumns; col++)
+                    alternating[row, col] = ((row + col) % 2 == 0) ? SymbolType.ATTACK : SymbolType.DEFENSE;
+            RunTest("Alternating Pattern", alternating);
+
+        }
+
+        private void RunAllTests3x3()
+        {
+            // Original 3x3 test cases
             RunTest("Full Grid Pattern", new SymbolType[3,3] {
                 { SymbolType.ATTACK, SymbolType.ATTACK, SymbolType.ATTACK },
                 { SymbolType.ATTACK, SymbolType.ATTACK, SymbolType.ATTACK },
@@ -158,11 +199,6 @@ namespace Utils.Tests
                 { SymbolType.SPECIAL, SymbolType.DEFENSE, SymbolType.SPECIAL },
                 { SymbolType.ATTACK, SymbolType.EMPTY, SymbolType.ATTACK }
             });
-            
-            LogMessage("\n=== Match Simulation Tests Complete ===");
-            LogMessage($"Total Scenarios Run: {scenarioCount}");
-            
-            if (logWriter != null) logWriter.Close();
         }
 
         private void RunTest(string name, SymbolType[,] pattern)
@@ -171,17 +207,18 @@ namespace Utils.Tests
             LogMessage($"\nScenario {scenarioCount}: {name}");
             LogMessage("----------------------------------------");
             
-            for (int row = 0; row < Global.GRID_SIZE; row++)
-                for (int col = 0; col < Global.GRID_SIZE; col++)
+            for (int row = 0; row < slotConfig.gridRows; row++)
+                for (int col = 0; col < slotConfig.gridColumns; col++)
                     grid.SetSlot(row, col, pattern[row, col]);
 
             // Print grid
             StringBuilder sb = new StringBuilder("\nCurrent Grid State:\n");
-            sb.AppendLine("-------------");
-            for (int row = 0; row < Global.GRID_SIZE; row++)
+            string horizontalLine = new string('-', slotConfig.gridColumns * 2 + 3);
+            sb.AppendLine(horizontalLine);
+            for (int row = 0; row < slotConfig.gridRows; row++)
             {
                 sb.Append("| ");
-                for (int col = 0; col < Global.GRID_SIZE; col++)
+                for (int col = 0; col < slotConfig.gridColumns; col++)
                 {
                     string symbol = grid.GetSlot(row, col) switch
                     {
@@ -194,7 +231,7 @@ namespace Utils.Tests
                 }
                 sb.AppendLine("|");
             }
-            sb.AppendLine("-------------");
+            sb.AppendLine(horizontalLine);
             LogMessage(sb.ToString());
 
             var matches = detector.DetectMatches();
