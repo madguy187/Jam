@@ -52,13 +52,18 @@ public class CombatManager : MonoBehaviour {
                 cDefenderUnit = cOtherDeck.GetUnitObject(nNewTarget);
             }
 
-            _ExecBattleOne(cAttackerUnit, cDefenderUnit);
+            _ExecBattleOne(cAttackerUnit, cDefenderUnit, eRollType.SINGLE);
         }
     }
 
-    void _ExecBattleOne(UnitObject cAttackerUnit, UnitObject cDefenderUnit) {
+    void _ExecBattleOne(UnitObject cAttackerUnit, UnitObject cDefenderUnit, eRollType eRoll) {
         if (cAttackerUnit == null || cDefenderUnit == null) {
             return;
+        }
+
+        EffectList effects = cAttackerUnit.GetEffectList(eRoll);
+        foreach (EffectScriptableObject effect in effects) {
+            _ActivateEffect(effect, ref cAttackerUnit);
         }
 
         float fAttack = cAttackerUnit.GetAttack();
@@ -102,8 +107,16 @@ public class CombatManager : MonoBehaviour {
     float _GetCritRatio(UnitObject cAttackerUnit) {
         return cAttackerUnit.GetCritMulti() / 100;
     }
-    
+
     float _GetResRatio(UnitObject cDefenderUnit) {
         return 100 / (100 + cDefenderUnit.GetRes() * 10);
+    }
+
+    void _ActivateEffect(EffectScriptableObject cEffect, ref UnitObject cAttackerUnit) {
+        if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_SHIELD)) {
+            cAttackerUnit.AddShield(cEffect.GetEffectVal());
+        }
+
+        Global.DEBUG_PRINT("[Effect] Triggered " + cEffect.GetTypeName() + " val=" + cEffect.GetEffectVal());
     }
 }

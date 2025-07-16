@@ -21,11 +21,11 @@ public class DeckManager : MonoBehaviour {
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            cPlayerDeck.AddUnit("PlayerUnitSO");
+            cPlayerDeck.AddUnit("Paladin");
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            cEnemyDeck.AddUnit("EnemyUnitSO");
+            cEnemyDeck.AddUnit("Paladin");
         }
     }
 
