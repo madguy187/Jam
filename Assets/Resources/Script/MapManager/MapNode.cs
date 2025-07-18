@@ -57,6 +57,8 @@ namespace Map
         {
             Node = node;
             Blueprint = blueprint;
+            NodePopUpBox popUpBox = GetComponentInChildren<NodePopUpBox>(true);
+            popUpBox.messsage = Blueprint.description;
             if (sr != null) { sr.sprite = blueprint.sprite; }
             if (image != null) { image.sprite = blueprint.sprite; }
             if (node.nodeType == NodeType.MajorBoss) { transform.localScale *= 1.5f; }
