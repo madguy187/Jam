@@ -35,6 +35,7 @@ public class NodePopUpManager : MonoBehaviour
     public void SetAndShowPopUp(string message)
     {
         textComponent.text = message;
+        transform.position = Input.mousePosition;
         gameObject.SetActive(true);
     }
 
