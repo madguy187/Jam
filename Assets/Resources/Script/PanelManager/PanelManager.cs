@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Text;
+using UnityEngine.EventSystems;
 
 public class UnitInfoPanelController : MonoBehaviour
 {
@@ -9,11 +9,6 @@ public class UnitInfoPanelController : MonoBehaviour
     [SerializeField] private Image unitIconImage;
     [SerializeField] private TextMeshProUGUI statsText;
     [SerializeField] private TextMeshProUGUI skillsText;
-    [SerializeField] private Transform relicsContainer;
-    [SerializeField] private Transform skillsContainer;
-    
-    [Header("Optional")]
-    [SerializeField] private Sprite defaultUnitIcon;
 
     private UnitObject currentUnit;
 
@@ -23,10 +18,8 @@ public class UnitInfoPanelController : MonoBehaviour
         
         currentUnit = unit;
         
-        // Update unit icon
         if (unitIconImage != null)
         {
-            // Try to get sprite from SpriteRenderer first
             SpriteRenderer spriteRenderer = unit.GetComponent<SpriteRenderer>();
             if (spriteRenderer != null && spriteRenderer.sprite != null)
             {
@@ -35,26 +28,11 @@ public class UnitInfoPanelController : MonoBehaviour
             }
             else
             {
-                // If no SpriteRenderer, try to get from UI Image
-                Image unitImage = unit.GetComponentInChildren<Image>();
-                if (unitImage != null && unitImage.sprite != null)
-                {
-                    unitIconImage.sprite = unitImage.sprite;
-                    unitIconImage.gameObject.SetActive(true);
-                }
-                else if (defaultUnitIcon != null)
-                {
-                    // Use default icon if available
-                    unitIconImage.sprite = defaultUnitIcon;
-                    unitIconImage.gameObject.SetActive(true);
-                }
-                else
-                {
-                    unitIconImage.gameObject.SetActive(false);
-                }
+                unitIconImage.gameObject.SetActive(false);
             }
         }
 
+        // Update stats
         if (statsText != null)
         {
             statsText.text = $"HP: {unit.GetHealth()}/{unit.unitSO.hp}\n" +
@@ -65,27 +43,23 @@ public class UnitInfoPanelController : MonoBehaviour
                            $"Crit Multi: {unit.GetCritMulti()}%";
         }
 
+        // Update skills
         if (skillsText != null)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine("Skills:");
-
+            string skillsList = "Skills:\n";
             foreach (eRollType rollType in System.Enum.GetValues(typeof(eRollType)))
             {
                 EffectList effects = unit.GetEffectList(rollType);
                 if (effects != null)
                 {
-                    sb.AppendLine($"\n{rollType}:");
-                    
                     foreach (EffectScriptableObject effect in effects)
                     {
                         string effectName = effect.GetTypeName().Replace("EFFECT_", "").Replace("_", " ");
-                        sb.AppendLine($"  • {effectName}: {effect.GetEffectVal()}");
+                        skillsList += $"• {rollType}: {effectName} ({effect.GetEffectVal()})\n";
                     }
                 }
             }
-
-            skillsText.text = sb.ToString();
+            skillsText.text = skillsList;
         }
 
         gameObject.SetActive(true);
