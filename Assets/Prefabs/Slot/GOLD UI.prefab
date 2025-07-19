@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1287854800297829630}
   - component: {fileID: 3825992370899376286}
   - component: {fileID: 4535851090537543932}
-  - component: {fileID: 2114497681622111341}
+  - component: {fileID: 85296961451886885}
   m_Layer: 5
   m_Name: GOLD UI
   m_TagString: Untagged
@@ -33,10 +33,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 332.6, y: 210.4}
-  m_SizeDelta: {x: 92.3177, y: 29.91}
+  m_AnchorMin: {x: 1, y: 1}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -67, y: -68}
+  m_SizeDelta: {x: 92.31769, y: 29.910004}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3825992370899376286
 CanvasRenderer:
@@ -137,7 +137,7 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &2114497681622111341
+--- !u!114 &85296961451886885
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -146,6 +146,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 821074357312753464}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2dffa13edd9a7402c8f0225640234a25, type: 3}
+  m_Script: {fileID: 11500000, guid: b50896d72054d544ab773de01889323a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  goldText: {fileID: 0}

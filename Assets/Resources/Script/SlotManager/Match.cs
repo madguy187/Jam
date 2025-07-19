@@ -58,6 +58,11 @@ public class Match
         return unitName;
     }
 
+    public void SetUnitName(string name)
+    {
+        unitName = name;
+    }
+
     public Match(MatchType type, List<Vector2Int> positions, SymbolType symbol) {
         if (positions == null) {
             Debug.LogWarning("[Match] Positions list cannot be null");
