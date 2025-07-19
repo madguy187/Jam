@@ -14,15 +14,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitType: Paladin
   skills:
-  - rollType: 0
-    skillName: SINGLE PALADIN SKILL
-    description: SINGLE PALADIN SKILL DESCRIPTION
-    value: 1
-  - rollType: 5
-    skillName: VERTICAL PALADIN SKILL
-    description: VERTICAL PALADIN SKILL DESCRIPTION
-    value: 1
   - rollType: 1
-    skillName: DIAGONAL PALADIN SKILL
-    description: DIAGONAL PALADIN SKILL DESCRIPTION
-    value: 1
+    skillName: SINGLE
+    description: Gain 3 Shield
+    value: 3
+  - rollType: 2
+    skillName: HORIZONTAL
+    description: Heal lowest-HP ally for 4
+    value: 4
+  - rollType: 3
+    skillName: VERTICAL
+    description: Heal lowest-HP ally for 4
+    value: 4
+  - rollType: 4
+    skillName: DIAGONAL
+    description: Gain Taunt (forces targeting for 1 turn), Enemy attacking the paladin
+      will recieve 20% of their damage back.
+    value: 0.2
+  - rollType: 5
+    skillName: DIAGONAL
+    description: Gain 10 Shield
+    value: 10
+  - rollType: 6
+    skillName: XSHAPE
+    description: All allies gain +2 Shield
+    value: 2
+  - rollType: 7
+    skillName: FULLGRID
+    description: All Holy units gain +2 RES this round
+    value: 2

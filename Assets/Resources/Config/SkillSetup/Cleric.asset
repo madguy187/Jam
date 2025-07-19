@@ -14,7 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitType: Paladin
   skills:
-  - rollType: 0
-    skillName: CLERIC SKILL NAME
-    description: CLERIC SKILL DESCRIPTION
-    value: 10
+  - rollType: 1
+    skillName: SINGLE
+    description: Heal lowest HP ally for 3
+    value: 3
+  - rollType: 2
+    skillName: HORIZONTAL
+    description: All allies gain +2 HP
+    value: 2
+  - rollType: 4
+    skillName: DIAGONAL
+    description: Boost all ally's Crit Rate by + 2%
+    value: 2
+  - rollType: 3
+    skillName: VERTICAL
+    description: All allies gain +2 HP
+    value: 2
+  - rollType: 5
+    skillName: ZIGZAG
+    description: Revive 1 random fallen ally (1 HP) and heal all allies for 5HP.
+    value: 5
+  - rollType: 6
+    skillName: XSHAPE
+    description: Cleanse all negative effects from allies and heal 3 HP.
+    value: 3
+  - rollType: 7
+    skillName: FULLGRID
+    description: All allies +1 Res and heal 4 HP
+    value: 4
