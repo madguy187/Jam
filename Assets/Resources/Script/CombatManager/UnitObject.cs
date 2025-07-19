@@ -1,16 +1,6 @@
 using System;
 using UnityEngine;
 
-public enum eRollType {
-    SINGLE,
-    DIAGONAL,
-    ZIGZAG,
-    XSHAPE,
-    FULLGRID,
-    VERTICAL,
-    HORIZONTAL
-}
-
 public class UnitObject : MonoBehaviour {
     [field: SerializeField] public UnitScriptableObject unitSO { get; private set; }
     [SerializeField] EffectList _listEffect;
@@ -84,17 +74,17 @@ public class UnitObject : MonoBehaviour {
         return _currentHealth / unitSO.hp;
     }
 
-    public EffectList GetEffectList(eRollType eType) {
+    public EffectList GetEffectList(MatchType eType) {
         switch (eType) {
-            case eRollType.SINGLE:
+            case MatchType.SINGLE:
                 return _listSingleEffect;
-            case eRollType.DIAGONAL:
+            case MatchType.DIAGONAL:
                 return _listDiagonalEffect;
-            case eRollType.ZIGZAG:
+            case MatchType.ZIGZAG:
                 return _listZigZagEffect;
-            case eRollType.XSHAPE:
+            case MatchType.XSHAPE:
                 return _listXShapeEffect;
-            case eRollType.FULLGRID:
+            case MatchType.FULLGRID:
                 return _listFullGridEffect;
         }
 

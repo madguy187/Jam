@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CombatManager : MonoBehaviour {
@@ -17,6 +18,8 @@ public class CombatManager : MonoBehaviour {
     eDeckType _eAttackerDeck = eDeckType.NONE;
     int _nAttackerIndex = Global.INVALID_INDEX;
 
+    List<Match> _listMatch = null;
+
     void Awake() {
         if (instance != null) {
             Destroy(instance);
@@ -32,7 +35,7 @@ public class CombatManager : MonoBehaviour {
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.Alpha3)) {
-            StartBattleLoop();
+            StartBattleLoop(null);
         }
 
         switch (_state) {
@@ -46,6 +49,7 @@ public class CombatManager : MonoBehaviour {
                 break;
             case eCombatState.FINISH:
                 _state = eCombatState.WAIT;
+                _listMatch = null;
                 break;
         }
     }
@@ -102,10 +106,12 @@ public class CombatManager : MonoBehaviour {
         return false;
     }
 
-    public void StartBattleLoop() {
+    public void StartBattleLoop(List<Match> matches) {
         if (!_CanBattle()) {
             return;
         }
+
+        _listMatch = matches;
         _state = eCombatState.ATTACK;
         _eAttackerDeck = eDeckType.PLAYER;
         _nAttackerIndex = 0;
@@ -147,17 +153,33 @@ public class CombatManager : MonoBehaviour {
         }
 
         Global.DEBUG_PRINT("attacker_deck=" + eType + " attacker_index=" + nAttackerIndex + " defender_index=" + nTarget);
-        _ExecBattleOne(cAttackerUnit, cDefenderUnit, eRollType.SINGLE);
+        _ExecBattleOne(cAttackerUnit, cDefenderUnit, _GetRollType(cAttackerUnit.unitSO.unitName));
     }
 
-    void _ExecBattleOne(UnitObject cAttackerUnit, UnitObject cDefenderUnit, eRollType eRoll) {
+    MatchType _GetRollType(string unitName) {
+        if (_listMatch == null) {
+            return MatchType.NONE;
+        }
+
+        foreach (Match match in _listMatch) {
+            if (match.GetUnitName() == unitName) {
+                return match.GetMatchType();
+            }
+        }
+        
+        return MatchType.NONE;
+    }
+
+    void _ExecBattleOne(UnitObject cAttackerUnit, UnitObject cDefenderUnit, MatchType eRoll) {
         if (cAttackerUnit == null || cDefenderUnit == null) {
             return;
         }
 
         EffectList effects = cAttackerUnit.GetEffectList(eRoll);
-        foreach (EffectScriptableObject effect in effects) {
-            _ActivateEffect(effect, ref cAttackerUnit);
+        if (effects != null) {
+            foreach (EffectScriptableObject effect in effects) {
+                _ActivateEffect(effect, ref cAttackerUnit);
+            }
         }
 
         float fAttack = cAttackerUnit.GetAttack();

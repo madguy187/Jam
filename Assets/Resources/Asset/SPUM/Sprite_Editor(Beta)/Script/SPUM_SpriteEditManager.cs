@@ -152,8 +152,10 @@ public class SPUM_SpriteEditManager : MonoBehaviour
             _syncList[i].GetComponent<SpriteSync>()._nowSprite = null;
         }        
     }
+
     //Reset all sprite added.
 
+    [System.Obsolete]
     public void SetPivot(SpriteRenderer _sprite)
     {
         if( _sprite.transform.localPosition.x ==0 && _sprite.transform.localPosition.y ==0) return;
