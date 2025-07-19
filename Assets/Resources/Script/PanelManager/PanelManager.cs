@@ -3,14 +3,17 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 
-public class UnitInfoPanelController : MonoBehaviour
+public class PanelManager : MonoBehaviour
 {
     [Header("Panel References")]
     [SerializeField] private Image unitIconImage;
     [SerializeField] private TextMeshProUGUI statsText;
+    [SerializeField] private TextMeshProUGUI unitIconTitle;
+    [SerializeField] private TextMeshProUGUI statsTitle;   
 
     [Header("Skill UI")]
     [SerializeField] private SkillBoxUI[] skillBoxes;
+    [SerializeField] private TextMeshProUGUI skillsTitle;  
 
     [Header("Unit Skill Descriptions")]
     [Tooltip("Assign the UnitSkillMapping asset here")]
@@ -18,11 +21,38 @@ public class UnitInfoPanelController : MonoBehaviour
     
     private UnitObject currentUnit;
 
+    private void Start()
+    {
+        // Hide all skill boxes
+        if (skillBoxes != null)
+        {
+            foreach (var skillBox in skillBoxes)
+            {
+                if (skillBox != null)
+                {
+                    skillBox.gameObject.SetActive(false);
+                }
+            }
+        }
+        
+        // Hide the panel
+        gameObject.SetActive(false);
+    }
+
     public void ShowUnitInfo(UnitObject unit)
     {
-        if (unit == null) return;
+        if (unit == null) 
+        {
+            HidePanel();
+            return;
+        }
         
         currentUnit = unit;
+        
+        // Show and set up titles
+        unitIconTitle.text = "Unit Icon";
+        statsTitle.text = "Combat Stats";
+        skillsTitle.text = "Skills";
         
         // Update unit icon
         if (unitIconImage != null)
@@ -31,11 +61,6 @@ public class UnitInfoPanelController : MonoBehaviour
             if (spriteRenderer != null && spriteRenderer.sprite != null)
             {
                 unitIconImage.sprite = spriteRenderer.sprite;
-                unitIconImage.gameObject.SetActive(true);
-            }
-            else
-            {
-                unitIconImage.gameObject.SetActive(false);
             }
         }
 
@@ -53,7 +78,6 @@ public class UnitInfoPanelController : MonoBehaviour
         // Update skill boxes
         if (skillBoxes != null && skillBoxes.Length > 0)
         {
-            // Get the appropriate skill config
             UnitSkillConfig skillConfig = GetSkillConfigForUnit(unit);
             bool hasSkillConfig = (skillConfig != null);
 
@@ -65,21 +89,18 @@ public class UnitInfoPanelController : MonoBehaviour
                     {
                         string description = skillConfig.GetDescription(skillBox.GetRollType());
                         float value = skillConfig.GetValue(skillBox.GetRollType());
-                        
-                        Global.DEBUG_PRINT($"Setting up {skillBox.GetRollType()} with description: {description}");
                         skillBox.SetupForUnit(description, value);
                         skillBox.gameObject.SetActive(true);
                     }
                     else
                     {
-                        // hide if no skills
                         skillBox.gameObject.SetActive(false);
-                        Global.DEBUG_PRINT($"No skills configured for unit: {unit.name} - hiding skill box");
                     }
                 }
             }
         }
 
+        // Show the panel
         gameObject.SetActive(true);
     }
 
@@ -118,6 +139,18 @@ public class UnitInfoPanelController : MonoBehaviour
 
     public void HidePanel()
     {
+        // Hide all skill boxes first
+        if (skillBoxes != null)
+        {
+            foreach (var skillBox in skillBoxes)
+            {
+                if (skillBox != null)
+                {
+                    skillBox.gameObject.SetActive(false);
+                }
+            }
+        }
+        
         gameObject.SetActive(false);
         currentUnit = null;
     }

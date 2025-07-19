@@ -15,6 +15,14 @@ MonoBehaviour:
   unitType: Enemy
   skills:
   - rollType: 0
-    skillName: SINGLE
-    description: ENEMYSINGLE
+    skillName: SINGLE ENEMY SKILL
+    description: SINGLE ENEMY SKILL DESCRIPTION
+    value: 10
+  - rollType: 5
+    skillName: VERTICAL ENEMY SKILL
+    description: VERTICAL ENEMY SKILL DESCRIPTION
+    value: 10
+  - rollType: 1
+    skillName: DIAGONAL ENEMY SKILL
+    description: DIAGONAL ENEMY SKILL DESCRIPTION
     value: 10

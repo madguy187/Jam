@@ -15,6 +15,14 @@ MonoBehaviour:
   unitType: Paladin
   skills:
   - rollType: 0
-    skillName: PALADIN SKILL
-    description: PALADIN SKILL DESCRIPTION
+    skillName: SINGLE PALADIN SKILL
+    description: SINGLE PALADIN SKILL DESCRIPTION
+    value: 1
+  - rollType: 5
+    skillName: VERTICAL PALADIN SKILL
+    description: VERTICAL PALADIN SKILL DESCRIPTION
+    value: 1
+  - rollType: 1
+    skillName: DIAGONAL PALADIN SKILL
+    description: DIAGONAL PALADIN SKILL DESCRIPTION
     value: 1

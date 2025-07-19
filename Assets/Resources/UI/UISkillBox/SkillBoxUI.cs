@@ -16,17 +16,37 @@ public class SkillBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     private void Start()
     {
         Global.DEBUG_PRINT($"SkillBox initialized for type: {skillType}");
+        
+        // Set transparent background
+        Image backgroundImage = GetComponent<Image>();
+        if (backgroundImage != null)
+        {
+            Color color = backgroundImage.color;
+            color.a = 0;
+            backgroundImage.color = color;
+        }
+        
+        // Load pattern sprite
+        if (patternIcon != null)
+        {
+            string spritePath = $"Sprites/Patterns/{skillType.ToString().ToLower()}";
+            Sprite sprite = Resources.Load<Sprite>(spritePath);
+            if (sprite != null)
+            {
+                patternIcon.sprite = sprite;
+                Global.DEBUG_PRINT($"Loaded pattern sprite from: {spritePath}");
+            }
+            else
+            {
+                Global.DEBUG_PRINT($"Failed to load pattern sprite from: {spritePath}");
+            }
+        }
     }
 
     public void SetupForUnit(string description, float value)
     {
         Global.DEBUG_PRINT($"Setting up skill box for type {skillType} with description: {description}");
         this.description = description;
-
-        if (patternIcon != null)
-        {
-            patternIcon.sprite = Resources.Load<Sprite>($"Sprites/Patterns/{skillType.ToString().ToLower()}");
-        }
     }
 
     public eRollType GetRollType()
