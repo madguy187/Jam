@@ -10,6 +10,9 @@ public enum eDeckType {
 public class DeckManager : MonoBehaviour {
     public static DeckManager instance;
 
+    [SerializeField] Transform _transPlayerPos;
+    [SerializeField] Transform _transEnemyPos;
+
     Deck cPlayerDeck = new Deck();
     Deck cEnemyDeck = new Deck();
 
@@ -28,13 +31,17 @@ public class DeckManager : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
             cEnemyDeck.AddUnit("Paladin");
         }
+
+        if (Input.GetKeyDown(KeyCode.Alpha4)) {
+            cEnemyDeck.AddUnit("Cleric");
+        }
     }
 
     void Start() {
         {
-            List<Transform> vecPos = new List<Transform>();
-            Transform transPlayerPos = transform.Find("DeckPosition/Player");
-            foreach (Transform playerPos in transPlayerPos) {
+            List<UnitPosition> vecPos = new List<UnitPosition>();
+            UnitPosition[] vecPlayerUnitPos = _transPlayerPos.GetComponentsInChildren<UnitPosition>();
+            foreach (UnitPosition playerPos in vecPlayerUnitPos) {
                 vecPos.Add(playerPos);
             }
             cPlayerDeck.Init(vecPos);
@@ -42,9 +49,9 @@ public class DeckManager : MonoBehaviour {
         }
 
         {
-            List<Transform> vecPos = new List<Transform>();
-            Transform transEnemyPos = transform.Find("DeckPosition/Enemy");
-            foreach (Transform enemyPos in transEnemyPos) {
+            List<UnitPosition> vecPos = new List<UnitPosition>();
+            UnitPosition[] vecEnemyUnitPos = _transEnemyPos.GetComponentsInChildren<UnitPosition>();
+            foreach (UnitPosition enemyPos in vecEnemyUnitPos) {
                 vecPos.Add(enemyPos);
             }
             cEnemyDeck.Init(vecPos);

@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ae3f48536174bf64a82442a0e1e19f19, type: 3}
-  m_Name: EnemyUnitSO
+  m_Name: ClericUnitSO
   m_EditorClassIdentifier: 
-  unitName: test
-  hp: 100
-  attack: 0
-  shield: 5
+  unitName: 
+  hp: 50
+  attack: 50
+  shield: 0
   res: 0
   critRate: 0
   critMulti: 0

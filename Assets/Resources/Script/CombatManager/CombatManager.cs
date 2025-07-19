@@ -15,9 +15,7 @@ public class CombatManager : MonoBehaviour {
 
     eCombatState _state = eCombatState.WAIT;
     eDeckType _eAttackerDeck = eDeckType.NONE;
-    int _nAttackerIndex = INVALID_INDEX;
-
-    const int INVALID_INDEX = -1;
+    int _nAttackerIndex = Global.INVALID_INDEX;
 
     void Awake() {
         if (instance != null) {
@@ -66,14 +64,12 @@ public class CombatManager : MonoBehaviour {
             _timer.Reset();
         }
 
-        _nAttackerIndex++;
-        int nMaxSize = cDeck.GetDeckMaxSize();
-        if (_nAttackerIndex >= nMaxSize) {
-            UpdateAttackOrder();
+        if (!_UpdateAttackerIndex(cDeck)) {
+            _UpdateAttackOrder();
         }
     }
 
-    void UpdateAttackOrder() {
+    void _UpdateAttackOrder() {
         switch (_eAttackerDeck) {
         case eDeckType.NONE:
             _eAttackerDeck = eDeckType.PLAYER;
@@ -86,6 +82,24 @@ public class CombatManager : MonoBehaviour {
             break;
         }
         _nAttackerIndex = 0;
+    }
+
+    bool _UpdateAttackerIndex(Deck cDeck) {
+        _nAttackerIndex++;
+
+        int nMaxSize = cDeck.GetDeckMaxSize();
+        if (_nAttackerIndex > nMaxSize) {
+            return false;
+        }
+
+        for (int i = _nAttackerIndex; i < nMaxSize; i++) {
+            if (cDeck.IsValidUnitIndex(i)) {
+                _nAttackerIndex = i;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void StartBattleLoop() {
@@ -115,20 +129,20 @@ public class CombatManager : MonoBehaviour {
         Deck cOtherDeck = DeckManager.instance.GetDeckByType(eOtherType);
 
         int nTarget = GetLowestHealth(cOtherDeck);
-        if (nTarget <= INVALID_INDEX) {
+        if (nTarget <= Global.INVALID_INDEX) {
             Global.DEBUG_PRINT("[ExecBattle] Cannot find target");
             return;
         }
 
         UnitObject cDefenderUnit = cOtherDeck.GetUnitObject(nTarget);
         if (cDefenderUnit == null) {
-            Global.DEBUG_PRINT("[ExecBattle] Defender deck is empty");
+            Global.DEBUG_PRINT("[ExecBattle] Defender deck is empty target=" + nTarget);
             return;
         }
 
         UnitObject cAttackerUnit = cDeck.GetUnitObject(nAttackerIndex);
         if (cAttackerUnit == null) {
-            Global.DEBUG_PRINT("[ExecBattle] Attacker deck is empty");
+            Global.DEBUG_PRINT("[ExecBattle] Attacker deck is empty target=" + nAttackerIndex);
             return;
         }
 
@@ -156,20 +170,30 @@ public class CombatManager : MonoBehaviour {
     }
 
     public int GetLowestHealth(Deck cDeck) {
-        int nIndex = INVALID_INDEX;
-
+        int nIndex = Global.INVALID_INDEX;
         float nLowestHealth = Mathf.Infinity;
+        bool bHasFrontUnit = cDeck.HasFrontUnit();
 
-        int nCount = 0;
         foreach (UnitObject unit in cDeck) {
+            if (unit == null) {
+                continue;
+            }
+
+            if (unit.IsDead()) {
+                continue;
+            }
+
             float nHealth = unit.GetHealth();
             if (nHealth > nLowestHealth) {
                 continue;
             }
 
-            nIndex = nCount;
+            if (bHasFrontUnit && !unit.IsFrontPosition()) {
+                continue;
+            }
+
+            nIndex = unit.index;
             nLowestHealth = nHealth;
-            nCount++;
         }
 
         return nIndex;
