@@ -11,6 +11,12 @@ public enum eRollType {
     HORIZONTAL
 }
 
+public enum eUnitPosition {
+    NONE,
+    FRONT,
+    BACK
+}
+
 public class UnitObject : MonoBehaviour {
     [field: SerializeField] public UnitScriptableObject unitSO { get; private set; }
     [SerializeField] EffectList _listEffect;
@@ -24,6 +30,8 @@ public class UnitObject : MonoBehaviour {
 
     float _currentHealth = 0.0f;
     float _currentShield = 0.0f;
+    eUnitPosition _ePosition = eUnitPosition.NONE;
+    public bool IsFrontPosition() { return _ePosition == eUnitPosition.FRONT; }
 
     bool _bIsDead = false;
     public bool IsDead() { return _bIsDead; }
@@ -68,16 +76,12 @@ public class UnitObject : MonoBehaviour {
             return;
         }
 
-        float fDamageAfterShield = damage - _currentShield;
-        if (fDamageAfterShield < 0) {
-            _currentShield = Mathf.Abs(fDamageAfterShield);
-            return;
-        }
-
-        _currentHealth -= fDamageAfterShield;
+        float fFinalDamage = _GetDamageAfterShield(damage);
+        _currentHealth -= fFinalDamage;
         if (_currentHealth <= 0.0f) {
             _TriggerDeath();
         }
+        Global.DEBUG_PRINT("Final Damage=" + fFinalDamage);
     }
 
     public float GetHealthPercentage() {
@@ -86,19 +90,30 @@ public class UnitObject : MonoBehaviour {
 
     public EffectList GetEffectList(eRollType eType) {
         switch (eType) {
-        case eRollType.SINGLE:
-            return _listSingleEffect;
-        case eRollType.DIAGONAL:
-            return _listDiagonalEffect;
-        case eRollType.ZIGZAG:
-            return _listZigZagEffect;
-        case eRollType.XSHAPE:
-            return _listXShapeEffect;
-        case eRollType.FULLGRID:
-            return _listFullGridEffect;
+            case eRollType.SINGLE:
+                return _listSingleEffect;
+            case eRollType.DIAGONAL:
+                return _listDiagonalEffect;
+            case eRollType.ZIGZAG:
+                return _listZigZagEffect;
+            case eRollType.XSHAPE:
+                return _listXShapeEffect;
+            case eRollType.FULLGRID:
+                return _listFullGridEffect;
         }
-        
+
         return null;
+    }
+
+    float _GetDamageAfterShield(float damage) {
+        damage -= _currentShield;
+        if (damage > 0) {
+            _currentShield = 0;
+            return damage;
+        }
+
+        _currentShield = Mathf.Abs(damage);
+        return 0;
     }
 
     void _TriggerDeath() {

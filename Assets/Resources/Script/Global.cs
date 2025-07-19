@@ -1,8 +1,9 @@
 using UnityEngine;
-using System.Collections.Generic;
 
 public static class Global {
-    public const int GRID_SIZE = 3; 
+    public const int GRID_SIZE = 3;
+    public const int PERCENTAGE_CONSTANT = 100;
+    public const int RESISTANCE_PERCENTAGE_CONSTANT = 10;
     public static bool IS_DEBUG = true;
 
     // Simulation test for Darren&Tianyu to verify all kinds of complicated scenarios

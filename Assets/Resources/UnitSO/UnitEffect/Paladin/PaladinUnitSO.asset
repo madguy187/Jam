@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: PaladinUnitSO
   m_EditorClassIdentifier: 
   unitName: 
-  hp: 0
-  attack: 0
+  hp: 100
+  attack: 50
   shield: 0
   res: 0
   critRate: 0

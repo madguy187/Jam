@@ -15,9 +15,10 @@ namespace Map
 
 namespace Map {
     [CreateAssetMenu]
-    public class NodeBlueprint : ScriptableObject 
+    public class NodeBlueprint : ScriptableObject
     {
         public Sprite sprite;
         public NodeType nodeType;
+        public string description;
     }
 }
