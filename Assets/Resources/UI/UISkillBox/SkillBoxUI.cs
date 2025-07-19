@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 public class SkillBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerMoveHandler
 {
     [Header("Skill Settings")]
-    [SerializeField] private eRollType skillType;
+    [SerializeField] private MatchType skillType;
     
     private RectTransform rectTransform;
     private string description;
@@ -31,57 +31,31 @@ public class SkillBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
     public void SetupForUnit(string description, float value)
     {
-        if (!isInitialized)
-        {
-            InitializeComponents();
-        }
-
-        Global.DEBUG_PRINT($"Setting up skill box for type {skillType} with description: {description}");
         this.description = description;
     }
 
-    public eRollType GetRollType()
-    {
-        return skillType;
-    }
-
-    #region Tooltip Handling
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (string.IsNullOrEmpty(description)) return;
-
-        Global.DEBUG_PRINT($"Pointer Enter - Has description: true");
         isHovering = true;
-        ShowTooltip(eventData.position);
+        TooltipSystem.Show(description, eventData.position);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Global.DEBUG_PRINT("Pointer Exit");
         isHovering = false;
-        HideTooltip();
+        TooltipSystem.Hide();
     }
 
     public void OnPointerMove(PointerEventData eventData)
     {
-        if (!isHovering || string.IsNullOrEmpty(description)) return;
-        ShowTooltip(eventData.position);
+        if (isHovering)
+        {
+            TooltipSystem.Show(description, eventData.position);
+        }
     }
 
-    private void ShowTooltip(Vector2 position)
+    public MatchType GetMatchType()
     {
-        TooltipSystem.Show(description, position);
-    }
-
-    private void HideTooltip()
-    {
-        TooltipSystem.Hide();
-    }
-    #endregion
-
-    private void OnDestroy()
-    {
-        description = null;
-        isHovering = false;
+        return skillType;
     }
 } 

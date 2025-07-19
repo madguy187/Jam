@@ -101,7 +101,7 @@ public class PanelManager : MonoBehaviour
         gameObject.SetActive(true);
         OnUnitSelected?.Invoke(unit);
     }
-    // test
+
     private void UpdateSkillBoxes(UnitObject unit)
     {
         if (skillBoxes == null || skillBoxes.Length == 0) return;
@@ -115,8 +115,8 @@ public class PanelManager : MonoBehaviour
             {
                 if (hasSkillConfig)
                 {
-                    string description = skillConfig.GetDescription(skillBox.GetRollType());
-                    float value = skillConfig.GetValue(skillBox.GetRollType());
+                    string description = skillConfig.GetDescription(skillBox.GetMatchType());
+                    float value = skillConfig.GetValue(skillBox.GetMatchType());
                     skillBox.SetupForUnit(description, value);
                     skillBox.gameObject.SetActive(true);
                 }
@@ -134,21 +134,6 @@ public class PanelManager : MonoBehaviour
 
         return skillMapping.GetSkillConfig(unit.unitSO.name) 
             ?? skillMapping.GetSkillConfig(unit.name);
-    }
-
-    private MatchType GetMatchTypeForRollType(eRollType rollType)
-    {
-        return rollType switch
-        {
-            eRollType.SINGLE => MatchType.SINGLE,
-            eRollType.DIAGONAL => MatchType.DIAGONAL,
-            eRollType.ZIGZAG => MatchType.ZIGZAG,
-            eRollType.XSHAPE => MatchType.XSHAPE,
-            eRollType.FULLGRID => MatchType.FULLGRID,
-            eRollType.VERTICAL => MatchType.VERTICAL,
-            eRollType.HORIZONTAL => MatchType.HORIZONTAL,
-            _ => MatchType.SINGLE
-        };
     }
 
     public void HidePanel()
