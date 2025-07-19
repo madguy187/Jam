@@ -5,6 +5,7 @@ using UnityEngine;
 public class Deck : IEnumerable<UnitObject> {
     List<UnitObject> _vecUnit = new List<UnitObject>();
     List<Transform> _vecPosition = new List<Transform>();
+    public int GetDeckMaxSize() { return _vecPosition.Count; }
 
     public void Init(List<Transform> vecPos) {
         _vecPosition = vecPos;
@@ -43,6 +44,14 @@ public class Deck : IEnumerable<UnitObject> {
         }
 
         return _vecUnit[index];
+    }
+
+    public bool IsValidUnitIndex(int index) {
+        if (index < 0 || index >= _vecUnit.Count) {
+            return false;
+        }
+
+        return true;
     }
 
     Transform _GetPosition() {
