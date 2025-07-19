@@ -9,12 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aee9251c355f9df46982cf7bd752f755, type: 3}
-  m_Name: SlotConfig
+  m_Script: {fileID: 11500000, guid: a571e656914834c7b9b4427846f4d19c, type: 3}
+  m_Name: Paladin
   m_EditorClassIdentifier: 
-  gridRows: 3
-  gridColumns: 3
-  freeSpinsPerTurn: 1
-  baseSpinCost: 2
-  spinAnimationDuration: 1
-  matchAnimationScale: 1.2
+  unitType: Paladin
+  skills:
+  - rollType: 0
+    skillName: PALADIN SKILL
+    description: PALADIN SKILL DESCRIPTION
+    value: 1

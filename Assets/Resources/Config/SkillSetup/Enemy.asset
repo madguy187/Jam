@@ -9,6 +9,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 410ab796330e947ffac155d41077e707, type: 3}
-  m_Name: PaladinSkills
-  m_EditorClassIdentifier: Assembly-CSharp::UnitSkillDescriptions
+  m_Script: {fileID: 11500000, guid: a571e656914834c7b9b4427846f4d19c, type: 3}
+  m_Name: Enemy
+  m_EditorClassIdentifier: 
+  unitType: Enemy
+  skills:
+  - rollType: 0
+    skillName: SINGLE
+    description: ENEMYSINGLE
+    value: 10

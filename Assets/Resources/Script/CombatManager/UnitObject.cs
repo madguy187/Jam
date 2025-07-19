@@ -6,7 +6,9 @@ public enum eRollType {
     DIAGONAL,
     ZIGZAG,
     XSHAPE,
-    FULLGRID
+    FULLGRID,
+    VERTICAL,
+    HORIZONTAL
 }
 
 public class UnitObject : MonoBehaviour {
