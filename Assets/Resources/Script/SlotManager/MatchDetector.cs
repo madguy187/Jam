@@ -96,7 +96,6 @@ public class MatchDetector
     {
         List<Match> allMatches = new List<Match>();
         HashSet<Vector2Int> positionsInComplexPatterns = new HashSet<Vector2Int>();
-        Dictionary<SymbolType, List<Match>> matchesBySymbolAndType = new Dictionary<SymbolType, List<Match>>();
 
         // First detect all complex patterns
         var complexMatches = new List<Match>();
@@ -107,63 +106,53 @@ public class MatchDetector
         complexMatches.AddRange(DetectHorizontalMatches());
         complexMatches.AddRange(DetectVerticalMatches());
 
-        // Group matches by symbol and type
+        // Track all positions that are part of complex patterns
         foreach (var match in complexMatches)
         {
-            if (!matchesBySymbolAndType.ContainsKey(match.GetSymbol()))
-            {
-                matchesBySymbolAndType[match.GetSymbol()] = new List<Match>();
-            }
-            matchesBySymbolAndType[match.GetSymbol()].Add(match);
-
-            // Track all positions that are part of complex patterns
             foreach (var pos in match.GetPositions())
             {
                 positionsInComplexPatterns.Add(pos);
             }
         }
 
-        // If flag is ON, add all complex matches
+        // Add complex matches
         if (Global.EXCLUDE_SINGLES_IN_LARGER_PATTERNS)
         {
             allMatches.AddRange(complexMatches);
         }
-        else
+        /*else
         {
-            foreach (var symbolMatches in matchesBySymbolAndType)
-            {
-                var uniqueTypeMatches = symbolMatches.Value
-                    .GroupBy(m => m.GetMatchType())
-                    .Select(g => g.First());
-                allMatches.AddRange(uniqueTypeMatches);
-            }
-        }
+            // Group matches by symbol and type to get unique matches
+            var uniqueMatches = complexMatches
+                .GroupBy(m => new { Symbol = m.GetSymbol(), Type = m.GetMatchType() })
+                .Select(g => g.First());
+            allMatches.AddRange(uniqueMatches);
+        }*/
 
-        // Now handle singles detection
+        // Handle singles detection
         var potentialSingles = DetectSingleMatches();
         var singlesBySymbol = new Dictionary<SymbolType, List<Match>>();    
 
         // Group singles by symbol type
         foreach (var single in potentialSingles)
         {
-            if (!singlesBySymbol.ContainsKey(single.GetSymbol()))
+            var symbol = single.GetSymbol();
+            if (!singlesBySymbol.ContainsKey(symbol))
             {
-                singlesBySymbol[single.GetSymbol()] = new List<Match>();
+                singlesBySymbol[symbol] = new List<Match>();
             }
-            singlesBySymbol[single.GetSymbol()].Add(single);
+            singlesBySymbol[symbol].Add(single);
         }
 
-        // For each symbol type, add ONE single if any position of that symbol is not part of a complex pattern
+        // Add singles that aren't part of complex patterns
         foreach (var symbolSingles in singlesBySymbol)
         {
             foreach (var single in symbolSingles.Value)
             {
-                // If this position is not part of any complex pattern
                 if (!positionsInComplexPatterns.Contains(single.GetPositions()[0]))
                 {
-                    // Only add one single per symbol type
                     allMatches.Add(single);
-                    break; 
+                    break; // Only add one single per symbol type
                 }
             }
         }

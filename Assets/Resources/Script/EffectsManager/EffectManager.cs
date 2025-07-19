@@ -10,14 +10,22 @@ public class EffectManager : MonoBehaviour
     [SerializeField] private float scaleAmount = 1.2f;
     [SerializeField] private Color matchGlowColor = new Color(1f, 0.92f, 0.016f, 0.5f);
     
-    private SlotGridUI slotGridUI;
-    private SlotController slotController;
+    [Header("References")]
+    [SerializeField] private SlotGridUI slotGridUI;
+    [SerializeField] private SlotController slotController;
+    
     private bool wasSpinning = false;
 
-    private void Start()
+    private void Awake()
     {
-        slotGridUI = FindObjectOfType<SlotGridUI>();
-        slotController = FindObjectOfType<SlotController>();
+        if (slotGridUI == null)
+        {
+            slotGridUI = Object.FindAnyObjectByType<SlotGridUI>();
+        }
+        if (slotController == null)
+        {
+            slotController = Object.FindAnyObjectByType<SlotController>();
+        }
     }
 
     private void Update()

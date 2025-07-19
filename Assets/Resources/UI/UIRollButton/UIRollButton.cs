@@ -1,17 +1,49 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
+[RequireComponent(typeof(Button))]
 public class UIRollButton : MonoBehaviour
 {
-    private Button button;
+    [SerializeField] private Button button;
+    [SerializeField] private TextMeshProUGUI buttonText;
+    
+    private void Awake()
+    {
+        InitializeComponents();
+    }
+    
+    private void InitializeComponents()
+    {
+        if (button == null)
+        {
+            button = GetComponent<Button>();
+            if (button == null)
+            {
+                Debug.LogError("[UIRollButton] Button component not found!");
+                enabled = false;
+                return;
+            }
+        }
+        
+        if (buttonText == null)
+        {
+            buttonText = GetComponentInChildren<TextMeshProUGUI>();
+        }
+    }
     
     void Start()
     {
-        button = GetComponent<Button>();
-        if (button != null)
+        if (!enabled) return;
+        
+        if (SlotController.instance == null)
         {
-            button.onClick.AddListener(OnClick);
+            Debug.LogError("[UIRollButton] SlotController instance not found!");
+            enabled = false;
+            return;
         }
+        
+        button.onClick.AddListener(OnClick);
     }
     
     void OnDestroy()
@@ -24,11 +56,22 @@ public class UIRollButton : MonoBehaviour
     
     private void OnClick()
     {
-        SlotController.instance.FillGridWithRandomSymbols();
+        if (SlotController.instance != null)
+        {
+            SlotController.instance.FillGridWithRandomSymbols();
+        }
     }
     
     public void TriggerRoll()
     {
         OnClick();
+    }
+    
+    public void SetInteractable(bool interactable)
+    {
+        if (button != null)
+        {
+            button.interactable = interactable;
+        }
     }
 } 

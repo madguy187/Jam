@@ -101,7 +101,7 @@ public class PanelManager : MonoBehaviour
         gameObject.SetActive(true);
         OnUnitSelected?.Invoke(unit);
     }
-
+    // test
     private void UpdateSkillBoxes(UnitObject unit)
     {
         if (skillBoxes == null || skillBoxes.Length == 0) return;

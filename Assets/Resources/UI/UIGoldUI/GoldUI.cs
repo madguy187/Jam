@@ -4,7 +4,7 @@ using System.Collections;
 
 public class GoldUI : MonoBehaviour
 {
-    private TextMeshProUGUI goldText;
+    [SerializeField] private TextMeshProUGUI goldText;
     private const string PREFIX = "Gold: ";
     private const float ANIM_DURATION = 0.2f;
     private const float SCALE_AMOUNT = 1.2f;
@@ -15,14 +15,24 @@ public class GoldUI : MonoBehaviour
 
     private void Awake()
     {
+        InitializeComponents();
+    }
+
+    private void InitializeComponents()
+    {
         if (goldText == null)
         {
             goldText = GetComponent<TextMeshProUGUI>();
+            if (goldText == null)
+            {
+                goldText = GetComponentInChildren<TextMeshProUGUI>();
+            }
         }
         
         if (goldText == null)
         {
-            Debug.LogWarning("[GoldUI] TextMeshProUGUI component not found!");
+            Debug.LogError("[GoldUI] TextMeshProUGUI component not found! Please assign it in the inspector.");
+            enabled = false;
             return;
         }
 
@@ -31,13 +41,24 @@ public class GoldUI : MonoBehaviour
 
     private void Start()
     {
+        if (!enabled) return;
+        
+        if (GoldManager.instance == null)
+        {
+            Debug.LogError("[GoldUI] GoldManager instance not found!");
+            enabled = false;
+            return;
+        }
+
         // Initialize with current gold value
         currentGold = GoldManager.instance.GetCurrentGold();
-        goldText.text = PREFIX + currentGold.ToString();
+        UpdateGoldText();
     }
 
     private void Update()
     {
+        if (!enabled) return;
+        
         if (GoldManager.instance != null)
         {
             int newGold = GoldManager.instance.GetCurrentGold();
@@ -52,7 +73,7 @@ public class GoldUI : MonoBehaviour
     {
         bool isIncrease = newAmount > currentGold;
         currentGold = newAmount;
-        goldText.text = PREFIX + currentGold.ToString();
+        UpdateGoldText();
         
         if (animationCoroutine != null)
         {
@@ -62,26 +83,49 @@ public class GoldUI : MonoBehaviour
         animationCoroutine = StartCoroutine(AnimateGoldChange(isIncrease));
     }
 
+    private void UpdateGoldText()
+    {
+        if (goldText != null)
+        {
+            goldText.text = PREFIX + currentGold.ToString();
+        }
+    }
+
     private IEnumerator AnimateGoldChange(bool isIncrease)
     {
         float elapsed = 0f;
-        Color originalColor = goldText.color;
-        Color targetColor = isIncrease ? Color.green : Color.red;
-        
+        Vector3 startScale = goldText.transform.localScale;
+        Vector3 targetScale = originalScale * SCALE_AMOUNT;
+
         while (elapsed < ANIM_DURATION)
         {
             elapsed += Time.deltaTime;
             float t = elapsed / ANIM_DURATION;
             
-            float scaleT = Mathf.Sin(t * Mathf.PI);
-            goldText.transform.localScale = Vector3.Lerp(originalScale, originalScale * SCALE_AMOUNT, scaleT);
-            goldText.color = Color.Lerp(originalColor, targetColor, scaleT);
+            // Scale up
+            if (t <= 0.5f)
+            {
+                goldText.transform.localScale = Vector3.Lerp(startScale, targetScale, t * 2f);
+            }
+            // Scale down
+            else
+            {
+                goldText.transform.localScale = Vector3.Lerp(targetScale, originalScale, (t - 0.5f) * 2f);
+            }
             
             yield return null;
         }
-        
+
         goldText.transform.localScale = originalScale;
-        goldText.color = originalColor;
         animationCoroutine = null;
+    }
+
+    private void OnDestroy()
+    {
+        if (animationCoroutine != null)
+        {
+            StopCoroutine(animationCoroutine);
+            animationCoroutine = null;
+        }
     }
 } 

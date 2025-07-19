@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 3665899075668804798}
   - component: {fileID: 932790715963225841}
   - component: {fileID: 561056367779723384}
-  - component: {fileID: 4541897274629407791}
+  - component: {fileID: 6884459148659807972}
   m_Layer: 5
-  m_Name: RollButton
+  m_Name: Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -36,7 +36,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 113.75699, y: -52.009}
+  m_AnchoredPosition: {x: 90.8, y: 139.42}
   m_SizeDelta: {x: 51.5141, y: 34.018}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3665899075668804798
@@ -121,7 +121,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &4541897274629407791
+--- !u!114 &6884459148659807972
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -130,6 +130,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 4549804478777541591}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c2f41b31a3eeb453abfd48dc49d40c2d, type: 3}
+  m_Script: {fileID: 11500000, guid: 640fa78d356249d41bb35ef2036111e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
