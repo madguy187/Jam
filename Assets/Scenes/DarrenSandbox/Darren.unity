@@ -169,8 +169,6 @@ GameObject:
   - component: {fileID: 161051253}
   - component: {fileID: 161051252}
   - component: {fileID: 161051251}
-  - component: {fileID: 161051255}
-  - component: {fileID: 161051256}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -270,30 +268,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &161051255
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 161051250}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea0da3577b88e4f9a9d63e378a6cbefb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &161051256
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 161051250}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d6d7970a4702b4092a628f4e39261700, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &290371593
 GameObject:
   m_ObjectHideFlags: 0
@@ -1476,9 +1450,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be85a6f7bd3f14d66bd4b09cb22d103d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  patternIcon: {fileID: 1106961573}
   skillType: 5
-  patternSprite: {fileID: 0}
 --- !u!114 &1697760583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1686,6 +1658,8 @@ MonoBehaviour:
   effectDuration: 0.5
   scaleAmount: 1.2
   matchGlowColor: {r: 1, g: 0.92, b: 0.016, a: 0.5}
+  slotGridUI: {fileID: 0}
+  slotController: {fileID: 0}
 --- !u!4 &1962631253
 Transform:
   m_ObjectHideFlags: 0
