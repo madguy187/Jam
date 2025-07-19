@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum eDeckType {
+    NONE,
     PLAYER,
     ENEMY,
 }
