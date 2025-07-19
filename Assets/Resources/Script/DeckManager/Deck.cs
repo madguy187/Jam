@@ -21,7 +21,6 @@ public class Deck : IEnumerable<UnitObject> {
         }
 
         int nIndex = _GetEmptySlotIndex();
-        Debug.Log(nIndex);
         if (nIndex < 0) {
             return null;
         }

@@ -16,6 +16,7 @@ public enum GridPosition
 
 public enum MatchType
 {
+    NONE,
     SINGLE,     
     HORIZONTAL, 
     VERTICAL,   
@@ -31,9 +32,9 @@ public class Match
     private List<Vector2Int> positions;
     private List<GridPosition> readablePositions;
     private SymbolType symbol;
+    private string unitName;
 
-    public MatchType GetMatchType() 
-    {
+    public MatchType GetMatchType() {
         return type;
     }
 
@@ -51,22 +52,24 @@ public class Match
     {
         return symbol;
     }
-
-    public Match(MatchType type, List<Vector2Int> positions, SymbolType symbol)
+    
+    public string GetUnitName() 
     {
-        if (positions == null)
-        {
+        return unitName;
+    }
+
+    public Match(MatchType type, List<Vector2Int> positions, SymbolType symbol) {
+        if (positions == null) {
             Debug.LogWarning("[Match] Positions list cannot be null");
             return;
         }
-        
+
         this.type = type;
         this.positions = positions;
         this.symbol = symbol;
         this.readablePositions = new List<GridPosition>();
-        
-        foreach (var pos in positions)
-        {
+
+        foreach (var pos in positions) {
             readablePositions.Add(GetGridPosition(pos));
         }
     }
