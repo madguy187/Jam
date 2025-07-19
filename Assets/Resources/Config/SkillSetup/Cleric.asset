@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a571e656914834c7b9b4427846f4d19c, type: 3}
+  m_Name: Cleric
+  m_EditorClassIdentifier: 
+  unitType: Paladin
+  skills:
+  - rollType: 0
+    skillName: CLERIC SKILL NAME
+    description: CLERIC SKILL DESCRIPTION
+    value: 10

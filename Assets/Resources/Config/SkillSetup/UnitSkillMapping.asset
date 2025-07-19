@@ -17,3 +17,5 @@ MonoBehaviour:
     skillConfig: {fileID: 11400000, guid: 6beddf019c7b34302ae35ecd79a25434, type: 2}
   - unitType: Enemy
     skillConfig: {fileID: 11400000, guid: 419730db9a5624ad8a6222364b82d09e, type: 2}
+  - unitType: Cleric
+    skillConfig: {fileID: 11400000, guid: 774ea87c731f544759fd55161d2cf802, type: 2}
