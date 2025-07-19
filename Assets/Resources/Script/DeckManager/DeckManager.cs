@@ -82,4 +82,9 @@ public class DeckManager : MonoBehaviour {
 
         return cDeck;
     }
+
+    public void ResolveTempEffect() {
+        cPlayerDeck.Resolve();
+        cEnemyDeck.Resolve();
+    }
 }

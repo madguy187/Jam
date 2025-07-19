@@ -61,8 +61,8 @@ public class SPUM_SpriteEditManager : MonoBehaviour
     //     _syncList[16].GetComponent<SpriteSync>()._nowSprite=_back;
     // }
 
-    public void SyncPivot()
-    {
+    [System.Obsolete]
+    public void SyncPivot() {
         SyncPivotProcess(_spriteObj._hairList[0]);
         SyncPivotProcess(_spriteObj._hairList[3]);
         SyncPivotProcess(_spriteObj._hairList[1]);
@@ -82,9 +82,9 @@ public class SPUM_SpriteEditManager : MonoBehaviour
         SyncPivotProcess(_spriteObj._backList[0]);
     }
 
-    public void SyncPivotProcess(SpriteRenderer SR)
-    {
-        if(SR.sprite!=null) SetPivot(SR);
+    [System.Obsolete]
+    public void SyncPivotProcess(SpriteRenderer SR) {
+        if (SR.sprite != null) SetPivot(SR);
     }
 
     public void SetMultiple(Texture2D sp, Sprite ttSP, string nameCode)

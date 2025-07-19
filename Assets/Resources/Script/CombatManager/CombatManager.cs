@@ -50,6 +50,7 @@ public class CombatManager : MonoBehaviour {
             case eCombatState.FINISH:
                 _state = eCombatState.WAIT;
                 _listMatch = null;
+                DeckManager.instance.ResolveTempEffect();
                 break;
         }
     }
@@ -75,15 +76,15 @@ public class CombatManager : MonoBehaviour {
 
     void _UpdateAttackOrder() {
         switch (_eAttackerDeck) {
-        case eDeckType.NONE:
-            _eAttackerDeck = eDeckType.PLAYER;
-            break;
-        case eDeckType.PLAYER:
-            _eAttackerDeck = eDeckType.ENEMY;
-            break;
-        case eDeckType.ENEMY:
-            _eAttackerDeck = eDeckType.NONE;
-            break;
+            case eDeckType.NONE:
+                _eAttackerDeck = eDeckType.PLAYER;
+                break;
+            case eDeckType.PLAYER:
+                _eAttackerDeck = eDeckType.ENEMY;
+                break;
+            case eDeckType.ENEMY:
+                _eAttackerDeck = eDeckType.NONE;
+                break;
         }
         _nAttackerIndex = 0;
     }
@@ -157,6 +158,7 @@ public class CombatManager : MonoBehaviour {
     }
 
     MatchType _GetRollType(string unitName) {
+        return MatchType.SINGLE;
         if (_listMatch == null) {
             return MatchType.NONE;
         }
@@ -166,7 +168,7 @@ public class CombatManager : MonoBehaviour {
                 return match.GetMatchType();
             }
         }
-        
+
         return MatchType.NONE;
     }
 
@@ -175,10 +177,10 @@ public class CombatManager : MonoBehaviour {
             return;
         }
 
-        EffectList effects = cAttackerUnit.GetEffectList(eRoll);
+        EffectList effects = cAttackerUnit.GetRollEffectList(eRoll);
         if (effects != null) {
             foreach (EffectScriptableObject effect in effects) {
-                _ActivateEffect(effect, ref cAttackerUnit);
+                _ActivateRollEffect(effect);
             }
         }
 
@@ -188,7 +190,24 @@ public class CombatManager : MonoBehaviour {
         }
 
         fAttack *= _GetResRatio(cDefenderUnit);
+
+        fAttack = _GetDamageAfterShield(cDefenderUnit, fAttack);
+
         cDefenderUnit.ReceiveDamage(fAttack);
+        Global.DEBUG_PRINT("Final Damage=" + fAttack);
+    }
+
+    float _GetDamageAfterShield(UnitObject cUnit, float damage) {
+        float cCurrentShield = cUnit.GetShield();
+        damage -= cCurrentShield;
+        if (damage > 0) {
+            cUnit.SetShield(0);
+            return damage;
+        }
+
+        cUnit.SetShield(Mathf.Abs(damage));
+
+        return 0;
     }
 
     public int GetLowestHealth(Deck cDeck) {
@@ -208,6 +227,10 @@ public class CombatManager : MonoBehaviour {
             float nHealth = unit.GetHealth();
             if (nHealth > nLowestHealth) {
                 continue;
+            }
+
+            if (unit.GetEffectParam(EffectTempType.EFFECT_TEMP_TAUNT) > 0) {
+                return unit.index;
             }
 
             if (bHasFrontUnit && !unit.IsFrontPosition()) {
@@ -238,11 +261,57 @@ public class CombatManager : MonoBehaviour {
         return Global.PERCENTAGE_CONSTANT / (Global.PERCENTAGE_CONSTANT + cDefenderUnit.GetRes() * Global.RESISTANCE_PERCENTAGE_CONSTANT);
     }
 
-    void _ActivateEffect(EffectScriptableObject cEffect, ref UnitObject cAttackerUnit) {
-        if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_SHIELD)) {
-            cAttackerUnit.AddShield(cEffect.GetEffectVal());
+    void _ActivateRollEffect(EffectScriptableObject cEffect) {
+        EffectTargetType eTargetType = cEffect.GetTargetType();
+        List<UnitObject> arrTargetUnit = _GetTargetUnitBasedOnTargetType(eTargetType);
+
+        foreach (UnitObject unit in arrTargetUnit) {
+            if (unit == null) {
+                continue;
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_SHIELD)) {
+                unit.AddShield(cEffect.GetEffectVal());
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_HEAL)) {
+                unit.AddHealth(cEffect.GetEffectVal());
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_TAUNT)) {
+                unit.AddEffect(EffectTempType.EFFECT_TEMP_TAUNT, cEffect);
+            }
+
+            Global.DEBUG_PRINT("[Effect] Triggered " + cEffect.GetTypeName() +
+                                " val=" + cEffect.GetEffectVal() +
+                                " unit_index=" + unit.index);
         }
 
-        Global.DEBUG_PRINT("[Effect] Triggered " + cEffect.GetTypeName() + " val=" + cEffect.GetEffectVal());
+    }
+
+    List<UnitObject> _GetTargetUnitBasedOnTargetType(EffectTargetType eTargetType) {
+        List<UnitObject> arrTarget = new List<UnitObject>();
+        Deck cDeck = DeckManager.instance.GetDeckByType(_eAttackerDeck);
+
+        eDeckType eOtherType = _eAttackerDeck == eDeckType.PLAYER ? eDeckType.ENEMY : eDeckType.PLAYER;
+        Deck cOtherDeck = DeckManager.instance.GetDeckByType(eOtherType);
+
+        if (cDeck == null || cOtherDeck == null) {
+            return arrTarget;
+        }
+
+        switch (eTargetType) {
+            case EffectTargetType.SELF:
+                arrTarget.Add(cDeck.GetUnitObject(_nAttackerIndex));
+                break;
+            case EffectTargetType.TEAM_DECK:
+                arrTarget = cDeck.GetAllAliveUnit();
+                break;
+            case EffectTargetType.ENEMY_DECK:
+                arrTarget = cOtherDeck.GetAllAliveUnit();
+                break;
+        }
+
+        return arrTarget;
     }
 }

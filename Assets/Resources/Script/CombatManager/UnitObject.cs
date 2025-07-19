@@ -9,6 +9,7 @@ public class UnitObject : MonoBehaviour {
     [SerializeField] EffectList _listZigZagEffect;
     [SerializeField] EffectList _listXShapeEffect;
     [SerializeField] EffectList _listFullGridEffect;
+    EffectMap _listTempEffect = new EffectMap();
 
     public int index { get; set; }
 
@@ -16,6 +17,7 @@ public class UnitObject : MonoBehaviour {
     float _currentShield = 0.0f;
     eUnitPosition _ePosition = eUnitPosition.NONE;
     public bool IsFrontPosition() { return _ePosition == eUnitPosition.FRONT; }
+    public eUnitPosition GetUnitPosition() { return _ePosition; }
     public void SetUnitPosition(eUnitPosition position) { _ePosition = position; }
 
     bool _bIsDead = false;
@@ -28,8 +30,28 @@ public class UnitObject : MonoBehaviour {
         _currentShield = unitSO.shield;
     }
 
+    public void AddEffect(EffectTempType eType, EffectScriptableObject effectSO) {
+        EffectObject effect = new EffectObject();
+        effect.effectType = eType;
+        effect.val = effectSO.GetEffectVal();
+        effect.turn = effectSO.GetEffectTurn();
+        _listTempEffect.AddEffect(eType, effect);
+    }
+
+    public void RemoveEffect(EffectTempType eType) {
+        _listTempEffect.RemoveEffect(eType);
+    }
+
+    public float GetEffectParam(EffectTempType eType) {
+        return _listTempEffect.GetParam(eType);
+    }
+
     public float GetHealth() {
         return _currentHealth;
+    }
+
+    public void AddHealth(float health) {
+        _currentHealth += health;
     }
 
     public float GetAttack() {
@@ -42,6 +64,10 @@ public class UnitObject : MonoBehaviour {
 
     public void AddShield(float shield) {
         _currentShield += shield;
+    }
+
+    public void SetShield(float shield) {
+        _currentShield = shield;
     }
 
     public float GetRes() {
@@ -61,20 +87,17 @@ public class UnitObject : MonoBehaviour {
             return;
         }
 
-        float fFinalDamage = _GetDamageAfterShield(damage);
-        _currentHealth -= fFinalDamage;
+        _currentHealth -= damage;
         if (_currentHealth <= 0.0f) {
             _TriggerDeath();
         }
-
-        Global.DEBUG_PRINT("Final Damage=" + fFinalDamage);
     }
 
     public float GetHealthPercentage() {
         return _currentHealth / unitSO.hp;
     }
 
-    public EffectList GetEffectList(MatchType eType) {
+    public EffectList GetRollEffectList(MatchType eType) {
         switch (eType) {
             case MatchType.SINGLE:
                 return _listSingleEffect;
@@ -91,15 +114,8 @@ public class UnitObject : MonoBehaviour {
         return null;
     }
 
-    float _GetDamageAfterShield(float damage) {
-        damage -= _currentShield;
-        if (damage > 0) {
-            _currentShield = 0;
-            return damage;
-        }
-
-        _currentShield = Mathf.Abs(damage);
-        return 0;
+    public void Resolve() {
+        _listTempEffect.Resolve();
     }
 
     void _TriggerDeath() {
