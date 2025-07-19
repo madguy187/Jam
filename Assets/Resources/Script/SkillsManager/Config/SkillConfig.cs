@@ -16,14 +16,42 @@ public class UnitSkillConfig : ScriptableObject
     public string unitType = "Paladin";
     public List<SkillEntry> skills = new List<SkillEntry>();
 
+    private Dictionary<MatchType, SkillEntry> skillCache;
+
+    private void OnEnable()
+    {
+        InitializeCache();
+    }
+
+    private void InitializeCache()
+    {
+        skillCache = new Dictionary<MatchType, SkillEntry>();
+        foreach (var skill in skills)
+        {
+            skillCache[skill.rollType] = skill;
+        }
+    }
+
     public SkillEntry GetSkillData(MatchType type)
     {
-        return skills.Find(s => s.rollType == type);
+        if (skillCache == null)
+        {
+            InitializeCache();
+        }
+
+        if (skillCache.TryGetValue(type, out SkillEntry skill))
+        {
+            return skill;
+        }
+
+        return default; 
     }
 
     public string GetDescription(MatchType type)
     {
         var skill = GetSkillData(type);
+        if (skill.Equals(default(SkillEntry))) return string.Empty;
+        
         return $"{skill.description} ({skill.value})";
     }
 

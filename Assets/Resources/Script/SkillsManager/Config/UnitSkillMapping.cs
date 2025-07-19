@@ -12,17 +12,49 @@ public class UnitSkillMapping : ScriptableObject
     }
 
     public List<Mapping> mappings = new List<Mapping>();
+    private Dictionary<string, UnitSkillConfig> skillConfigCache;
+
+    private void OnEnable()
+    {
+        InitializeCache();
+    }
+
+    private void InitializeCache()
+    {
+        skillConfigCache = new Dictionary<string, UnitSkillConfig>();
+        
+        foreach (var mapping in mappings)
+        {
+            if (!string.IsNullOrEmpty(mapping.unitType) && mapping.skillConfig != null)
+            {
+                string key = mapping.unitType.ToLower();
+                skillConfigCache[key] = mapping.skillConfig;
+            }
+        }
+    }
 
     public UnitSkillConfig GetSkillConfig(string unitName)
     {
-        unitName = unitName.ToLower();
-        foreach (var mapping in mappings)
+        if (skillConfigCache == null)
         {
-            if (unitName.Contains(mapping.unitType.ToLower()))
+            InitializeCache();
+        }
+
+        string key = unitName.ToLower();
+        
+        if (skillConfigCache.TryGetValue(key, out UnitSkillConfig config))
+        {
+            return config;
+        }
+
+        foreach (var cachedKey in skillConfigCache.Keys)
+        {
+            if (key.Contains(cachedKey))
             {
-                return mapping.skillConfig;
+                return skillConfigCache[cachedKey];
             }
         }
+
         return null;
     }
 } 

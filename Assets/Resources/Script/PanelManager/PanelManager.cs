@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 using System;
+using System.Collections.Generic; 
 
 public class PanelManager : MonoBehaviour
 {
@@ -23,6 +24,14 @@ public class PanelManager : MonoBehaviour
     [SerializeField] private SkillBoxUI[] skillBoxes;
     [SerializeField] private TextMeshProUGUI skillsTitle;  
 
+    [Header("Relic UI")]
+    [SerializeField] private RelicBoxUI[] relicBoxes;
+    [SerializeField] private RelicConfig relicConfig;
+
+    private Dictionary<string, RelicBoxUI> relicBoxMap;
+    private Dictionary<RelicTier, RelicConfig.RelicData[]> relicsByTier;
+    private bool relicsInitialized;
+
     [Header("Unit Skill Descriptions")]
     [Tooltip("Assign the UnitSkillMapping asset here")]
     [SerializeField] private UnitSkillMapping skillMapping;
@@ -40,12 +49,14 @@ public class PanelManager : MonoBehaviour
     private const string UNIT_ICON_TITLE = "Unit Icon";
     private const string COMBAT_STATS_TITLE = "Combat Stats";
     private const string SKILLS_TITLE = "Skills";
+    private const string RELICS_TITLE = "Relics";
 
     private void Awake()
     {
         if (instance == null)
         {
             instance = this;
+            InitializeRelics();  
             ValidateReferences();
         }
         else
@@ -53,6 +64,42 @@ public class PanelManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+    }
+
+    private void InitializeRelics()
+    {
+        if (relicsInitialized) return;
+
+        if (relicBoxes == null || relicBoxes.Length == 0)
+        {
+            Debug.LogError("[PanelManager] No relic boxes assigned!");
+            return;
+        }
+
+        if (relicConfig == null)
+        {
+            Debug.LogError("[PanelManager] Relic config not assigned!");
+            return;
+        }
+
+        relicBoxMap = new Dictionary<string, RelicBoxUI>();
+        foreach (var relicBox in relicBoxes)
+        {
+            if (relicBox != null)
+            {
+                relicBoxMap[relicBox.GetRelicName()] = relicBox;
+            }
+        }
+
+        relicsByTier = new Dictionary<RelicTier, RelicConfig.RelicData[]>
+        {
+            { RelicTier.Basic, relicConfig.basicRelics },
+            { RelicTier.AdvancedSelf, relicConfig.advancedSelfRelics },
+            { RelicTier.AdvancedMixed, relicConfig.advancedMixedRelics },
+            { RelicTier.Legendary, relicConfig.legendaryRelics }
+        };
+
+        relicsInitialized = true;
     }
 
     private void ValidateReferences()
@@ -66,6 +113,31 @@ public class PanelManager : MonoBehaviour
     private void Start()
     {
         HidePanel();
+    }
+
+    private void UpdateRelicBoxes()
+    {
+        if (!relicsInitialized) return;
+
+        if (relicsByTier.TryGetValue(RelicTier.Basic, out RelicConfig.RelicData[] basicRelics))
+        {
+            foreach (var relic in basicRelics)
+            {
+                if (relicBoxMap.TryGetValue(relic.name, out RelicBoxUI relicBox))
+                {
+                    relicBox.SetupRelic(relic);
+                    relicBox.gameObject.SetActive(true); 
+                }
+            }
+        }
+
+        foreach (var relicBox in relicBoxes)
+        {
+            if (relicBox != null && !relicBox.gameObject.activeSelf)
+            {
+                relicBox.gameObject.SetActive(true);
+            }
+        }
     }
 
     public void ShowUnitInfo(UnitObject unit)
@@ -103,6 +175,7 @@ public class PanelManager : MonoBehaviour
         }
 
         UpdateSkillBoxes(unit);
+        UpdateRelicBoxes();
 
         gameObject.SetActive(true);
         OnUnitSelected?.Invoke(unit);
@@ -154,7 +227,18 @@ public class PanelManager : MonoBehaviour
                 }
             }
         }
-        
+
+        if (relicBoxes != null)
+        {
+            foreach (var relicBox in relicBoxes)
+            {
+                if (relicBox != null)
+                {
+                    relicBox.gameObject.SetActive(false);
+                }
+            }
+        }
+
         gameObject.SetActive(false);
         currentUnit = null;
         OnPanelHidden?.Invoke();
