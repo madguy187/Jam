@@ -9,44 +9,35 @@ public class SkillBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     
     [Header("Skill Settings")]
     [SerializeField] private eRollType skillType;
-
-    [Header("Visual Settings")]
-    [SerializeField] private float backgroundAlpha = 0f;
+    [SerializeField] private Sprite patternSprite;
     
-    private Image backgroundImage;
     private RectTransform rectTransform;
-    private const string PATTERN_SPRITE_PATH = "Sprites/Patterns/{0}";
     private string description;
     private bool isHovering = false;
     private bool isInitialized = false;
 
     private void Awake()
     {
-        CacheComponents();
+        InitializeComponents();
+        SetupPatternIcon();
     }
 
-    private void CacheComponents()
+    private void InitializeComponents()
     {
         if (isInitialized) return;
         
-        backgroundImage = GetComponent<Image>();
         rectTransform = GetComponent<RectTransform>();
         
-        if (backgroundImage != null)
+        if (patternIcon == null)
         {
-            SetBackgroundTransparency(backgroundAlpha);
+            patternIcon = GetComponentInChildren<Image>();
+            Global.DEBUG_PRINT("Pattern icon reference was missing - attempting to find in children");
         }
         
         isInitialized = true;
     }
 
-    private void Start()
-    {
-        Global.DEBUG_PRINT($"SkillBox initialized for type: {skillType}");
-        LoadPatternSprite();
-    }
-
-    private void LoadPatternSprite()
+    private void SetupPatternIcon()
     {
         if (patternIcon == null) 
         {
@@ -54,32 +45,27 @@ public class SkillBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
             return;
         }
 
-        string spritePath = string.Format(PATTERN_SPRITE_PATH, skillType.ToString().ToLower());
-        Sprite sprite = Resources.Load<Sprite>(spritePath);
-        
-        if (sprite != null)
+        if (patternSprite != null)
         {
-            patternIcon.sprite = sprite;
-            Global.DEBUG_PRINT($"Loaded pattern sprite from: {spritePath}");
+            patternIcon.sprite = patternSprite;
+            Global.DEBUG_PRINT($"Pattern sprite set for type: {skillType}");
         }
         else
         {
-            Global.DEBUG_PRINT($"Failed to load pattern sprite from: {spritePath}");
+            Global.DEBUG_PRINT($"No pattern sprite assigned for type: {skillType}");
         }
     }
 
-    private void SetBackgroundTransparency(float alpha)
+    private void Start()
     {
-        Color color = backgroundImage.color;
-        color.a = alpha;
-        backgroundImage.color = color;
+        Global.DEBUG_PRINT($"SkillBox initialized for type: {skillType}");
     }
 
     public void SetupForUnit(string description, float value)
     {
         if (!isInitialized)
         {
-            CacheComponents();
+            InitializeComponents();
         }
 
         Global.DEBUG_PRINT($"Setting up skill box for type {skillType} with description: {description}");
