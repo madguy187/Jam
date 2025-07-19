@@ -9,12 +9,6 @@ public enum eRollType {
     FULLGRID
 }
 
-public enum eUnitPosition {
-    NONE,
-    FRONT,
-    BACK
-}
-
 public class UnitObject : MonoBehaviour {
     [field: SerializeField] public UnitScriptableObject unitSO { get; private set; }
     [SerializeField] EffectList _listEffect;
@@ -30,6 +24,7 @@ public class UnitObject : MonoBehaviour {
     float _currentShield = 0.0f;
     eUnitPosition _ePosition = eUnitPosition.NONE;
     public bool IsFrontPosition() { return _ePosition == eUnitPosition.FRONT; }
+    public void SetUnitPosition(eUnitPosition position) { _ePosition = position; }
 
     bool _bIsDead = false;
     public bool IsDead() { return _bIsDead; }
@@ -79,6 +74,7 @@ public class UnitObject : MonoBehaviour {
         if (_currentHealth <= 0.0f) {
             _TriggerDeath();
         }
+
         Global.DEBUG_PRINT("Final Damage=" + fFinalDamage);
     }
 
