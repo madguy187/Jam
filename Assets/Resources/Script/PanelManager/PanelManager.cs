@@ -2,9 +2,17 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using System;
 
 public class PanelManager : MonoBehaviour
 {
+    private static PanelManager instance;
+    
+    public static PanelManager GetInstance()
+    {
+        return instance;
+    }
+
     [Header("Panel References")]
     [SerializeField] private Image unitIconImage;
     [SerializeField] private TextMeshProUGUI statsText;
@@ -20,23 +28,38 @@ public class PanelManager : MonoBehaviour
     [SerializeField] private UnitSkillMapping skillMapping;
     
     private UnitObject currentUnit;
+    public event Action<UnitObject> OnUnitSelected;
+    public event Action OnPanelHidden;
+    private const string STATS_FORMAT = "HP: {0}/{1}\nShield: {2}/{3}\nAttack: {4}\nResistance: {5}\nCrit Rate: {6}%\nCrit Multi: {7}%";
+    private const string UNIT_ICON_TITLE = "Unit Icon";
+    private const string COMBAT_STATS_TITLE = "Combat Stats";
+    private const string SKILLS_TITLE = "Skills";
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            ValidateReferences();
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
+
+    private void ValidateReferences()
+    {
+        if (unitIconImage == null) Global.DEBUG_PRINT("Unit icon image not assigned!");
+        if (statsText == null) Global.DEBUG_PRINT("Stats text not assigned!");
+        if (skillBoxes == null || skillBoxes.Length == 0) Global.DEBUG_PRINT("No skill boxes assigned!");
+        if (skillMapping == null) Global.DEBUG_PRINT("Skill mapping not assigned!");
+    }
 
     private void Start()
     {
-        // Hide all skill boxes
-        if (skillBoxes != null)
-        {
-            foreach (var skillBox in skillBoxes)
-            {
-                if (skillBox != null)
-                {
-                    skillBox.gameObject.SetActive(false);
-                }
-            }
-        }
-        
-        // Hide the panel
-        gameObject.SetActive(false);
+        HidePanel();
     }
 
     public void ShowUnitInfo(UnitObject unit)
@@ -49,12 +72,10 @@ public class PanelManager : MonoBehaviour
         
         currentUnit = unit;
         
-        // Show and set up titles
-        unitIconTitle.text = "Unit Icon";
-        statsTitle.text = "Combat Stats";
-        skillsTitle.text = "Skills";
+        unitIconTitle.text = UNIT_ICON_TITLE;
+        statsTitle.text = COMBAT_STATS_TITLE;
+        skillsTitle.text = SKILLS_TITLE;
         
-        // Update unit icon
         if (unitIconImage != null)
         {
             SpriteRenderer spriteRenderer = unit.GetComponent<SpriteRenderer>();
@@ -64,82 +85,74 @@ public class PanelManager : MonoBehaviour
             }
         }
 
-        // Update stats
         if (statsText != null)
         {
-            statsText.text = $"HP: {unit.GetHealth()}/{unit.unitSO.hp}\n" +
-                           $"Shield: {unit.GetShield()}/{unit.unitSO.shield}\n" +
-                           $"Attack: {unit.GetAttack()}\n" +
-                           $"Resistance: {unit.GetRes()}\n" +
-                           $"Crit Rate: {unit.GetCritRate()}%\n" +
-                           $"Crit Multi: {unit.GetCritMulti()}%";
+            statsText.text = string.Format(STATS_FORMAT,
+                unit.GetHealth(), unit.unitSO.hp,
+                unit.GetShield(), unit.unitSO.shield,
+                unit.GetAttack(),
+                unit.GetRes(),
+                unit.GetCritRate(),
+                unit.GetCritMulti());
         }
 
-        // Update skill boxes
-        if (skillBoxes != null && skillBoxes.Length > 0)
-        {
-            UnitSkillConfig skillConfig = GetSkillConfigForUnit(unit);
-            bool hasSkillConfig = (skillConfig != null);
+        UpdateSkillBoxes(unit);
 
-            foreach (var skillBox in skillBoxes)
+        gameObject.SetActive(true);
+        OnUnitSelected?.Invoke(unit);
+    }
+
+    private void UpdateSkillBoxes(UnitObject unit)
+    {
+        if (skillBoxes == null || skillBoxes.Length == 0) return;
+
+        UnitSkillConfig skillConfig = GetSkillConfigForUnit(unit);
+        bool hasSkillConfig = (skillConfig != null);
+
+        foreach (var skillBox in skillBoxes)
+        {
+            if (skillBox != null)
             {
-                if (skillBox != null)
+                if (hasSkillConfig)
                 {
-                    if (hasSkillConfig)
-                    {
-                        string description = skillConfig.GetDescription(skillBox.GetRollType());
-                        float value = skillConfig.GetValue(skillBox.GetRollType());
-                        skillBox.SetupForUnit(description, value);
-                        skillBox.gameObject.SetActive(true);
-                    }
-                    else
-                    {
-                        skillBox.gameObject.SetActive(false);
-                    }
+                    string description = skillConfig.GetDescription(skillBox.GetRollType());
+                    float value = skillConfig.GetValue(skillBox.GetRollType());
+                    skillBox.SetupForUnit(description, value);
+                    skillBox.gameObject.SetActive(true);
+                }
+                else
+                {
+                    skillBox.gameObject.SetActive(false);
                 }
             }
         }
-
-        // Show the panel
-        gameObject.SetActive(true);
     }
 
     private UnitSkillConfig GetSkillConfigForUnit(UnitObject unit)
     {
-        if (unit == null || unit.unitSO == null || skillMapping == null) return null;
+        if (unit?.unitSO == null || skillMapping == null) return null;
 
-        UnitSkillConfig config = skillMapping.GetSkillConfig(unit.unitSO.name);
-        if (config != null) return config;
-
-        return skillMapping.GetSkillConfig(unit.name);
+        return skillMapping.GetSkillConfig(unit.unitSO.name) 
+            ?? skillMapping.GetSkillConfig(unit.name);
     }
 
     private MatchType GetMatchTypeForRollType(eRollType rollType)
     {
-        switch (rollType)
+        return rollType switch
         {
-            case eRollType.SINGLE:
-                return MatchType.SINGLE;
-            case eRollType.DIAGONAL:
-                return MatchType.DIAGONAL;
-            case eRollType.ZIGZAG:
-                return MatchType.ZIGZAG;
-            case eRollType.XSHAPE:
-                return MatchType.XSHAPE;
-            case eRollType.FULLGRID:
-                return MatchType.FULLGRID;
-            case eRollType.VERTICAL:
-                return MatchType.VERTICAL;
-            case eRollType.HORIZONTAL:
-                return MatchType.HORIZONTAL;
-            default:
-                return MatchType.SINGLE;
-        }
+            eRollType.SINGLE => MatchType.SINGLE,
+            eRollType.DIAGONAL => MatchType.DIAGONAL,
+            eRollType.ZIGZAG => MatchType.ZIGZAG,
+            eRollType.XSHAPE => MatchType.XSHAPE,
+            eRollType.FULLGRID => MatchType.FULLGRID,
+            eRollType.VERTICAL => MatchType.VERTICAL,
+            eRollType.HORIZONTAL => MatchType.HORIZONTAL,
+            _ => MatchType.SINGLE
+        };
     }
 
     public void HidePanel()
     {
-        // Hide all skill boxes first
         if (skillBoxes != null)
         {
             foreach (var skillBox in skillBoxes)
@@ -153,5 +166,17 @@ public class PanelManager : MonoBehaviour
         
         gameObject.SetActive(false);
         currentUnit = null;
+        OnPanelHidden?.Invoke();
+    }
+
+    private void OnDestroy()
+    {
+        OnUnitSelected = null;
+        OnPanelHidden = null;
+
+        if (instance == this)
+        {
+            instance = null;
+        }
     }
 } 
