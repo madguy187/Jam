@@ -1,21 +1,27 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
-[RequireComponent(typeof(UnitObject))]
-public class UnitClickHandler : MonoBehaviour, IPointerClickHandler
+public class UnitClickHandler : MonoBehaviour
 {
-    [SerializeField] private PanelManager panelManager;
     private UnitObject unit;
 
     void Awake()
     {
         unit = GetComponent<UnitObject>();
+        
+        // Add BoxCollider2D if dont have
+        // need to change method as previously i used IPointerClickHandler which works with only UI elementts
+        if (GetComponent<BoxCollider2D>() == null)
+        {
+            var collider = gameObject.AddComponent<BoxCollider2D>();
+            collider.isTrigger = true;  
+        }
     }
 
-    public void OnPointerClick(PointerEventData eventData)
+    void OnMouseDown()
     {
         Global.DEBUG_PRINT("[UnitClickHandler] Unit clicked!");
         
+        var panelManager = PanelManager.GetInstance();
         if (panelManager != null)
         {
             Global.DEBUG_PRINT("[UnitClickHandler] Showing info for unit: " + unit.unitSO.unitName);
@@ -23,7 +29,7 @@ public class UnitClickHandler : MonoBehaviour, IPointerClickHandler
         }
         else
         {
-            Global.DEBUG_PRINT("[UnitClickHandler] ERROR: PanelManager reference not set!");
+            Global.DEBUG_PRINT("[UnitClickHandler] ERROR: PanelManager instance not found in scene!");
         }
     }
 } 

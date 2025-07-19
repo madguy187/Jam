@@ -117,8 +117,20 @@ public class SlotController : MonoBehaviour
     {
         if (matches.Count <= 0) return;
 
-        // Set unit name for each match
-        UnitObject selectedUnit = PanelManager.GetInstance().GetCurrentUnit();
+        UnitObject selectedUnit = null;
+        Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
+        
+        // Get first non-null unit from deck
+        for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
+        {
+            var unit = playerDeck.GetUnitObject(i);
+            if (unit != null)
+            {
+                selectedUnit = unit;
+                break;
+            }
+        }
+        
         Global.DEBUG_PRINT($"[SlotController] Selected Unit: {(selectedUnit ? selectedUnit.name : "None")}");
         
         if (selectedUnit != null)
@@ -146,7 +158,7 @@ public class SlotController : MonoBehaviour
         }
         else
         {
-            Global.DEBUG_PRINT("[SlotController] No unit selected!");
+            Global.DEBUG_PRINT("[SlotController] No unit in player deck!");
         }
     }
 
