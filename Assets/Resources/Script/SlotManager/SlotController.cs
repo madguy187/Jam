@@ -113,6 +113,43 @@ public class SlotController : MonoBehaviour
         StartCoroutine(WaitForSpinComplete(autoSpendGold));
     }
     
+    private void ProcessMatchesForUnit(List<Match> matches)
+    {
+        if (matches.Count <= 0) return;
+
+        // Set unit name for each match
+        UnitObject selectedUnit = PanelManager.GetInstance().GetCurrentUnit();
+        Global.DEBUG_PRINT($"[SlotController] Selected Unit: {(selectedUnit ? selectedUnit.name : "None")}");
+        
+        if (selectedUnit != null)
+        {
+            Global.DEBUG_PRINT($"[SlotController] Has UnitSO: {(selectedUnit.unitSO != null ? "Yes" : "No")}");
+            if (selectedUnit.unitSO == null)
+            {
+                Global.DEBUG_PRINT("[SlotController] ERROR: Unit's ScriptableObject (unitSO) is null!");
+                return;
+            }
+
+            string unitName = selectedUnit.unitSO.unitName;
+            Global.DEBUG_PRINT($"[SlotController] Unit Name: {unitName}");
+            Global.DEBUG_PRINT($"[SlotController] Unit SO Name: {selectedUnit.unitSO.name}");
+            
+            foreach (var match in matches)
+            {
+                match.SetUnitName(unitName);
+                Global.DEBUG_PRINT($"[SlotController] Match {match.GetMatchType()} -> Unit: {match.GetUnitName()}");
+            }
+
+            // Start the battle loop
+            Global.DEBUG_PRINT("[SlotController] Starting Combat");
+            CombatManager.instance.StartBattleLoop(matches);
+        }
+        else
+        {
+            Global.DEBUG_PRINT("[SlotController] No unit selected!");
+        }
+    }
+
     private IEnumerator WaitForSpinComplete(bool autoSpendGold)
     {
         // Wait for spin animation to complete
@@ -123,6 +160,7 @@ public class SlotController : MonoBehaviour
 
         // After grid is filled and animation is complete, check for matches
         List<Match> matches = CheckForMatches();
+        Global.DEBUG_PRINT($"[SlotController] Found {matches.Count} matches");
         
         // Calculate total gold earned
         int totalGold = 0;
@@ -138,12 +176,12 @@ public class SlotController : MonoBehaviour
                 }
             }
         }
+
+        // Process matches and start combat if needed
+        ProcessMatchesForUnit(matches);
         
         // Save matches to our SpinResult
         spinResult.SetMatches(matches, totalGold);
-
-        // for demo purposes
-        PrintSpinResults();
         
         isSpinning = false;
     }

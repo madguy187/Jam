@@ -28,6 +28,12 @@ public class PanelManager : MonoBehaviour
     [SerializeField] private UnitSkillMapping skillMapping;
     
     private UnitObject currentUnit;
+    
+    public UnitObject GetCurrentUnit()
+    {
+        return currentUnit;
+    }
+
     public event Action<UnitObject> OnUnitSelected;
     public event Action OnPanelHidden;
     private const string STATS_FORMAT = "HP: {0}/{1}\nShield: {2}/{3}\nAttack: {4}\nResistance: {5}\nCrit Rate: {6}%\nCrit Multi: {7}%";
