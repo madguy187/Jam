@@ -78,20 +78,18 @@ public class SpriteEyeSync : MonoBehaviour
         }
     }
 
-    public void SyncPivot()
-    {
+    [System.Obsolete]
+    public void SyncPivot() {
         // if(_mySprite.sprite!=null)
         // {
         //     _manager.SyncPivotProcess(_mySprite);
         // }
-        for(var i = 0 ; i < _eyeSpList.Count ; i++)
-        {
-            if(_eyeSpList[i].sprite != null)
-            {
+        for (var i = 0; i < _eyeSpList.Count; i++) {
+            if (_eyeSpList[i].sprite != null) {
                 _manager.SetPivot(_eyeSpList[i]);
             }
         }
-        
+
     }
 
     public void RemoveSprite()
