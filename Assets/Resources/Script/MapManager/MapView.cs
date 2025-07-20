@@ -96,7 +96,7 @@ namespace Map
         public virtual void ShowMap(Map m) 
         {
             if (m == null) {
-                Debug.LogWarning("Map was null in MapView.ShowMap()");
+                Global.DEBUG_PRINT("Map was null in MapView.ShowMap()");
                 return;
             }
 
@@ -199,7 +199,7 @@ namespace Map
         /// Updates the color of all lines to reflect which are available, visited, or locked
         public virtual void SetLineColors() 
         {
-            Debug.Log("Setting line colors for map: " + mapManager.CurrentMap.configName);
+            Global.DEBUG_PRINT("Setting line colors for map: " + mapManager.CurrentMap.configName);
             foreach (LineConnection connection in lineConnections)
                 connection.SetColor(lineLockedColor);
 
@@ -235,7 +235,7 @@ namespace Map
             ScrollNonUI scrollNonUi = mapParent.GetComponent<ScrollNonUI>();
             float span = mapManager.CurrentMap.DistanceBetweenFirstAndLastLayers();
             MapNode bossNode = MapNodes.FirstOrDefault(node => node.Node.nodeType == NodeType.MajorBoss);
-            Debug.Log("Map span in set orientation: " + span + " camera aspect: " + cam.aspect);
+            Global.DEBUG_PRINT("Map span in set orientation: " + span + " camera aspect: " + cam.aspect);
 
             // setting first parent to be right in front of the camera first:
             firstParent.transform.position = new Vector3(cam.transform.position.x, cam.transform.position.y, 0f);
