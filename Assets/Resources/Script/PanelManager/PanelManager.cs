@@ -46,10 +46,6 @@ public class PanelManager : MonoBehaviour
     public event Action<UnitObject> OnUnitSelected;
     public event Action OnPanelHidden;
     private const string STATS_FORMAT = "HP: {0}/{1}\nShield: {2}/{3}\nAttack: {4}\nResistance: {5}\nCrit Rate: {6}%\nCrit Multi: {7}%";
-    private const string UNIT_ICON_TITLE = "Unit Icon";
-    private const string COMBAT_STATS_TITLE = "Combat Stats";
-    private const string SKILLS_TITLE = "Skills";
-    private const string RELICS_TITLE = "Relics";
 
     private void Awake()
     {
@@ -149,10 +145,6 @@ public class PanelManager : MonoBehaviour
         }
         
         currentUnit = unit;
-        
-        unitIconTitle.text = UNIT_ICON_TITLE;
-        statsTitle.text = COMBAT_STATS_TITLE;
-        skillsTitle.text = SKILLS_TITLE;
         
         if (unitIconImage != null)
         {

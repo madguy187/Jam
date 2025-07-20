@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+/* own notes
+Higher Min/Preferred Height = moves content up
+Lower Min/Preferred Height = moves content down
+Higher Min/Preferred Width = makes wider
+Lower Min/Preferred Width = makes narrower
+*/
+
 public class SlotController : MonoBehaviour
 {
     public static SlotController instance;

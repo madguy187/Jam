@@ -32,4 +32,4 @@ public class UnitClickHandler : MonoBehaviour
             Global.DEBUG_PRINT("[UnitClickHandler] ERROR: PanelManager instance not found in scene!");
         }
     }
-} 
+}   
