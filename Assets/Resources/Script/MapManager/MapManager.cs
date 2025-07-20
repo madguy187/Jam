@@ -52,7 +52,7 @@ namespace Map
                 config = newConfig;
                 GenerateNewMap();
             } else {
-                Global.DEBUG_PRINT($"MapConfig with name '{newConfigName}' not found in MapConfigs. Add it to allMapConfigs in MapView script");
+                Global.DEBUG_PRINT($"[MapManager::LoadNextConfig] with name '{newConfigName}' not found in MapConfigs. Add it to allMapConfigs in MapView script");
             }
         }
 

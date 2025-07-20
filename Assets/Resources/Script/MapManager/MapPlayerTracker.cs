@@ -44,7 +44,7 @@ namespace Map
                 if (mapNode.Node.point.y == 0) {
                     SendPlayerToNode(mapNode);
                 } else {
-                    Global.DEBUG_PRINT("Selected node cannot be accessed");
+                    Global.DEBUG_PRINT("[MapPlayerTracker::SelectNode] Selected node cannot be accessed");
                 }
             } else {
                 Vector2Int currentPoint = mapManager.CurrentMap.path[mapManager.CurrentMap.path.Count - 1];
@@ -53,7 +53,7 @@ namespace Map
                 if (currentNode != null && currentNode.outgoing.Any(point => point.Equals(mapNode.Node.point))) {
                     SendPlayerToNode(mapNode);
                 } else {
-                    Global.DEBUG_PRINT("Selected node cannot be accessed");
+                    Global.DEBUG_PRINT("[MapPlayerTracker::SelectNode] Selected node cannot be accessed");
                 }
             }
         }
@@ -84,7 +84,7 @@ namespace Map
         private static void EnterNode(MapNode mapNode) 
         {
             // We have access to blueprint name here as well
-            Global.DEBUG_PRINT("Entering node: " + mapNode.Node.blueprintName + " of type: " + mapNode.Node.nodeType);
+            Global.DEBUG_PRINT("[MapPlayerTracker::EnterNode] Entering node: " + mapNode.Node.blueprintName + " of type: " + mapNode.Node.nodeType);
             // Load appropriate scene with context based on nodeType:
             // If choose to show GUI in some of these cases, do not forget to set "Locked" in MapPlayerTracker back to false
             switch (mapNode.Node.nodeType) {
