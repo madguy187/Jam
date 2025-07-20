@@ -20,6 +20,7 @@ public class GoldManager : MonoBehaviour
         else if (instance != this)
         {
             Destroy(gameObject);
+            return;
         }
     }
 
@@ -31,10 +32,22 @@ public class GoldManager : MonoBehaviour
         }
     }
 
+    public void StartNewTurn()
+    {
+        CalculateInterest();
+        OnRoundStart(false); // Add base income
+    }
+
+    public void OnVictory()
+    {
+        AddGold(config.winRoundBonus); // +3 gold for winning
+    }
+
     public void CalculateInterest()
     {
         if (config == null) return;
 
+        // For every 10 unspent gold, gain +1 gold (max +5)
         int interestAmount = Mathf.Min(currentGold / config.goldPerInterest, config.maxInterest);
         
         Global.DEBUG_PRINT($"[GoldManager] Calculate interest: {interestAmount} gold");
@@ -49,6 +62,7 @@ public class GoldManager : MonoBehaviour
     {
         if (config == null) return;
 
+        // Base income of 5 gold
         Global.DEBUG_PRINT($"Adding base income: +{config.baseIncomePerRound} gold");
         AddGold(config.baseIncomePerRound);
         

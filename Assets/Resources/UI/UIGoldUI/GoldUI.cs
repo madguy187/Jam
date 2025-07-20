@@ -16,6 +16,9 @@ public class GoldUI : MonoBehaviour
     private void Start()
     {
         InitializeComponents();
+        
+        currentGold = GoldManager.instance.GetCurrentGold();
+        UpdateGoldText();
     }
 
     private void InitializeComponents()
@@ -30,22 +33,6 @@ public class GoldUI : MonoBehaviour
         }
 
         originalScale = goldText.transform.localScale;
-    }
-
-    private void Start()
-    {
-        if (!enabled) return;
-        
-        if (GoldManager.instance == null)
-        {
-            Debug.LogError("[GoldUI] GoldManager instance not found!");
-            enabled = false;
-            return;
-        }
-
-        // Initialize with current gold value
-        currentGold = GoldManager.instance.GetCurrentGold();
-        UpdateGoldText();
     }
 
     private void Update()

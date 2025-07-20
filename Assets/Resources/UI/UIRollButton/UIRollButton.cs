@@ -5,26 +5,18 @@ using TMPro;
 [RequireComponent(typeof(Button))]
 public class UIRollButton : MonoBehaviour
 {
-    [SerializeField] private Button button;
-    [SerializeField] private TextMeshProUGUI buttonText;
+    private Button button;
     
     private void InitializeComponents()
     {
+        button = GetComponent<Button>();
         if (button == null)
         {
-            button = GetComponent<Button>();
-            if (button == null)
-            {
-                Debug.LogError("[UIRollButton] Button component not found!");
-                enabled = false;
-                return;
-            }
+            Debug.LogError("[UIRollButton] Button component not found!");
+            enabled = false;
+            return;
         }
-        
-        if (buttonText == null)
-        {
-            buttonText = GetComponentInChildren<TextMeshProUGUI>();
-        }
+
     }
     
     void Start()
@@ -41,6 +33,7 @@ public class UIRollButton : MonoBehaviour
         }
         
         button.onClick.AddListener(OnClick);
+        Global.DEBUG_PRINT("[UIRollButton] Click listener added");
     }
     
     void OnDestroy()
@@ -53,6 +46,7 @@ public class UIRollButton : MonoBehaviour
     
     private void OnClick()
     {
+        Global.DEBUG_PRINT("[UIRollButton] Button clicked!");
         if (SlotController.instance != null)
         {
             SlotController.instance.FillGridWithRandomSymbols();
