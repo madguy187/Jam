@@ -8,11 +8,6 @@ public class UIRollButton : MonoBehaviour
     [SerializeField] private Button button;
     [SerializeField] private TextMeshProUGUI buttonText;
     
-    private void Awake()
-    {
-        InitializeComponents();
-    }
-    
     private void InitializeComponents()
     {
         if (button == null)
@@ -34,6 +29,8 @@ public class UIRollButton : MonoBehaviour
     
     void Start()
     {
+        InitializeComponents();
+
         if (!enabled) return;
         
         if (SlotController.instance == null)

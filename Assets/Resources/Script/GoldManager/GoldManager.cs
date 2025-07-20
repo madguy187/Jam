@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GoldManager : MonoBehaviour
 {
-    public static GoldManager instance;
+    public static GoldManager instance { get; private set; }
     
     [Header("Configuration")]
     [SerializeField] private GoldConfig config;
@@ -12,8 +12,19 @@ public class GoldManager : MonoBehaviour
 
     void Awake()
     {
-        instance = this;
-        
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    void Start()
+    {
         if (config == null)
         {
             Debug.LogWarning("[GoldManager] Gold configuration is missing");
@@ -85,5 +96,32 @@ public class GoldManager : MonoBehaviour
     public bool HasEnoughGold(int amount)
     {
         return currentGold >= amount;
+    }
+
+    public int GetGoldRewardForMatch(MatchType type)
+    {
+        if (config == null)
+        {
+            Debug.LogWarning("[GoldManager] Gold configuration is missing! Please assign it in the inspector.");
+            return 0;
+        }
+
+        switch (type)
+        {
+            case MatchType.HORIZONTAL:
+                return config.horizontalReward;
+            case MatchType.VERTICAL:
+                return config.verticalReward;
+            case MatchType.DIAGONAL:
+                return config.diagonalReward;
+            case MatchType.ZIGZAG:
+                return config.zigzagReward;
+            case MatchType.XSHAPE:
+                return config.xShapeReward;
+            case MatchType.FULLGRID:
+                return config.fullGridReward;
+            default:
+                return 0;
+        }
     }
 } 

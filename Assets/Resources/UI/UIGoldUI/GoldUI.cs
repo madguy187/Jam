@@ -13,7 +13,7 @@ public class GoldUI : MonoBehaviour
     private Vector3 originalScale;
     private Coroutine animationCoroutine;
 
-    private void Awake()
+    private void Start()
     {
         InitializeComponents();
     }
@@ -27,13 +27,6 @@ public class GoldUI : MonoBehaviour
             {
                 goldText = GetComponentInChildren<TextMeshProUGUI>();
             }
-        }
-        
-        if (goldText == null)
-        {
-            Debug.LogError("[GoldUI] TextMeshProUGUI component not found! Please assign it in the inspector.");
-            enabled = false;
-            return;
         }
 
         originalScale = goldText.transform.localScale;

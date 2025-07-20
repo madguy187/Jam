@@ -12,10 +12,9 @@ Lower Min/Preferred Width = makes narrower
 
 public class SlotController : MonoBehaviour
 {
-    public static SlotController instance;
+    public static SlotController instance { get; private set; }
     
     [Header("Configuration")]
-    [SerializeField] private GoldConfig goldConfig;
     [SerializeField] private SlotConfig slotConfig;
     [SerializeField] private bool isCombatEnabled = true;
 
@@ -45,19 +44,22 @@ public class SlotController : MonoBehaviour
     public bool GetHasFreeSpinsRemaining() {
         return spinsThisTurn < slotConfig.freeSpinsPerTurn;
     }
-    
+
     private void Awake()
     {
         if (instance == null)
         {
             instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else if (instance != this)
         {
             Destroy(gameObject);
-            return;
         }
-
+    }
+    
+    private void Start()
+    {
         if (slotConfig == null)
         {
             Debug.LogWarning("[SlotController] Slot configuration is missing");
@@ -177,7 +179,7 @@ public class SlotController : MonoBehaviour
             {
                 if (match.GetMatchType() != MatchType.SINGLE)
                 {
-                    int goldReward = GetGoldRewardForMatch(match.GetMatchType());
+                    int goldReward = GoldManager.instance.GetGoldRewardForMatch(match.GetMatchType());
                     totalGold += goldReward;
                     GoldManager.instance.AddGold(goldReward);
                 }
@@ -318,33 +320,6 @@ public class SlotController : MonoBehaviour
                 int index = row * slotConfig.gridColumns + col;
                 slotGrid.SetSlot(row, col, symbols[index]);
             }
-        }
-    }
-    
-    private int GetGoldRewardForMatch(MatchType type)
-    {
-        if (goldConfig == null)
-        {
-            Debug.LogWarning("[SlotController] Gold configuration is missing! Please assign it in the inspector.");
-            return 0;
-        }
-
-        switch (type)
-        {
-            case MatchType.HORIZONTAL:
-                return goldConfig.horizontalReward;
-            case MatchType.VERTICAL:
-                return goldConfig.verticalReward;
-            case MatchType.DIAGONAL:
-                return goldConfig.diagonalReward;
-            case MatchType.ZIGZAG:
-                return goldConfig.zigzagReward;
-            case MatchType.XSHAPE:
-                return goldConfig.xShapeReward;
-            case MatchType.FULLGRID:
-                return goldConfig.fullGridReward;
-            default:
-                return 0;
         }
     }
 
