@@ -9,6 +9,7 @@ public class Deck : IEnumerable<UnitObject> {
 
     public void Init(List<UnitPosition> vecPos) {
         _vecPosition = vecPos;
+        Global.DEBUG_PRINT("[Deck] Init Deck with Size: " + _vecPosition.Count);
 
         for (int i = 0; i < _vecPosition.Count; i++) {
             _vecUnit.Add(null);
@@ -47,6 +48,7 @@ public class Deck : IEnumerable<UnitObject> {
         unit.SetUnitPosition(eUnitPos);
 
         _vecUnit[nIndex] = unit;
+        Global.DEBUG_PRINT("[Deck] Added Unit: " + unitName + " at index: " + nIndex);
         return unit;
     }
 
