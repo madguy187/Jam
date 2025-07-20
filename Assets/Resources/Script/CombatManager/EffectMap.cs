@@ -1,22 +1,21 @@
 using System.Collections.Generic;
 
 public class EffectMap {
-    const int NO_REMOVE = -1;
-    Dictionary<EffectTempType, EffectObject> _dictEffect = new Dictionary<EffectTempType, EffectObject>();
+    Dictionary<EffectType, EffectObject> _dictEffect = new Dictionary<EffectType, EffectObject>();
 
-    public void AddEffect(EffectTempType eType, EffectObject objEffect) {
+    public void AddEffect(EffectType eType, EffectObject objEffect) {
         if (!_dictEffect.ContainsKey(eType)) {
             _dictEffect.Add(eType, objEffect);
         }
     }
 
-    public void RemoveEffect(EffectTempType eType) {
+    public void RemoveEffect(EffectType eType) {
         _dictEffect.Remove(eType);
     }
 
-    public float GetParam(EffectTempType eType) {
+    public float GetParam(EffectType eType) {
         if (_dictEffect.ContainsKey(eType)) {
-            return _dictEffect[eType].val;
+            return _dictEffect[eType].GetEffectVal();
         }
 
         return 0.0f;
@@ -28,13 +27,9 @@ public class EffectMap {
 
     public void Resolve() {
         foreach (EffectObject effect in _dictEffect.Values) {
-            if (effect.turn == NO_REMOVE) {
-                continue;
-            }
-            
-            effect.turn--;
+            effect.Resolve();
 
-            if (effect.turn < 0) {
+            if (effect.IsEmpty()) {
                 RemoveEffect(effect.effectType);
             }
         }

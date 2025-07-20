@@ -122,6 +122,16 @@ public class Deck : IEnumerable<UnitObject> {
         }
     }
 
+    public void InitDeck() {
+        foreach (UnitObject unit in _vecUnit) {
+            if (unit == null) {
+                continue;
+            }
+            
+            unit.InitTempEffect();
+        }
+    }
+
     int _GetEmptySlotIndex() {
         for (int i = 0; i < GetDeckMaxSize(); i++) {
             if (_vecUnit[i] == null) {

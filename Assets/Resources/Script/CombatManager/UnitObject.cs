@@ -3,12 +3,13 @@ using UnityEngine;
 
 public class UnitObject : MonoBehaviour {
     [field: SerializeField] public UnitScriptableObject unitSO { get; private set; }
-    [SerializeField] EffectList _listEffect;
     [SerializeField] EffectList _listSingleEffect;
     [SerializeField] EffectList _listDiagonalEffect;
     [SerializeField] EffectList _listZigZagEffect;
     [SerializeField] EffectList _listXShapeEffect;
     [SerializeField] EffectList _listFullGridEffect;
+    EffectList _listRelicEffect = new EffectList();
+
     EffectMap _listTempEffect = new EffectMap();
 
     public int index { get; set; }
@@ -30,19 +31,19 @@ public class UnitObject : MonoBehaviour {
         _currentShield = unitSO.shield;
     }
 
-    public void AddEffect(EffectTempType eType, EffectScriptableObject effectSO) {
+    public void AddTempEffect(EffectType eType, float nVal, int nTurn) {
         EffectObject effect = new EffectObject();
         effect.effectType = eType;
-        effect.val = effectSO.GetEffectVal();
-        effect.turn = effectSO.GetEffectTurn();
+        effect.Add(nVal, nTurn);
+
         _listTempEffect.AddEffect(eType, effect);
     }
 
-    public void RemoveEffect(EffectTempType eType) {
+    public void RemoveEffect(EffectType eType) {
         _listTempEffect.RemoveEffect(eType);
     }
 
-    public float GetEffectParam(EffectTempType eType) {
+    public float GetEffectParam(EffectType eType) {
         return _listTempEffect.GetParam(eType);
     }
 
@@ -116,6 +117,25 @@ public class UnitObject : MonoBehaviour {
 
     public void Resolve() {
         _listTempEffect.Resolve();
+    }
+
+    public void LoadRelic(RelicScriptableObject relicSO) {
+        _listRelicEffect.LoadFromRelicSO(relicSO);
+    }
+
+    public void InitTempEffect() {
+        _listTempEffect.Clear();
+
+        if (!_listRelicEffect.IsValid()) {
+            return;
+        }
+
+        foreach (EffectScriptableObject effect in _listRelicEffect) {
+            if (effect.GetExecType() == EffectExecType.START_OF_ROUND) {
+                AddTempEffect(effect.GetEffectType(), effect.GetEffectVal(), Global.TEMP_EFFECT_ONLY_THIS_ROUND);
+            }
+        }
+
     }
 
     void _TriggerDeath() {

@@ -33,8 +33,13 @@ public class CombatManager : MonoBehaviour {
         _timer.SetTime(fTimeBetweenEachUnitAttack);
     }
 
+    public void InitRound() {
+        DeckManager.instance.InitDeckEffect();
+    }
+
     void Update() {
         if (Input.GetKeyDown(KeyCode.Alpha3)) {
+            InitRound();
             StartBattleLoop(null);
         }
 
@@ -229,8 +234,9 @@ public class CombatManager : MonoBehaviour {
                 continue;
             }
 
-            if (unit.GetEffectParam(EffectTempType.EFFECT_TEMP_TAUNT) > 0) {
-                return unit.index;
+            if (unit.GetEffectParam(EffectType.EFFECT_TAUNT) > 0) {
+                nIndex = unit.index;
+                continue;
             }
 
             if (bHasFrontUnit && !unit.IsFrontPosition()) {
@@ -279,7 +285,7 @@ public class CombatManager : MonoBehaviour {
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_TAUNT)) {
-                unit.AddEffect(EffectTempType.EFFECT_TEMP_TAUNT, cEffect);
+                unit.AddTempEffect(EffectType.EFFECT_TAUNT, cEffect.GetEffectVal(), cEffect.GetEffectTurn());
             }
 
             Global.DEBUG_PRINT("[Effect] Triggered " + cEffect.GetTypeName() +
