@@ -51,36 +51,53 @@ public class DeckDisplayManager : MonoBehaviour
     void RefreshDeckDisplay(List<UnitObject> units)
     {
         // Clean up old boxes and textures
-        foreach (var box in deckBoxes) {
-            Destroy(box);
-        }
-        deckBoxes.Clear();
-
-        foreach (var tex in deckTextures) {
-            tex.Release();
-            Destroy(tex);
-        }
-        deckTextures.Clear();
-
-        // Clean up old cameras
-        foreach (var camObj in deckCameras) {
-            Destroy(camObj);
-        }
-        deckCameras.Clear();
-
-        foreach (UnitObject unit in units) {
-            GameObject box = Instantiate(deckBoxPrefab, deckPanel);
-            RawImage rawImg = box.GetComponent<RawImage>();
-            if (rawImg != null)
-            {
-                RenderTexture tex;
-                GameObject camObj;
-                (tex, camObj) = RenderUnitToTexture(unit);
-                rawImg.texture = tex;
-                deckTextures.Add(tex);
-                deckCameras.Add(camObj); // Store camera for later cleanup
+        if (deckBoxes != null) {
+            foreach (var box in deckBoxes) {
+                if (box != null) { Destroy(box); }
             }
-            deckBoxes.Add(box);
+            deckBoxes.Clear();
+        }
+
+        if (deckTextures != null) {
+            foreach (var tex in deckTextures) {
+                if (tex != null) {
+                    tex.Release();
+                    Destroy(tex);
+                }
+            }
+            deckTextures.Clear();
+        }
+
+        if (deckCameras != null) {
+            foreach (var camObj in deckCameras) {
+                if (camObj != null)
+                    Destroy(camObj);
+            }
+            deckCameras.Clear();
+        }
+
+        if (units != null) {
+            foreach (UnitObject unit in units) {
+                if (unit == null) { continue; }
+
+                GameObject box = Instantiate(deckBoxPrefab, deckPanel);
+                if (box == null) { continue; }
+
+                RawImage rawImg = box.GetComponent<RawImage>();
+                if (rawImg != null) {
+                    RenderTexture tex;
+                    GameObject camObj;
+                    (tex, camObj) = RenderUnitToTexture(unit);
+                    if (tex != null) {
+                        rawImg.texture = tex;
+                        deckTextures.Add(tex);
+                    }
+                    if (camObj != null) {
+                        deckCameras.Add(camObj);
+                    }
+                }
+                deckBoxes.Add(box);
+            }
         }
     }
 
