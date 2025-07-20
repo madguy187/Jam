@@ -35,6 +35,10 @@ public class DeckManager : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.Alpha4)) {
             cEnemyDeck.AddUnit("Cleric");
         }
+
+        if (Input.GetKeyDown(KeyCode.Alpha5)) {
+            cPlayerDeck.GetUnitObject(0).LoadRelic(ResourceManager.instance.GetRelic("IronShard"));
+        }
     }
 
     void Start() {
@@ -81,5 +85,15 @@ public class DeckManager : MonoBehaviour {
         }
 
         return cDeck;
+    }
+
+    public void ResolveTempEffect() {
+        cPlayerDeck.Resolve();
+        cEnemyDeck.Resolve();
+    }
+
+    public void InitDeckEffect() {
+        cPlayerDeck.InitDeck();
+        cEnemyDeck.InitDeck();
     }
 }
