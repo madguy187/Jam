@@ -9,6 +9,7 @@ public class Deck : IEnumerable<UnitObject> {
 
     public void Init(List<UnitPosition> vecPos) {
         _vecPosition = vecPos;
+        Global.DEBUG_PRINT("[Deck] Init Deck with Size: " + _vecPosition.Count);
 
         for (int i = 0; i < _vecPosition.Count; i++) {
             _vecUnit.Add(null);
@@ -47,6 +48,7 @@ public class Deck : IEnumerable<UnitObject> {
         unit.SetUnitPosition(eUnitPos);
 
         _vecUnit[nIndex] = unit;
+        Global.DEBUG_PRINT("[Deck] Added Unit: " + unitName + " at index: " + nIndex);
         return unit;
     }
 
@@ -56,6 +58,24 @@ public class Deck : IEnumerable<UnitObject> {
         }
 
         return _vecUnit[index];
+    }
+
+    public List<UnitObject> GetAllAliveUnit(eUnitPosition eUnitPos = eUnitPosition.NONE) {
+        List<UnitObject> arrUnit = new List<UnitObject>();
+        foreach (UnitObject unit in _vecUnit) {
+            if (unit == null) {
+                continue;
+            }
+
+            if (eUnitPos != eUnitPosition.NONE) {
+                if (unit.GetUnitPosition() != eUnitPos) {
+                    continue;
+                }
+            }
+
+            arrUnit.Add(unit);
+        }
+        return arrUnit;
     }
 
     public bool IsValidUnitIndex(int index) {
@@ -92,6 +112,26 @@ public class Deck : IEnumerable<UnitObject> {
         }
 
         return true;
+    }
+
+    public void Resolve() {
+        foreach (UnitObject unit in _vecUnit) {
+            if (unit == null) {
+                continue;
+            }
+            
+            unit.Resolve();
+        }
+    }
+
+    public void InitDeck() {
+        foreach (UnitObject unit in _vecUnit) {
+            if (unit == null) {
+                continue;
+            }
+            
+            unit.InitTempEffect();
+        }
     }
 
     int _GetEmptySlotIndex() {

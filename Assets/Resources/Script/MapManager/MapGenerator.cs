@@ -16,7 +16,7 @@ namespace Map
         public static Map GetMap(MapConfig conf)
         {
             if (conf == null) {
-                Debug.LogWarning("Config was null in MapGenerator.Generate()");
+                Global.DEBUG_PRINT("[MapGenerator::GetMap] Config was null in MapGenerator.Generate()");
                 return null;
             }
 

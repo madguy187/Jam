@@ -49,13 +49,12 @@ public class SpriteSync : MonoBehaviour
         }
     }
 
-    public void SyncPivot()
-    {
-        if(_mySprite.sprite!=null)
-        {
+    [System.Obsolete]
+    public void SyncPivot() {
+        if (_mySprite.sprite != null) {
             _manager.SyncPivotProcess(_mySprite);
         }
-        
+
     }
 
     public void RemoveSprite()

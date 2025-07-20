@@ -8,6 +8,8 @@ public static class Global {
     public const int PERCENTAGE_CONSTANT = 100;
     public const int RESISTANCE_PERCENTAGE_CONSTANT = 10;
     public const int INVALID_INDEX = -1;
+    public const int TEMP_EFFECT_ONLY_THIS_TURN = 1;
+    public const int TEMP_EFFECT_ONLY_THIS_ROUND = 0;
 
     // Simulation test for Darren&Tianyu to verify all kinds of complicated scenarios
     public static bool RUN_SIMULATION = false; 

@@ -9,13 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ae3f48536174bf64a82442a0e1e19f19, type: 3}
-  m_Name: PaladinUnitSO
+  m_Script: {fileID: 11500000, guid: b5582afcca3112d4db68ad91c7708617, type: 3}
+  m_Name: IronShard
   m_EditorClassIdentifier: 
-  unitName: Paladin
-  hp: 100
-  attack: 50
-  shield: 0
-  res: 0
-  critRate: 0
-  critMulti: 0
+  listEffect:
+  - {fileID: 11400000, guid: 63e5ee0306f9e824698de52c650657ba, type: 2}
