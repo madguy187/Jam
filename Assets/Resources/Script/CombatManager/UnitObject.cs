@@ -14,14 +14,17 @@ public class UnitObject : MonoBehaviour {
 
     public int index { get; set; }
 
-    float _currentHealth = 0.0f;
-    float _currentShield = 0.0f;
-    eUnitPosition _ePosition = eUnitPosition.NONE;
+    [Header("Current Stats")]
+    [SerializeField] private float _currentHealth = 0.0f;
+    [SerializeField] private float _currentShield = 0.0f;
+    [SerializeField] private eUnitPosition _ePosition = eUnitPosition.NONE;
+
+    [Header("Status")]
+    [SerializeField] private bool _bIsDead = false;
+
     public bool IsFrontPosition() { return _ePosition == eUnitPosition.FRONT; }
     public eUnitPosition GetUnitPosition() { return _ePosition; }
     public void SetUnitPosition(eUnitPosition position) { _ePosition = position; }
-
-    bool _bIsDead = false;
     public bool IsDead() { return _bIsDead; }
 
     public Action onDeath { private get; set; } = null;

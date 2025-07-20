@@ -24,11 +24,6 @@ public class SkillBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         isInitialized = true;
     }
 
-    private void Start()
-    {
-        Global.DEBUG_PRINT($"SkillBox initialized for type: {skillType}");
-    }
-
     public void SetupForUnit(string description, float value)
     {
         this.description = description;

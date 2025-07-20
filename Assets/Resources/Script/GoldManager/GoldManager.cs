@@ -35,22 +35,20 @@ public class GoldManager : MonoBehaviour
     public void StartNewTurn()
     {
         CalculateInterest();
-        OnRoundStart(false); // Add base income
+        // Add base income
+        OnRoundStart(false); 
     }
 
     public void OnVictory()
     {
-        AddGold(config.winRoundBonus); // +3 gold for winning
+        AddGold(config.winRoundBonus);
     }
 
     public void CalculateInterest()
     {
-        if (config == null) return;
-
-        // For every 10 unspent gold, gain +1 gold (max +5)
         int interestAmount = Mathf.Min(currentGold / config.goldPerInterest, config.maxInterest);
         
-        Global.DEBUG_PRINT($"[GoldManager] Calculate interest: {interestAmount} gold");
+        Global.DEBUG_PRINT($"[GoldManager] Calculate interest: Current gold={currentGold}, Interest amount={interestAmount}");
         
         if (interestAmount > 0)
         {
@@ -60,15 +58,12 @@ public class GoldManager : MonoBehaviour
 
     public void OnRoundStart(bool isVictory)
     {
-        if (config == null) return;
-
-        // Base income of 5 gold
-        Global.DEBUG_PRINT($"Adding base income: +{config.baseIncomePerRound} gold");
+        Global.DEBUG_PRINT($"[GoldManager] Adding base income: +{config.baseIncomePerRound} gold (Current: {currentGold})");
         AddGold(config.baseIncomePerRound);
         
         if (isVictory)
         {
-            Global.DEBUG_PRINT($"Victory bonus: +{config.winRoundBonus} gold!");
+            Global.DEBUG_PRINT($"[GoldManager] Victory bonus: +{config.winRoundBonus} gold!");
             AddGold(config.winRoundBonus);
         }
     }
@@ -83,11 +78,12 @@ public class GoldManager : MonoBehaviour
 
         if (currentGold < amount)
         {
-            Global.DEBUG_PRINT("[GoldManager] Not enough gold");
+            Global.DEBUG_PRINT($"[GoldManager] Not enough gold (Have: {currentGold}, Need: {amount})");
             return false;
         }
 
         currentGold -= amount;
+        Global.DEBUG_PRINT($"[GoldManager] Spent {amount} gold, remaining: {currentGold}");
         return true;
     }
 
@@ -100,6 +96,7 @@ public class GoldManager : MonoBehaviour
         }
 
         currentGold += amount;
+        Global.DEBUG_PRINT($"[GoldManager] Added {amount} gold, new total: {currentGold}");
     }
 
     public int GetCurrentGold()
@@ -116,26 +113,37 @@ public class GoldManager : MonoBehaviour
     {
         if (config == null)
         {
-            Debug.LogWarning("[GoldManager] Gold configuration is missing! Please assign it in the inspector.");
+            Debug.LogWarning("[GoldManager] Gold configuration is missing!");
             return 0;
         }
 
+        int reward = 0;
         switch (type)
         {
             case MatchType.HORIZONTAL:
-                return config.horizontalReward;
+                reward = config.horizontalReward;
+                break;
             case MatchType.VERTICAL:
-                return config.verticalReward;
+                reward = config.verticalReward;
+                break;
             case MatchType.DIAGONAL:
-                return config.diagonalReward;
+                reward = config.diagonalReward;
+                break;
             case MatchType.ZIGZAG:
-                return config.zigzagReward;
+                reward = config.zigzagReward;
+                break;
             case MatchType.XSHAPE:
-                return config.xShapeReward;
+                reward = config.xShapeReward;
+                break;
             case MatchType.FULLGRID:
-                return config.fullGridReward;
-            default:
-                return 0;
+                reward = config.fullGridReward;
+                break;
         }
+        
+        if (reward > 0)
+        {
+            Global.DEBUG_PRINT($"[GoldManager] Match reward for {type}: +{reward} gold");
+        }
+        return reward;
     }
 } 

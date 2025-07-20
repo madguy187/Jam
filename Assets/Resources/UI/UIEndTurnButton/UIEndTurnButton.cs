@@ -1,37 +1,45 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Button))]
 public class UIEndTurnButton : MonoBehaviour
 {
-    private Button endTurnButton;
+    private Button button;
 
-    void Start()
+    void Awake()
     {
-        endTurnButton = GetComponent<Button>();
-        if (endTurnButton != null)
+        button = GetComponent<Button>();
+        if (button != null)
         {
-            endTurnButton.onClick.AddListener(OnEndTurnClick);
+            button.onClick.AddListener(OnEndTurnClicked);
+        }
+        else
+        {
+            Debug.LogError("[UIEndTurnButton] No Button component found!");
         }
     }
 
-    void OnEndTurnClick()
+    void OnEndTurnClicked()
     {
-        SpinResult spinResult = SlotController.instance.GetSpinResult();
-        if (spinResult != null && spinResult.GetAllMatches().Count > 0)
+        if (SlotController.instance != null)
         {
-            CombatManager.instance.StartBattleLoop(spinResult.GetAllMatches());
+            SlotController.instance.EndPlayerTurn();
         }
+    }
 
-        SlotController.instance.ResetSpins();
-        SlotController.instance.ClearSpinResult();
-        GoldManager.instance.StartNewTurn();
+    public void SetInteractable(bool interactable)
+    {
+        if (button != null)
+        {
+            button.interactable = interactable;
+        }
     }
 
     void OnDestroy()
     {
-        if (endTurnButton != null)
+        if (button != null)
         {
-            endTurnButton.onClick.RemoveListener(OnEndTurnClick);
+            button.onClick.RemoveListener(OnEndTurnClicked);
         }
     }
 } 

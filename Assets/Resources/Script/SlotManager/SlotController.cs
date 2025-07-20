@@ -12,19 +12,29 @@ public class SlotController : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private SlotGridUI gridUI;
-    [SerializeField] private UIRollButton rollButton;  
+    [SerializeField] private UIRollButton rollButton;
+    [SerializeField] private UIEndTurnButton endTurnButton;
     
     private SlotGrid slotGrid;
     private MatchDetector matchDetector;
     private bool isSpinning;
     private SpinResult spinResult;
     private int spinsThisTurn = 0;
+    private bool isEnemyTurn = false;
+    
+    public bool IsEnemyTurn() => isEnemyTurn;
 
     private void Awake()
     {
         if (instance == null)
         {
             instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (instance != this)
+        {
+            Destroy(gameObject);
+            return;
         }
 
         if (slotConfig == null)
@@ -42,6 +52,101 @@ public class SlotController : MonoBehaviour
         slotGrid = new SlotGrid(slotConfig.gridRows, slotConfig.gridColumns);
         matchDetector = new MatchDetector(slotGrid);
         spinResult = new SpinResult(new List<Match>(), 0);
+
+        // Start with player's turn
+        StartPlayerTurn();
+    }
+
+    public void StartPlayerTurn()
+    {
+        Global.DEBUG_PRINT("[SlotController] Starting player turn");
+        isEnemyTurn = false;
+        spinsThisTurn = 0;
+        spinResult.Clear();
+        
+        // Add base income at start of turn
+        Global.DEBUG_PRINT("[SlotController] Adding base income for new turn");
+        GoldManager.instance.OnRoundStart(false);
+        
+        // Enable buttons for player turn
+        if (rollButton != null) rollButton.SetInteractable(true);
+        if (endTurnButton != null) endTurnButton.SetInteractable(true);
+    }
+
+    public void EndPlayerTurn()
+    {
+        Global.DEBUG_PRINT("[SlotController] EndPlayerTurn called - calculating interest before enemy turn");
+        // Calculate interest at end of player's turn
+        GoldManager.instance.CalculateInterest();
+        StartEnemyTurn();
+    }
+
+    public void StartEnemyTurn()
+    {
+        isEnemyTurn = true;
+        spinsThisTurn = 0;
+        spinResult.Clear();
+
+        // Disable buttons during enemy turn
+        if (rollButton != null) rollButton.SetInteractable(false);
+        if (endTurnButton != null) endTurnButton.SetInteractable(false);
+
+        // Execute enemy's single spin
+        StartCoroutine(ExecuteEnemyTurn());
+    }
+
+    private IEnumerator ExecuteEnemyTurn()
+    {
+        // Small delay before enemy acts - will deal w this magic number later
+        yield return new WaitForSeconds(1f); 
+        
+        // Generate random symbols for enemy's single spin
+        SymbolType[] finalSymbols = new SymbolType[slotConfig.TotalGridSize];
+        for (int i = 0; i < slotConfig.TotalGridSize; i++)
+        {
+            finalSymbols[i] = SymbolGenerator.instance.GenerateRandomSymbol();
+        }
+        
+        isSpinning = true;
+        gridUI.StartSpinAnimation(finalSymbols);
+        FillGridWithSymbols(finalSymbols);
+        
+        // Wait for spin animation
+        while (gridUI.GetIsSpinning())
+        {
+            yield return null;
+        }
+
+        // Check for matches
+        List<Match> matches = CheckForMatches();
+        
+        // If we have matches, execute enemy attack
+        if (matches.Count > 0)
+        {
+            // Get enemy unit that will attack
+            Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+            for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
+            {
+                var unit = enemyDeck.GetUnitObject(i);
+                if (unit != null && unit.unitSO != null)
+                {
+                    foreach (var match in matches)
+                    {
+                        match.SetUnitName(unit.unitSO.unitName);
+                    }
+
+                    // Execute enemy attack
+                    CombatManager.instance.ExecBattle(eDeckType.ENEMY, i);
+                    break;
+                }
+            }
+        }
+        // enemy dont earn gold, we only got gold for player
+        spinResult.SetMatches(matches, 0);
+        isSpinning = false;
+
+        yield return new WaitForSeconds(1f); 
+        StartPlayerTurn();
     }
     
     public bool GetIsSpinning() {
@@ -176,7 +281,7 @@ public class SlotController : MonoBehaviour
                         match.SetUnitName(unitName);
                     }
 
-                    // Execute the attack immediately
+                    // Execute the attack directly
                     CombatManager.instance.ExecBattle(eDeckType.PLAYER, i);
                     break;
                 }
