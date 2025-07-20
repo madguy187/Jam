@@ -130,48 +130,24 @@ public class SlotController : MonoBehaviour
             return;
         }
 
-        UnitObject selectedUnit = null;
+        // Get first unit from player deck
         Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
-        
-        // Get first non-null unit from deck
         for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
         {
             var unit = playerDeck.GetUnitObject(i);
-            if (unit != null)
+            if (unit != null && unit.unitSO != null)
             {
-                selectedUnit = unit;
+                // 1. Fill up List<Match> with unit name
+                string unitName = unit.unitSO.unitName;
+                foreach (var match in matches)
+                {
+                    match.SetUnitName(unitName);
+                }
+
+                // 2. Then call CombatManager ExecBattle
+                CombatManager.instance.ExecBattle(eDeckType.PLAYER, i);
                 break;
             }
-        }
-        
-        Global.DEBUG_PRINT($"[SlotController] Selected Unit: {(selectedUnit ? selectedUnit.name : "None")}");
-        
-        if (selectedUnit != null)
-        {
-            Global.DEBUG_PRINT($"[SlotController] Has UnitSO: {(selectedUnit.unitSO != null ? "Yes" : "No")}");
-            if (selectedUnit.unitSO == null)
-            {
-                Global.DEBUG_PRINT("[SlotController] ERROR: Unit's ScriptableObject (unitSO) is null!");
-                return;
-            }
-
-            string unitName = selectedUnit.unitSO.unitName;
-            Global.DEBUG_PRINT($"[SlotController] Unit Name: {unitName}");
-            Global.DEBUG_PRINT($"[SlotController] Unit SO Name: {selectedUnit.unitSO.name}");
-            
-            foreach (var match in matches)
-            {
-                match.SetUnitName(unitName);
-                Global.DEBUG_PRINT($"[SlotController] Match {match.GetMatchType()} -> Unit: {match.GetUnitName()}");
-            }
-
-            // Start the battle loop
-            Global.DEBUG_PRINT("[SlotController] Starting Combat");
-            CombatManager.instance.StartBattleLoop(matches);
-        }
-        else
-        {
-            Global.DEBUG_PRINT("[SlotController] No unit in player deck!");
         }
     }
 
