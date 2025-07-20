@@ -29,6 +29,11 @@ public class SlotController : MonoBehaviour
     private SpinResult spinResult;
     private int currentSpinCost;
     
+    [Header("Turn Settings")]
+    [SerializeField] private float enemyTurnDelay = 1f;
+    [SerializeField] private float enemySpinDuration = 0.5f;
+    private bool isEnemyTurn = false;
+    
     public bool GetIsSpinning() {
         return isSpinning;
     }
@@ -118,10 +123,10 @@ public class SlotController : MonoBehaviour
         gridUI.StartSpinAnimation(finalSymbols);
         FillGridWithSymbols(finalSymbols);
         
-        StartCoroutine(WaitForSpinComplete(autoSpendGold));
+        StartCoroutine(WaitForSpinComplete(autoSpendGold, false));
     }
     
-    private void ProcessMatchesForUnit(List<Match> matches)
+    private void ProcessMatchesForUnit(List<Match> matches, bool isEnemyAttack)
     {
         if (matches.Count <= 0) return;
 
@@ -130,11 +135,13 @@ public class SlotController : MonoBehaviour
             return;
         }
 
-        // Get first unit from player deck
-        Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
-        for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
+        // Get unit from correct deck
+        eDeckType attackerDeck = isEnemyAttack ? eDeckType.ENEMY : eDeckType.PLAYER;
+        Deck deck = DeckManager.instance.GetDeckByType(attackerDeck);
+        
+        for (int i = 0; i < deck.GetDeckMaxSize(); i++)
         {
-            var unit = playerDeck.GetUnitObject(i);
+            var unit = deck.GetUnitObject(i);
             if (unit != null && unit.unitSO != null)
             {
                 // 1. Fill up List<Match> with unit name
@@ -145,13 +152,13 @@ public class SlotController : MonoBehaviour
                 }
 
                 // 2. Then call CombatManager ExecBattle
-                CombatManager.instance.ExecBattle(eDeckType.PLAYER, i);
+                CombatManager.instance.ExecBattle(attackerDeck, i);
                 break;
             }
         }
     }
 
-    private IEnumerator WaitForSpinComplete(bool autoSpendGold)
+    private IEnumerator WaitForSpinComplete(bool autoSpendGold, bool isEnemyAttack)
     {
         // Wait for spin animation to complete
         while (gridUI.GetIsSpinning())
@@ -161,11 +168,10 @@ public class SlotController : MonoBehaviour
 
         // After grid is filled and animation is complete, check for matches
         List<Match> matches = CheckForMatches();
-        Global.DEBUG_PRINT($"[SlotController] Found {matches.Count} matches");
         
-        // Calculate total gold earned
+        // Calculate total gold earned (only for player)
         int totalGold = 0;
-        if (autoSpendGold && matches.Count > 0)
+        if (!isEnemyAttack && autoSpendGold && matches.Count > 0)
         {
             foreach (Match match in matches)
             {
@@ -179,12 +185,25 @@ public class SlotController : MonoBehaviour
         }
 
         // Process matches and start combat if needed
-        ProcessMatchesForUnit(matches);
+        if (matches.Count > 0)
+        {
+            ProcessMatchesForUnit(matches, isEnemyAttack);
+            yield return new WaitForSeconds(0.5f); // Small delay for combat effects
+        }
         
         // Save matches to our SpinResult
         spinResult.SetMatches(matches, totalGold);
-        
         isSpinning = false;
+        
+        // Switch turns
+        if (!isEnemyAttack)
+        {
+            StartEnemyTurn();
+        }
+        else
+        {
+            StartPlayerTurn();
+        }
     }
 
     private void PrintSpinResults()
@@ -238,20 +257,14 @@ public class SlotController : MonoBehaviour
         gridUI.StartSpinAnimation(finalSymbols);
         FillGridWithSymbols(finalSymbols);
         
-        StartCoroutine(WaitForSpinComplete(true));
+        StartCoroutine(WaitForSpinComplete(true, false));
     }
     
     public SpinResult GetSpinResult()
     {
         return spinResult;
     }
-    
-    public void StartNewTurn()
-    {
-        spinsThisTurn = 0;
-        spinResult.Clear();
-    }
-    
+
     public bool CanSpin()
     {
         if (isSpinning) 
@@ -343,5 +356,50 @@ public class SlotController : MonoBehaviour
     public void ClearSpinResult()
     {
         spinResult.Clear();
+    }
+
+    // ===== ADD SOME TURN MANAGEMENT FUNCTIONS HERE FOR BATTLE ======
+    public void StartNewTurn()
+    {
+        spinsThisTurn = 0;
+        spinResult.Clear();
+    }
+    
+    public void StartPlayerTurn()
+    {
+        isEnemyTurn = false;
+        spinsThisTurn = 0;
+        spinResult.Clear();
+    }
+    
+    public void StartEnemyTurn()
+    {
+        isEnemyTurn = true;
+        spinsThisTurn = 0;
+        spinResult.Clear();
+        StartCoroutine(ExecuteEnemyTurn());
+    }
+    
+    private IEnumerator ExecuteEnemyTurn()
+    {
+        yield return new WaitForSeconds(enemyTurnDelay);
+        
+        if (!isCombatEnabled) yield break;
+        
+        isSpinning = true;
+        
+        // Generate random symbols for enemy
+        SymbolType[] finalSymbols = new SymbolType[slotConfig.TotalGridSize];
+        for (int i = 0; i < slotConfig.TotalGridSize; i++)
+        {
+            finalSymbols[i] = SymbolGenerator.instance.GenerateRandomSymbol();
+        }
+        
+        // Start spin with enemy duration
+        gridUI.StartSpinAnimation(finalSymbols, gridUI.GetEnemySpinDuration());
+        FillGridWithSymbols(finalSymbols);
+        
+        // autoSpendGold=false, isEnemyTurn=true
+        StartCoroutine(WaitForSpinComplete(false, true)); 
     }
 } 
