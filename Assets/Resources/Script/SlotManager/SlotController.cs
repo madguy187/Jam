@@ -17,6 +17,7 @@ public class SlotController : MonoBehaviour
     [Header("Configuration")]
     [SerializeField] private GoldConfig goldConfig;
     [SerializeField] private SlotConfig slotConfig;
+    [SerializeField] private bool isCombatEnabled = true;
 
     [Header("References")]
     [SerializeField] private SlotGridUI gridUI; 
@@ -123,6 +124,11 @@ public class SlotController : MonoBehaviour
     private void ProcessMatchesForUnit(List<Match> matches)
     {
         if (matches.Count <= 0) return;
+
+        if (!isCombatEnabled) {
+            Global.DEBUG_PRINT("[SlotController] Combat is disabled");
+            return;
+        }
 
         UnitObject selectedUnit = null;
         Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
