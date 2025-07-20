@@ -25,14 +25,17 @@ public class DeckManager : MonoBehaviour {
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            Global.DEBUG_PRINT("[Deck] Adding Paladin to Player Deck");
             cPlayerDeck.AddUnit("Paladin");
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
+            Global.DEBUG_PRINT("[Deck] Adding Paladin to Enemy Deck");
             cEnemyDeck.AddUnit("Paladin");
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha4)) {
+            Global.DEBUG_PRINT("[Deck] Adding Cleric to Enemy Deck");
             cEnemyDeck.AddUnit("Cleric");
         }
     }
