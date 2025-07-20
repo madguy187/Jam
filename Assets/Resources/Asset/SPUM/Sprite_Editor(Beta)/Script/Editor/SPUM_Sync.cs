@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using System.IO;
 
+[System.Obsolete]
 [CustomEditor(typeof(SpriteSync))]
 public class SPUM_Sync : Editor
 {

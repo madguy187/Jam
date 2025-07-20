@@ -60,6 +60,24 @@ public class Deck : IEnumerable<UnitObject> {
         return _vecUnit[index];
     }
 
+    public List<UnitObject> GetAllAliveUnit(eUnitPosition eUnitPos = eUnitPosition.NONE) {
+        List<UnitObject> arrUnit = new List<UnitObject>();
+        foreach (UnitObject unit in _vecUnit) {
+            if (unit == null) {
+                continue;
+            }
+
+            if (eUnitPos != eUnitPosition.NONE) {
+                if (unit.GetUnitPosition() != eUnitPos) {
+                    continue;
+                }
+            }
+
+            arrUnit.Add(unit);
+        }
+        return arrUnit;
+    }
+
     public bool IsValidUnitIndex(int index) {
         if (index < 0 || index >= _vecUnit.Count) {
             return false;
@@ -94,6 +112,26 @@ public class Deck : IEnumerable<UnitObject> {
         }
 
         return true;
+    }
+
+    public void Resolve() {
+        foreach (UnitObject unit in _vecUnit) {
+            if (unit == null) {
+                continue;
+            }
+            
+            unit.Resolve();
+        }
+    }
+
+    public void InitDeck() {
+        foreach (UnitObject unit in _vecUnit) {
+            if (unit == null) {
+                continue;
+            }
+            
+            unit.InitTempEffect();
+        }
     }
 
     int _GetEmptySlotIndex() {
