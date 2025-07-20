@@ -26,12 +26,17 @@ public class EffectMap {
     }
 
     public void Resolve() {
+        List<EffectType> listRemove = new List<EffectType>();
         foreach (EffectObject effect in _dictEffect.Values) {
             effect.Resolve();
 
             if (effect.IsEmpty()) {
-                RemoveEffect(effect.effectType);
+                listRemove.Add(effect.effectType);
             }
+        }
+
+        foreach (EffectType type in listRemove) {
+            _dictEffect.Remove(type);
         }
     }
 }

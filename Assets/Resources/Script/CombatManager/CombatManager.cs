@@ -163,7 +163,6 @@ public class CombatManager : MonoBehaviour {
     }
 
     MatchType _GetRollType(string unitName) {
-        return MatchType.SINGLE;
         if (_listMatch == null) {
             return MatchType.NONE;
         }
