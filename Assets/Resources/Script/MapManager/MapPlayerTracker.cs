@@ -89,6 +89,8 @@ namespace Map
             // If choose to show GUI in some of these cases, do not forget to set "Locked" in MapPlayerTracker back to false
             switch (mapNode.Node.nodeType) {
                 case NodeType.Enemy:
+                    MapPlayerTracker.Instance.mapManager.SaveMap();
+                    SceneManager.LoadScene("Game");
                     break;
                 case NodeType.Encounter:
                     break;
