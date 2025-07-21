@@ -33,6 +33,7 @@ public class Match
     private List<GridPosition> readablePositions;
     private SymbolType symbol;
     private string unitName;
+    private eUnitArchetype archetype; // Add archetype field
 
     public MatchType GetMatchType() {
         return type;
@@ -61,6 +62,16 @@ public class Match
     public void SetUnitName(string name)
     {
         unitName = name;
+    }
+
+    public eUnitArchetype GetArchetype()
+    {
+        return archetype;
+    }
+
+    public void SetArchetype(eUnitArchetype newArchetype)
+    {
+        archetype = newArchetype;
     }
 
     public Match(MatchType type, List<Vector2Int> positions, SymbolType symbol) {

@@ -95,7 +95,15 @@ public class SlotController : MonoBehaviour
 
     public void EndPlayerTurn()
     {
-        Global.DEBUG_PRINT("[SlotController] EndPlayerTurn called - calculating interest before enemy turn");
+        Global.DEBUG_PRINT("[SlotController] EndPlayerTurn called");
+
+        // Execute combat with current matches
+        List<Match> currentMatches = spinResult.GetAllMatches();
+        if (currentMatches.Count > 0)
+        {
+            CombatManager.instance.StartBattleLoop(currentMatches);
+        }
+
         // Calculate interest at end of player's turn
         GoldManager.instance.CalculateInterest();
         StartEnemyTurn();
@@ -117,15 +125,12 @@ public class SlotController : MonoBehaviour
 
     private IEnumerator ExecuteEnemyTurn()
     {
-        // Small delay before enemy acts - will deal w this magic number later
+        // Small delay before enemy acts
         yield return new WaitForSeconds(1f); 
         
-        // Generate random symbols for enemy's single spin
-        SymbolType[] finalSymbols = new SymbolType[slotConfig.TotalGridSize];
-        for (int i = 0; i < slotConfig.TotalGridSize; i++)
-        {
-            finalSymbols[i] = SymbolGenerator.instance.GenerateRandomSymbol();
-        }
+        // Generate symbols based on enemy deck archetypes
+        Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+        SymbolType[] finalSymbols = SymbolGenerator.instance.GenerateSymbolsForDeck(enemyDeck);
         
         isSpinning = true;
         gridUI.StartSpinAnimation(finalSymbols);
@@ -140,29 +145,20 @@ public class SlotController : MonoBehaviour
         // Check for matches
         List<Match> matches = CheckForMatches();
         
-        // If we have matches, execute enemy attack
+        // Set archetypes for matches
+        foreach (Match match in matches)
+        {
+            match.SetArchetype(SymbolGenerator.GetArchetypeForSymbol(match.GetSymbol()));
+        }
+
+        // Execute combat with matches
         if (matches.Count > 0)
         {
-            // Get enemy unit that will attack
-            Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
-            for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
-            {
-                var unit = enemyDeck.GetUnitObject(i);
-                if (unit != null && unit.unitSO != null)
-                {
-                    foreach (var match in matches)
-                    {
-                        match.SetUnitName(unit.unitSO.unitName);
-                    }
-
-                    // Execute enemy attack
-                    CombatManager.instance.ExecBattle(eDeckType.ENEMY, i);
-                    break;
-                }
-            }
+            CombatManager.instance.StartBattleLoop(matches);
         }
-        // enemy dont earn gold, we only got gold for player
-        spinResult.SetMatches(matches, 0);
+
+        // Enemy doesn't earn gold
+        spinResult.SetMatches(matches, 0); 
         isSpinning = false;
 
         yield return new WaitForSeconds(1f); 
@@ -235,12 +231,9 @@ public class SlotController : MonoBehaviour
         
         IncrementSpins();
         
-        // Generate random symbols
-        SymbolType[] finalSymbols = new SymbolType[slotConfig.TotalGridSize];
-        for (int i = 0; i < slotConfig.TotalGridSize; i++)
-        {
-            finalSymbols[i] = SymbolGenerator.instance.GenerateRandomSymbol();
-        }
+        // Get current deck's archetypes
+        Deck currentDeck = DeckManager.instance.GetDeckByType(isEnemyTurn ? eDeckType.ENEMY : eDeckType.PLAYER);
+        SymbolType[] finalSymbols = SymbolGenerator.instance.GenerateSymbolsForDeck(currentDeck);
         
         if (finalSymbols == null || finalSymbols.Length != slotConfig.TotalGridSize)
         {
@@ -276,6 +269,9 @@ public class SlotController : MonoBehaviour
         int totalGold = 0;
         foreach (Match match in matches)
         {
+            // Set archetype for each match based on symbol
+            match.SetArchetype(SymbolGenerator.GetArchetypeForSymbol(match.GetSymbol()));
+
             if (match.GetMatchType() != MatchType.SINGLE)
             {
                 int goldReward = GoldManager.instance.GetGoldRewardForMatch(match.GetMatchType());
@@ -284,30 +280,6 @@ public class SlotController : MonoBehaviour
             }
         }
 
-        // If we have matches, execute combat immediately
-        if (matches.Count > 0)
-        {
-            // Get the player's unit that will attack
-            Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
-            for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
-            {
-                var unit = playerDeck.GetUnitObject(i);
-                if (unit != null && unit.unitSO != null)
-                {
-                    // Set unit name for each match
-                    string unitName = unit.unitSO.unitName;
-                    foreach (var match in matches)
-                    {
-                        match.SetUnitName(unitName);
-                    }
-
-                    // Execute the attack directly
-                    CombatManager.instance.ExecBattle(eDeckType.PLAYER, i);
-                    break;
-                }
-            }
-        }
-        
         // Save matches to our SpinResult
         spinResult.SetMatches(matches, totalGold);
         isSpinning = false;

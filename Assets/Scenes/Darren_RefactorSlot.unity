@@ -209,9 +209,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   emptyProbability: 0.2
-  attackProbability: 0.3
-  defenseProbability: 0.25
-  specialProbability: 0.25
+  holyProbability: 0.3
+  undeadProbability: 0.25
+  elfProbability: 0.25
 --- !u!1 &223026535
 GameObject:
   m_ObjectHideFlags: 0
@@ -2381,9 +2381,25 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8313275753077245064, guid: e037c54729ca6497c8b6ca7ae98cf13c, type: 3}
+      propertyPath: elfSprite
+      value: 
+      objectReference: {fileID: 2613986998692081816, guid: 9242a1677d87e7143bcf39d0133b04c4, type: 3}
+    - target: {fileID: 8313275753077245064, guid: e037c54729ca6497c8b6ca7ae98cf13c, type: 3}
+      propertyPath: holySprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 9a363b86d8dc1f9469388fb98608bb7b, type: 3}
+    - target: {fileID: 8313275753077245064, guid: e037c54729ca6497c8b6ca7ae98cf13c, type: 3}
+      propertyPath: emptySprite
+      value: 
+      objectReference: {fileID: 2172342012233351780, guid: 0d7d0bf8307514eaf81aa72f558d3fb4, type: 3}
+    - target: {fileID: 8313275753077245064, guid: e037c54729ca6497c8b6ca7ae98cf13c, type: 3}
       propertyPath: spinDuration
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8313275753077245064, guid: e037c54729ca6497c8b6ca7ae98cf13c, type: 3}
+      propertyPath: undeadSprite
+      value: 
+      objectReference: {fileID: 9220052400780551148, guid: 53b212e6ccfac8a44893b2d70458004d, type: 3}
     - target: {fileID: 8313275753077245064, guid: e037c54729ca6497c8b6ca7ae98cf13c, type: 3}
       propertyPath: enemySpinDuration
       value: 0.5
