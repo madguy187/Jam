@@ -37,7 +37,6 @@ public class Deck : IEnumerable<UnitObject> {
         unit.SetUnitPosition(eUnitPos);
 
         _vecUnit[nIndex] = unit;
-        Global.DEBUG_PRINT("[Deck] Added Unit: " + unitName + " at index: " + nIndex);
         return unit;
     }
 

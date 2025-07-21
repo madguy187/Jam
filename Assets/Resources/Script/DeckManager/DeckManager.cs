@@ -26,12 +26,21 @@ public class DeckManager : MonoBehaviour {
     void Update() {
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
             GameObject prefab = ResourceManager.instance.Debug_RandUnit();
+            if (prefab == null) {
+                Global.DEBUG_PRINT("Error loading");
+                return;
+            }
+            
             cPlayerDeck.AddUnit(prefab);
             Global.DEBUG_PRINT("Loaded " + prefab.name + " into Player Team");
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
             GameObject prefab = ResourceManager.instance.Debug_RandUnit();
+            if (prefab == null) {
+                Global.DEBUG_PRINT("Error loading");
+                return;
+            }
             cEnemyDeck.AddUnit(prefab);
             Global.DEBUG_PRINT("Loaded " + prefab.name + " into Enemy Team");
         }

@@ -46,7 +46,7 @@ public class ResourceManager : MonoBehaviour {
 
         UnitObject unit = obj.GetComponent<UnitObject>();
         if (unit == null) {
-            Destroy(obj);
+            Destroy(obj.gameObject);
             return null;
         }
 
