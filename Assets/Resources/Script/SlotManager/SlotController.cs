@@ -182,8 +182,12 @@ public class SlotController : MonoBehaviour
             return;
         }
         
-        if (gridUI.GetIsSpinning() || isSpinning)
+        if (unit.IsDead())
         {
+            return;
+        }
+        
+        if (gridUI.GetIsSpinning() || isSpinning) {
             return;
         } 
         

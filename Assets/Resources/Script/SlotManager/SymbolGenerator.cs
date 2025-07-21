@@ -98,6 +98,7 @@ public class SymbolGenerator : MonoBehaviour
     public SymbolType[] GenerateSymbolsForUnit(UnitObject unit)
     {
         if (unit == null) return null;
+        if (unit.IsDead()) return null;
 
         float tempEmptyProb = emptyProbability;
         float tempAttackProb = attackProbability;

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 public class EffectMap {
@@ -11,6 +12,19 @@ public class EffectMap {
 
     public void RemoveEffect(EffectType eType) {
         _dictEffect.Remove(eType);
+    }
+
+    public void RemoveEffectByPredicate(Predicate<EffectObject> predicate) {
+        List<EffectType> listRemove = new List<EffectType>();
+        foreach (KeyValuePair<EffectType, EffectObject> pair in _dictEffect) {
+            if (predicate(pair.Value)) {
+                listRemove.Add(pair.Key);
+            }
+        }
+
+        foreach (EffectType type in listRemove) {
+            _dictEffect.Remove(type);
+        }
     }
 
     public float GetParam(EffectType eType) {

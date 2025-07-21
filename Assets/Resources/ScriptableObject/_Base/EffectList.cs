@@ -7,6 +7,15 @@ using UnityEngine;
 public class EffectList : IEnumerable<EffectScriptableObject> {
     [SerializeField] List<EffectScriptableObject> _listScriptableObject;
 
+    // ONLY FOR EDITOR MODE
+    public void AddEffect(EffectScriptableObject _effect) {
+        if (_listScriptableObject == null) {
+            _listScriptableObject = new List<EffectScriptableObject>();
+        }
+        _listScriptableObject.Add(_effect);
+    }
+    // ONLY FOR EDITOR MODE
+
     public bool IsValid() {
         return _listScriptableObject != null;
     }

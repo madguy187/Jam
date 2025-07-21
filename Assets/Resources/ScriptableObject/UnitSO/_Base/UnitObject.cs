@@ -1,9 +1,46 @@
 using System;
 using UnityEngine;
 
+public class UnitStat {
+    float val = 0.0f;
+    float max = 0.0f;
+
+    public UnitStat(float _val) { val = _val; }
+
+    public void SetMax(float _max) { max = _max; }
+    public void SetVal(float _val) {
+        if (max > 0 && _val > max) {
+            _val = max;
+        }
+        val = _val;
+    }
+
+    public float GetVal() { return val; }
+
+    public void AddVal(float _val) {
+        if (max > 0 && val + _val > max) {
+            _val = max - val;
+        }
+        val += _val;
+    }
+    public void MinusVal(float _val) { val -= _val; }
+}
+
 public class UnitObject : MonoBehaviour {
+    // ONLY FOR EDITOR MODE
+    public void SetUnitSO(UnitScriptableObject _unitSO) { unitSO = _unitSO; }
+    public void SetEffectList_Single(EffectList _list) { _listSingleEffect = _list; }
+    public void SetEffectList_Horizontal(EffectList _list) { _listHorizontalEffect = _list; }
+    public void SetEffectList_XShape(EffectList _list) { _listXShapeEffect = _list; }
+    public void SetEffectList_Diagonal(EffectList _list) { _listDiagonalEffect = _list; }
+    public void SetEffectList_ZigZag(EffectList _list) { _listZigZagEffect = _list; }
+    public void SetEffectList_FullGrid(EffectList _list) { _listFullGridEffect = _list; }
+    // ONLY FOR EDITOR MODE
+
+
     [field: SerializeField] public UnitScriptableObject unitSO { get; private set; }
     [SerializeField] EffectList _listSingleEffect;
+    [SerializeField] EffectList _listHorizontalEffect;
     [SerializeField] EffectList _listDiagonalEffect;
     [SerializeField] EffectList _listZigZagEffect;
     [SerializeField] EffectList _listXShapeEffect;
@@ -14,8 +51,13 @@ public class UnitObject : MonoBehaviour {
 
     public int index { get; set; }
 
-    float _currentHealth = 0.0f;
-    float _currentShield = 0.0f;
+    public UnitStat _currentHealth = new UnitStat(0.0f);
+    public UnitStat _currentAttack = new UnitStat(0.0f);
+    public UnitStat _currentShield = new UnitStat(0.0f);
+    public UnitStat _currentRes = new UnitStat(0.0f);
+    public UnitStat _currentCritRate = new UnitStat(0.0f);
+    public UnitStat _currentCritMulti = new UnitStat(0.0f);
+
     eUnitPosition _ePosition = eUnitPosition.NONE;
     public bool IsFrontPosition() { return _ePosition == eUnitPosition.FRONT; }
     public eUnitPosition GetUnitPosition() { return _ePosition; }
@@ -27,32 +69,53 @@ public class UnitObject : MonoBehaviour {
     public Action onDeath { private get; set; } = null;
 
     public void Init() {
-        _currentHealth = unitSO.hp;
-        _currentShield = unitSO.shield;
+        _currentHealth.SetVal(unitSO.hp);
+        _currentHealth.SetMax(unitSO.hp);
+
+        _currentAttack.SetVal(unitSO.attack);
+        _currentShield.SetVal(unitSO.shield);
+        _currentRes.SetVal(unitSO.res);
+        _currentCritRate.SetVal(unitSO.critRate);
+        _currentCritMulti.SetVal(unitSO.critMulti);
     }
 
-    public void AddTempEffect(EffectType eType, float nVal, int nTurn) {
+    public void AddTempEffect(EffectScriptableObject effectSO) {
         EffectObject effect = new EffectObject();
-        effect.effectType = eType;
-        effect.Add(nVal, nTurn);
+        effect.effectType = effectSO.GetEffectType();
+        effect.eAffinity = effectSO.GetEffectAffinityType();
+        effect.Add(effectSO.GetEffectVal(), effectSO.GetEffectTurn());
 
-        _listTempEffect.AddEffect(eType, effect);
+        _listTempEffect.AddEffect(effectSO.GetEffectType(), effect);
     }
 
     public void RemoveEffect(EffectType eType) {
         _listTempEffect.RemoveEffect(eType);
     }
 
-    public float GetEffectParam(EffectType eType) {
-        return _listTempEffect.GetParam(eType);
+    public void RemoveTempEffectByPredicate(Predicate<EffectObject> predicate) {
+        _listTempEffect.RemoveEffectByPredicate(predicate);
+    }
+
+    public bool GetEffectParam(EffectType eType, out float val) {
+        val = _listTempEffect.GetParam(eType);
+        if (val > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool HasEffectParam(EffectType eType) {
+        float val = _listTempEffect.GetParam(eType);
+        if (val > 0) {
+            return true;
+        }
+
+        return false;
     }
 
     public float GetHealth() {
-        return _currentHealth;
-    }
-
-    public void AddHealth(float health) {
-        _currentHealth += health;
+        return _currentHealth.GetVal();
     }
 
     public float GetAttack() {
@@ -60,15 +123,7 @@ public class UnitObject : MonoBehaviour {
     }
 
     public float GetShield() {
-        return _currentShield;
-    }
-
-    public void AddShield(float shield) {
-        _currentShield += shield;
-    }
-
-    public void SetShield(float shield) {
-        _currentShield = shield;
+        return _currentShield.GetVal();
     }
 
     public float GetRes() {
@@ -88,20 +143,22 @@ public class UnitObject : MonoBehaviour {
             return;
         }
 
-        _currentHealth -= damage;
-        if (_currentHealth <= 0.0f) {
+        _currentHealth.MinusVal(damage);
+        if (_currentHealth.GetVal() <= Mathf.Epsilon) {
             _TriggerDeath();
         }
     }
 
     public float GetHealthPercentage() {
-        return _currentHealth / unitSO.hp;
+        return _currentHealth.GetVal() / unitSO.hp;
     }
 
     public EffectList GetRollEffectList(MatchType eType) {
         switch (eType) {
             case MatchType.SINGLE:
                 return _listSingleEffect;
+            case MatchType.HORIZONTAL:
+                return _listHorizontalEffect;
             case MatchType.DIAGONAL:
                 return _listDiagonalEffect;
             case MatchType.ZIGZAG:
@@ -132,10 +189,13 @@ public class UnitObject : MonoBehaviour {
 
         foreach (EffectScriptableObject effect in _listRelicEffect) {
             if (effect.GetExecType() == EffectExecType.START_OF_ROUND) {
-                AddTempEffect(effect.GetEffectType(), effect.GetEffectVal(), Global.TEMP_EFFECT_ONLY_THIS_ROUND);
+                AddTempEffect(effect);
             }
         }
+    }
 
+    public void Revive() {
+        _bIsDead = false;
     }
 
     void _TriggerDeath() {
@@ -148,6 +208,5 @@ public class UnitObject : MonoBehaviour {
         }
 
         _bIsDead = true;
-        Destroy(gameObject, 1.0f);
     }
 }

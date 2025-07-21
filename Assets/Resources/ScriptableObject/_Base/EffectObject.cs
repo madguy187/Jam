@@ -8,6 +8,7 @@ public class EffectInfo {
 public class EffectObject {
 
     public EffectType effectType;
+    public EffectAffinityType eAffinity = EffectAffinityType.NONE;
     List<EffectInfo> vecEffectInfo = new List<EffectInfo>();
 
     public void Add(float val, int turn) {

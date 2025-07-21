@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &6134034919542146130
+--- !u!1001 &4388287012366436848
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -11,39 +11,47 @@ PrefabInstance:
     - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
       propertyPath: <unitSO>k__BackingField
       value: 
-      objectReference: {fileID: 11400000, guid: ba0ea497fe29ca342a4e71277e885cc7, type: 2}
+      objectReference: {fileID: 11400000, guid: ae8fa0aefe993124ea498b657aa9d03d, type: 2}
     - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
       propertyPath: _listSingleEffect._listScriptableObject.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
       propertyPath: _listXShapeEffect._listScriptableObject.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
-      propertyPath: _listZigZagEffect._listScriptableObject.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
-      propertyPath: _listDiagonalEffect._listScriptableObject.Array.size
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
-      propertyPath: _listFullGridEffect._listScriptableObject.Array.size
+      propertyPath: _listZigZagEffect._listScriptableObject.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
+      propertyPath: _listDiagonalEffect._listScriptableObject.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
+      propertyPath: _listFullGridEffect._listScriptableObject.Array.size
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
       propertyPath: '_listSingleEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 9c8f7c0e28670324db85246e3a7f5f84, type: 2}
+      objectReference: {fileID: 11400000, guid: ac035d9cd0bc4b6478c2a3760f001a02, type: 2}
     - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
       propertyPath: '_listXShapeEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: a6871aeb9ae4f314a9503d80cfa8efd7, type: 2}
+      objectReference: {fileID: 11400000, guid: 8abd8513b2ea32c4c91e8d2a86befb30, type: 2}
+    - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
+      propertyPath: '_listXShapeEffect._listScriptableObject.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: cc86ede2b8df2e641ba0f7529089af18, type: 2}
     - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
       propertyPath: '_listZigZagEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: c323a7d23726c7d428fc5bf420936210, type: 2}
+      objectReference: {fileID: 11400000, guid: cc062f3fe186c8a4388f3e1c1b07ee52, type: 2}
+    - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
+      propertyPath: '_listZigZagEffect._listScriptableObject.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: ca047522ec11d7140bc75b6a1f00b9e2, type: 2}
     - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
       propertyPath: _listHorizontalEffect._listScriptableObject.Array.size
       value: 1
@@ -51,19 +59,19 @@ PrefabInstance:
     - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
       propertyPath: '_listDiagonalEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: c5343c0a726775c41a94f14a49697710, type: 2}
-    - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
-      propertyPath: '_listDiagonalEffect._listScriptableObject.Array.data[1]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 2716528cf3deacd43a0f9e3acf71cf4f, type: 2}
+      objectReference: {fileID: 11400000, guid: 3030c6aad4249ca48bac4f4ad1d6ecd5, type: 2}
     - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
       propertyPath: '_listFullGridEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 738c3803eb4666645ae81d8dc409b7f2, type: 2}
+      objectReference: {fileID: 11400000, guid: ff0073696cca81c4db6dc590bda02d74, type: 2}
+    - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
+      propertyPath: '_listFullGridEffect._listScriptableObject.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 82071907792e2d04e943be245b2172b9, type: 2}
     - target: {fileID: 35963157277327231, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
       propertyPath: '_listHorizontalEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 3bffb843bd387e341a1ea0847e24d1db, type: 2}
+      objectReference: {fileID: 11400000, guid: cef8b3729b5e3d246ab81f3b3bde655e, type: 2}
     - target: {fileID: 227152007938698508, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -146,7 +154,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5538696476440443800, guid: eefae57a00b451e4b83e0a29f39a1022, type: 3}
       propertyPath: m_Name
-      value: Paladin
+      value: Cleric
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

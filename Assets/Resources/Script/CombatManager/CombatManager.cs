@@ -147,13 +147,13 @@ public class CombatManager : MonoBehaviour {
         }
 
         UnitObject cDefenderUnit = cOtherDeck.GetUnitObject(nTarget);
-        if (cDefenderUnit == null) {
+        if (cDefenderUnit == null || cDefenderUnit.IsDead()) {
             Global.DEBUG_PRINT("[ExecBattle] Defender deck is empty target=" + nTarget);
             return;
         }
 
         UnitObject cAttackerUnit = cDeck.GetUnitObject(nAttackerIndex);
-        if (cAttackerUnit == null) {
+        if (cAttackerUnit == null || cAttackerUnit.IsDead()) {
             Global.DEBUG_PRINT("[ExecBattle] Attacker deck is empty target=" + nAttackerIndex);
             return;
         }
@@ -163,6 +163,7 @@ public class CombatManager : MonoBehaviour {
     }
 
     MatchType _GetRollType(string unitName) {
+        return MatchType.HORIZONTAL;
         if (_listMatch == null) {
             return MatchType.NONE;
         }
@@ -177,7 +178,11 @@ public class CombatManager : MonoBehaviour {
     }
 
     void _ExecBattleOne(UnitObject cAttackerUnit, UnitObject cDefenderUnit, MatchType eRoll) {
-        if (cAttackerUnit == null || cDefenderUnit == null) {
+        if (cAttackerUnit == null || cAttackerUnit.IsDead()) {
+            return;
+        }
+
+        if (cDefenderUnit == null || cDefenderUnit.IsDead()) {
             return;
         }
 
@@ -197,6 +202,12 @@ public class CombatManager : MonoBehaviour {
 
         fAttack = _GetDamageAfterShield(cDefenderUnit, fAttack);
 
+        if (cDefenderUnit.GetEffectParam(EffectType.EFFECT_REFLECT, out float val)) {
+            float fReflect = _GetDamageAfterShield(cAttackerUnit, fAttack);
+            cAttackerUnit.ReceiveDamage(fReflect * val / Global.PERCENTAGE_CONSTANT);
+        }
+
+        fAttack = Mathf.Floor(fAttack);
         cDefenderUnit.ReceiveDamage(fAttack);
         Global.DEBUG_PRINT("Final Damage=" + fAttack);
     }
@@ -205,11 +216,11 @@ public class CombatManager : MonoBehaviour {
         float cCurrentShield = cUnit.GetShield();
         damage -= cCurrentShield;
         if (damage > 0) {
-            cUnit.SetShield(0);
+            cUnit._currentShield.SetVal(0);
             return damage;
         }
 
-        cUnit.SetShield(Mathf.Abs(damage));
+        cUnit._currentShield.SetVal(Mathf.Abs(damage));
 
         return 0;
     }
@@ -233,7 +244,7 @@ public class CombatManager : MonoBehaviour {
                 continue;
             }
 
-            if (unit.GetEffectParam(EffectType.EFFECT_TAUNT) > 0) {
+            if (unit.HasEffectParam(EffectType.EFFECT_TAUNT)) {
                 nIndex = unit.index;
                 continue;
             }
@@ -276,15 +287,42 @@ public class CombatManager : MonoBehaviour {
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_SHIELD)) {
-                unit.AddShield(cEffect.GetEffectVal());
+                unit._currentShield.AddVal(cEffect.GetEffectVal());
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_SHIELD)) {
+                unit._currentShield.AddVal(cEffect.GetEffectVal());
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_HEAL)) {
-                unit.AddHealth(cEffect.GetEffectVal());
+                unit._currentHealth.AddVal(cEffect.GetEffectVal());
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_CRIT_RATE)) {
+                unit._currentCritRate.AddVal(cEffect.GetEffectVal());
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_REVIVE)) {
+                unit.Revive();
+                unit._currentHealth.SetVal(cEffect.GetEffectVal());
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_CLEANSE)) {
+                unit.RemoveTempEffectByPredicate(delegate (EffectObject obj) {
+                    if (obj.eAffinity == EffectAffinityType.NEGATIVE) {
+                        return true;
+                    }
+
+                    return false;
+                });
+            }
+
+            if (cEffect.GetExecType() == EffectExecType.TURN_SPECIFIED) {
+                unit.AddTempEffect(cEffect);
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_TAUNT)) {
-                unit.AddTempEffect(EffectType.EFFECT_TAUNT, cEffect.GetEffectVal(), cEffect.GetEffectTurn());
+                
             }
 
             Global.DEBUG_PRINT("[Effect] Triggered " + cEffect.GetTypeName() +
@@ -309,8 +347,18 @@ public class CombatManager : MonoBehaviour {
             case EffectTargetType.SELF:
                 arrTarget.Add(cDeck.GetUnitObject(_nAttackerIndex));
                 break;
+            case EffectTargetType.TEAM_LOWEST_HP:
+                int nLowestHealthIndex = GetLowestHealth(cDeck);
+                arrTarget.Add(cDeck.GetUnitObject(nLowestHealthIndex));
+                break;
+            case EffectTargetType.TEAM_HOLY:
+                arrTarget = _GetUnitByArchetype(cDeck, eUnitArchetype.HOLY);
+                break;
             case EffectTargetType.TEAM_DECK:
                 arrTarget = cDeck.GetAllAliveUnit();
+                break;
+            case EffectTargetType.TEAM_DEAD:
+                arrTarget = _GetAllDeadUnit(cDeck);
                 break;
             case EffectTargetType.ENEMY_DECK:
                 arrTarget = cOtherDeck.GetAllAliveUnit();
@@ -318,5 +366,37 @@ public class CombatManager : MonoBehaviour {
         }
 
         return arrTarget;
+    }
+
+    List<UnitObject> _GetUnitByArchetype(Deck cDeck, eUnitArchetype eUnitArchetype) {
+        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
+            if (unit == null) {
+                return false;
+            }
+
+            if (unit.IsDead()) {
+                return false;
+            }
+
+            if (unit.unitSO.eUnitArchetype != eUnitArchetype) {
+                return false;
+            }
+
+            return true;
+        });
+    }
+    
+    List<UnitObject> _GetAllDeadUnit(Deck cDeck) {
+        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
+            if (unit == null) {
+                return false;
+            }
+
+            if (!unit.IsDead()) {
+                return false;
+            }
+
+            return true;
+        });
     }
 }

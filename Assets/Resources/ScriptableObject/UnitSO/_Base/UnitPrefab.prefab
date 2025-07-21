@@ -3575,6 +3575,8 @@ MonoBehaviour:
   <unitSO>k__BackingField: {fileID: 0}
   _listSingleEffect:
     _listScriptableObject: []
+  _listHorizontalEffect:
+    _listScriptableObject: []
   _listDiagonalEffect:
     _listScriptableObject: []
   _listZigZagEffect:
@@ -10854,6 +10856,10 @@ PrefabInstance:
     - target: {fileID: 4960972685280065693, guid: 2654e3d0e7601d647902c907a84fd5c0, type: 3}
       propertyPath: m_Name
       value: UIHealthBar
+      objectReference: {fileID: 0}
+    - target: {fileID: 5243194776642995295, guid: 2654e3d0e7601d647902c907a84fd5c0, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

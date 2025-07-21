@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,9 +28,6 @@ public class Deck : IEnumerable<UnitObject> {
         }
 
         unit.index = nIndex;
-        unit.onDeath = () => {
-            _vecUnit[unit.index] = null;
-        };
 
         Transform pos = _GetPosition(nIndex);
         unit.transform.position = pos.position;
@@ -69,6 +67,10 @@ public class Deck : IEnumerable<UnitObject> {
                 continue;
             }
 
+            if (unit.IsDead()) {
+                continue;
+            }
+
             if (eUnitPos != eUnitPosition.NONE) {
                 if (unit.GetUnitPosition() != eUnitPos) {
                     continue;
@@ -80,6 +82,10 @@ public class Deck : IEnumerable<UnitObject> {
         return arrUnit;
     }
 
+    public List<UnitObject> GetUnitByPredicate(Predicate<UnitObject> predicate) {
+        return _vecUnit.FindAll(predicate);
+    }
+
     public bool IsValidUnitIndex(int index) {
         if (index < 0 || index >= _vecUnit.Count) {
             return false;
@@ -89,12 +95,20 @@ public class Deck : IEnumerable<UnitObject> {
             return false;
         }
 
+        if (_vecUnit[index].IsDead()) {
+            return false;
+        }
+
         return true;
     }
 
     public bool HasFrontUnit() {
         foreach (UnitObject unit in _vecUnit) {
             if (unit == null) {
+                continue;
+            }
+
+            if (unit.IsDead()) {
                 continue;
             }
 
@@ -119,6 +133,10 @@ public class Deck : IEnumerable<UnitObject> {
     public void Resolve() {
         foreach (UnitObject unit in _vecUnit) {
             if (unit == null) {
+                continue;
+            }
+
+            if (unit.IsDead()) {
                 continue;
             }
             
