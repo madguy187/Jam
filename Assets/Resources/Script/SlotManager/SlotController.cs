@@ -5,64 +5,199 @@ using System.Linq;
 
 public class SlotController : MonoBehaviour
 {
-    public static SlotController instance;
+    public static SlotController instance { get; private set; }
     
     [Header("Configuration")]
-    [SerializeField] private GoldConfig goldConfig;
     [SerializeField] private SlotConfig slotConfig;
 
     [Header("References")]
-    [SerializeField] private SlotGridUI gridUI; 
+    [SerializeField] private SlotGridUI gridUI;
+    [SerializeField] private UIRollButton rollButton;
+    [SerializeField] private UIEndTurnButton endTurnButton;
     
     private SlotGrid slotGrid;
     private MatchDetector matchDetector;
-    private int spinsThisTurn = 0;
     private bool isSpinning;
     private SpinResult spinResult;
-    private int currentSpinCost;
+    private int spinsThisTurn = 0;
+    private bool isEnemyTurn = false;
     
-    public bool GetIsSpinning() {
-        return isSpinning;
-    }
-    
-    public int GetCurrentSpinCost() {
-        return GetNextSpinCost();
-    }
-    
-    public bool GetHasFreeSpinsRemaining() {
-        return spinsThisTurn < slotConfig.freeSpinsPerTurn;
-    }
-    
+    public bool IsEnemyTurn() => isEnemyTurn;
+
     private void Awake()
     {
         if (instance == null)
         {
             instance = this;
+            DontDestroyOnLoad(gameObject);
+            InitializeSlotController();
         }
-        else if (instance != this)
+        else
         {
             Destroy(gameObject);
-            return;
         }
+    }
 
+    private void InitializeSlotController()
+    {
+        ValidateReferences();
+        InitializeComponents();
+        StartPlayerTurn();
+    }
+
+    private void ValidateReferences()
+    {
         if (slotConfig == null)
         {
-            Debug.LogWarning("[SlotController] Slot configuration is missing");
+            Debug.LogError("[SlotController] Slot configuration is missing!");
             return;
         }
 
         if (gridUI == null)
         {
-            Debug.LogWarning("[SlotController] SlotGridUI reference is missing");
+            Debug.LogError("[SlotController] SlotGridUI reference is missing!");
             return;
         }
-        
+
+        if (rollButton == null)
+        {
+            Debug.LogError("[SlotController] Roll button reference is missing!");
+        }
+
+        if (endTurnButton == null)
+        {
+            Debug.LogError("[SlotController] End turn button reference is missing!");
+        }
+    }
+
+    private void InitializeComponents()
+    {
         slotGrid = new SlotGrid(slotConfig.gridRows, slotConfig.gridColumns);
         matchDetector = new MatchDetector(slotGrid);
         spinResult = new SpinResult(new List<Match>(), 0);
     }
+
+    public void StartPlayerTurn()
+    {
+        Global.DEBUG_PRINT("[SlotController] Starting player turn");
+        isEnemyTurn = false;
+        spinsThisTurn = 0;
+        spinResult.Clear();
+        
+        // Add base income at start of turn
+        Global.DEBUG_PRINT("[SlotController] Adding base income for new turn");
+        GoldManager.instance.OnRoundStart(false);
+        
+        // Enable buttons for player turn
+        if (rollButton != null) rollButton.SetInteractable(true);
+        if (endTurnButton != null) endTurnButton.SetInteractable(true);
+    }
+
+    public void EndPlayerTurn()
+    {
+        Global.DEBUG_PRINT("[SlotController] EndPlayerTurn called - calculating interest before enemy turn");
+        // Calculate interest at end of player's turn
+        GoldManager.instance.CalculateInterest();
+        StartEnemyTurn();
+    }
+
+    public void StartEnemyTurn()
+    {
+        isEnemyTurn = true;
+        spinsThisTurn = 0;
+        spinResult.Clear();
+
+        // Disable buttons during enemy turn
+        if (rollButton != null) rollButton.SetInteractable(false);
+        if (endTurnButton != null) endTurnButton.SetInteractable(false);
+
+        // Execute enemy's single spin
+        StartCoroutine(ExecuteEnemyTurn());
+    }
+
+    private IEnumerator ExecuteEnemyTurn()
+    {
+        // Small delay before enemy acts - will deal w this magic number later
+        yield return new WaitForSeconds(1f); 
+        
+        // Generate random symbols for enemy's single spin
+        SymbolType[] finalSymbols = new SymbolType[slotConfig.TotalGridSize];
+        for (int i = 0; i < slotConfig.TotalGridSize; i++)
+        {
+            finalSymbols[i] = SymbolGenerator.instance.GenerateRandomSymbol();
+        }
+        
+        isSpinning = true;
+        gridUI.StartSpinAnimation(finalSymbols);
+        FillGridWithSymbols(finalSymbols);
+        
+        // Wait for spin animation
+        while (gridUI.GetIsSpinning())
+        {
+            yield return null;
+        }
+
+        // Check for matches
+        List<Match> matches = CheckForMatches();
+        
+        // If we have matches, execute enemy attack
+        if (matches.Count > 0)
+        {
+            // Get enemy unit that will attack
+            Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+            for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
+            {
+                var unit = enemyDeck.GetUnitObject(i);
+                if (unit != null && unit.unitSO != null)
+                {
+                    foreach (var match in matches)
+                    {
+                        match.SetUnitName(unit.unitSO.unitName);
+                    }
+
+                    // Execute enemy attack
+                    CombatManager.instance.ExecBattle(eDeckType.ENEMY, i);
+                    break;
+                }
+            }
+        }
+        // enemy dont earn gold, we only got gold for player
+        spinResult.SetMatches(matches, 0);
+        isSpinning = false;
+
+        yield return new WaitForSeconds(1f); 
+        StartPlayerTurn();
+    }
     
-    public void FillGridWithRandomSymbols(bool autoSpendGold = true)
+    public bool GetIsSpinning() {
+        return isSpinning;
+    }
+
+    public int GetSpinsThisTurn() {
+        return spinsThisTurn;
+    }
+
+    public void ResetSpins() {
+        spinsThisTurn = 0;
+    }
+
+    public void IncrementSpins() {
+        spinsThisTurn++;
+    }
+
+    public bool HasFreeSpinAvailable() {
+        return spinsThisTurn == 0;
+    }
+
+    public int GetCurrentSpinCost()
+    {
+        if (HasFreeSpinAvailable()) {
+            return 0;
+        }
+        return slotConfig.baseSpinCost + ((spinsThisTurn - 1) * 2);
+    }
+    
+    public void FillGridWithRandomSymbols()
     {
         if (isSpinning) 
         {
@@ -74,24 +209,31 @@ public class SlotController : MonoBehaviour
             return;
         }
         
-        isSpinning = true;
-        
-        // Check if we need to spend gold
-        if (spinsThisTurn >= slotConfig.freeSpinsPerTurn)
+        // Check if this is a free spin or if we need to spend gold
+        bool isFreeSpin = HasFreeSpinAvailable();
+        if (!isFreeSpin)
         {
-            currentSpinCost = GetNextSpinCost();
-            if (!GoldManager.instance.SpendGold(currentSpinCost))
+            // Only try to spend gold if it's not a free spin
+            int spinCost = GetCurrentSpinCost();
+            if (!GoldManager.instance.SpendGold(spinCost))
             {
-                isSpinning = false;
+                Global.DEBUG_PRINT("Cannot afford spin, cost: " + spinCost);
                 return;
             }
         }
         else
         {
-            currentSpinCost = 0;
+            Global.DEBUG_PRINT("Using free spin!");
+        }
+
+        isSpinning = true;
+        // Disable roll button during spin
+        if (rollButton != null)
+        {
+            rollButton.SetInteractable(false);
         }
         
-        spinsThisTurn++;
+        IncrementSpins();
         
         // Generate random symbols
         SymbolType[] finalSymbols = new SymbolType[slotConfig.TotalGridSize];
@@ -102,7 +244,13 @@ public class SlotController : MonoBehaviour
         
         if (finalSymbols == null || finalSymbols.Length != slotConfig.TotalGridSize)
         {
+            Debug.LogError("Failed to generate symbols!");
             isSpinning = false;
+            // Re-enable roll button if spin fails
+            if (rollButton != null)
+            {
+                rollButton.SetInteractable(true);
+            }
             return;
         }
         
@@ -110,10 +258,10 @@ public class SlotController : MonoBehaviour
         gridUI.StartSpinAnimation(finalSymbols);
         FillGridWithSymbols(finalSymbols);
         
-        StartCoroutine(WaitForSpinComplete(autoSpendGold));
+        StartCoroutine(WaitForSpinComplete());
     }
-    
-    private IEnumerator WaitForSpinComplete(bool autoSpendGold)
+
+    private IEnumerator WaitForSpinComplete()
     {
         // Wait for spin animation to complete
         while (gridUI.GetIsSpinning())
@@ -126,93 +274,51 @@ public class SlotController : MonoBehaviour
         
         // Calculate total gold earned
         int totalGold = 0;
-        if (autoSpendGold && matches.Count > 0)
+        foreach (Match match in matches)
         {
-            foreach (Match match in matches)
+            if (match.GetMatchType() != MatchType.SINGLE)
             {
-                if (match.GetMatchType() != MatchType.SINGLE)
+                int goldReward = GoldManager.instance.GetGoldRewardForMatch(match.GetMatchType());
+                totalGold += goldReward;
+                GoldManager.instance.AddGold(goldReward);
+            }
+        }
+
+        // If we have matches, execute combat immediately
+        if (matches.Count > 0)
+        {
+            // Get the player's unit that will attack
+            Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
+            for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
+            {
+                var unit = playerDeck.GetUnitObject(i);
+                if (unit != null && unit.unitSO != null)
                 {
-                    int goldReward = GetGoldRewardForMatch(match.GetMatchType());
-                    totalGold += goldReward;
-                    GoldManager.instance.AddGold(goldReward);
+                    // Set unit name for each match
+                    string unitName = unit.unitSO.unitName;
+                    foreach (var match in matches)
+                    {
+                        match.SetUnitName(unitName);
+                    }
+
+                    // Execute the attack directly
+                    CombatManager.instance.ExecBattle(eDeckType.PLAYER, i);
+                    break;
                 }
             }
         }
         
         // Save matches to our SpinResult
         spinResult.SetMatches(matches, totalGold);
-
-        // for demo purposes
-        PrintSpinResults();
-        
         isSpinning = false;
+
+        // Re-enable roll button after spin completes
+        if (rollButton != null)
+        {
+            rollButton.SetInteractable(true);
+        }
     }
 
-    private void PrintSpinResults()
-    {
-        Global.DEBUG_PRINT("=== SPIN RESULT ===");
-        
-        List<Match> allMatches = spinResult.GetAllMatches();
-        if (allMatches.Count == 0)
-        {
-            Global.DEBUG_PRINT("No matches found!");
-        }
-        else 
-        {
-            // Group matches by type
-            var matchesByType = allMatches.GroupBy(m => m.GetMatchType());
-            
-            foreach (var group in matchesByType)
-            {
-                Global.DEBUG_PRINT($"\n{group.Key} Matches:");
-                foreach (var match in group)
-                {
-                    Global.DEBUG_PRINT($"  - {match.GetSymbol()} at positions: {string.Join(", ", match.GetReadablePositions())}");
-                }
-            }
-        }
-        
-        Global.DEBUG_PRINT("==================");
-    }
-    
-    public void SpinForUnit(UnitObject unit)
-    {
-        if (unit == null)
-        {
-            return;
-        }
-        
-        if (gridUI.GetIsSpinning() || isSpinning)
-        {
-            return;
-        } 
-        
-        isSpinning = true;
-
-        SymbolType[] finalSymbols = SymbolGenerator.instance.GenerateSymbolsForUnit(unit);
-        if (finalSymbols == null || finalSymbols.Length != 9)
-        {
-            isSpinning = false;
-            return;
-        }
-        
-        gridUI.StartSpinAnimation(finalSymbols);
-        FillGridWithSymbols(finalSymbols);
-        
-        StartCoroutine(WaitForSpinComplete(true));
-    }
-    
-    public SpinResult GetSpinResult()
-    {
-        return spinResult;
-    }
-    
-    public void StartNewTurn()
-    {
-        spinsThisTurn = 0;
-        spinResult.Clear();
-    }
-    
     public bool CanSpin()
     {
         if (isSpinning) 
@@ -220,27 +326,7 @@ public class SlotController : MonoBehaviour
             return false;
         }
         
-        if (spinsThisTurn < slotConfig.freeSpinsPerTurn) 
-        {
-            return true;
-        }
-
-        return GoldManager.instance.HasEnoughGold(GetNextSpinCost());
-    }
-    
-    public int GetNextSpinCost()
-    {
-        if (spinsThisTurn < slotConfig.freeSpinsPerTurn)
-        {
-            return 0;
-        }
-
-        return slotConfig.baseSpinCost * (spinsThisTurn - slotConfig.freeSpinsPerTurn + 1);
-    }
-    
-    public int GetSpinsThisTurn()
-    {
-        return spinsThisTurn;
+        return GoldManager.instance.HasEnoughGold(GetCurrentSpinCost());
     }
     
     private void ClearGrid()
@@ -268,39 +354,12 @@ public class SlotController : MonoBehaviour
             }
         }
     }
-    
-    private int GetGoldRewardForMatch(MatchType type)
-    {
-        if (goldConfig == null)
-        {
-            Debug.LogWarning("[SlotController] Gold configuration is missing! Please assign it in the inspector.");
-            return 0;
-        }
 
-        switch (type)
-        {
-            case MatchType.HORIZONTAL:
-                return goldConfig.horizontalReward;
-            case MatchType.VERTICAL:
-                return goldConfig.verticalReward;
-            case MatchType.DIAGONAL:
-                return goldConfig.diagonalReward;
-            case MatchType.ZIGZAG:
-                return goldConfig.zigzagReward;
-            case MatchType.XSHAPE:
-                return goldConfig.xShapeReward;
-            case MatchType.FULLGRID:
-                return goldConfig.fullGridReward;
-            default:
-                return 0;
-        }
+    public SpinResult GetSpinResult()
+    {
+        return spinResult;
     }
 
-    public bool GetHasActiveSpinResult() 
-    {
-        return spinResult != null;
-    }
-    
     public void ClearSpinResult()
     {
         spinResult.Clear();

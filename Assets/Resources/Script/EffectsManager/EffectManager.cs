@@ -5,33 +5,56 @@ using System.Collections.Generic;
 
 public class EffectManager : MonoBehaviour
 {
+    public static EffectManager instance { get; private set; }
+
     [Header("Effect Settings")]
     [SerializeField] private float effectDuration = 0.5f;
     [SerializeField] private float scaleAmount = 1.2f;
     [SerializeField] private Color matchGlowColor = new Color(1f, 0.92f, 0.016f, 0.5f);
     
-    private SlotGridUI slotGridUI;
-    private SlotController slotController;
+    [Header("References")]
+    [SerializeField] private SlotGridUI slotGridUI;  // Keep this as it's a UI reference
+    
     private bool wasSpinning = false;
 
-    private void Start()
+    private void Awake()
     {
-        slotGridUI = FindObjectOfType<SlotGridUI>();
-        slotController = FindObjectOfType<SlotController>();
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+            InitializeManager();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void InitializeManager()
+    {
+        if (slotGridUI == null)
+        {
+            slotGridUI = FindObjectOfType<SlotGridUI>();
+            if (slotGridUI == null)
+            {
+                Debug.LogError("[EffectManager] SlotGridUI reference is missing!");
+            }
+        }
     }
 
     private void Update()
     {
-        if (wasSpinning && !slotController.GetIsSpinning())
+        if (wasSpinning && !SlotController.instance.GetIsSpinning())
         {
-            var spinResult = slotController.GetSpinResult();
+            var spinResult = SlotController.instance.GetSpinResult();
             if (spinResult != null)
             {
                 PlayMatchEffects(spinResult);
             }
             wasSpinning = false;
         }
-        else if (slotController.GetIsSpinning())
+        else if (SlotController.instance.GetIsSpinning())
         {
             wasSpinning = true;
         }
@@ -39,6 +62,8 @@ public class EffectManager : MonoBehaviour
 
     public void PlayMatchEffects(SpinResult spinResult)
     {
+        if (spinResult == null) return;
+
         var matches = spinResult.GetAllMatches();
         foreach (var match in matches)
         {
@@ -47,10 +72,13 @@ public class EffectManager : MonoBehaviour
             foreach (var pos in positions)
             {
                 int index = pos.x * 3 + pos.y;
-                var slot = slotGridUI.transform.GetChild(index).GetComponent<Image>();
-                if (slot != null)
+                if (slotGridUI != null && index < slotGridUI.transform.childCount)
                 {
-                    StartCoroutine(PlaySlotEffect(slot));
+                    var slot = slotGridUI.transform.GetChild(index).GetComponent<Image>();
+                    if (slot != null)
+                    {
+                        StartCoroutine(PlaySlotEffect(slot));
+                    }
                 }
             }
         }

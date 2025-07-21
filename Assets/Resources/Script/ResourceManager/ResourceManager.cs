@@ -40,6 +40,11 @@ public class ResourceManager : MonoBehaviour {
             return null;
         }
 
+        // Add UnitClickHandler component for hovering to work
+        if (unit.GetComponent<UnitClickHandler>() == null) {
+            unit.gameObject.AddComponent<UnitClickHandler>();
+        }
+
         unit.Init();
 
         return unit;

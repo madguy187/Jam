@@ -18,7 +18,9 @@ public class SlotGridUI : MonoBehaviour
     [SerializeField] private Sprite emptySprite;
 
     [Header("Animation Settings")]
-    [SerializeField] [Range(0.5f, 5f)] private float spinDuration = 2f;
+    [SerializeField] [Range(0.5f, 5f)] private float spinDuration = 2.0f; 
+     // Enemy spins faster
+    [SerializeField] [Range(0.5f, 5f)] private float enemySpinDuration = 0.5f; 
     [SerializeField] [Range(0.1f, 1f)] private float symbolDropDelay = 0.1f;
     [SerializeField] [Range(0.6f, 0.9f)] private float finalSymbolsStartTime = 0.7f;
 
@@ -96,17 +98,20 @@ public class SlotGridUI : MonoBehaviour
         }
     }
 
-    public void StartSpinAnimation(SymbolType[] finalSymbols)
+    public void StartSpinAnimation(SymbolType[] finalSymbols, float customDuration = -1)
     {
         if (isSpinning) return;
         isSpinning = true;
-        StartCoroutine(SpinAnimationCoroutine(finalSymbols));
+
+        // Use custom duration if provided, otherwise use default
+        float duration = customDuration > 0 ? customDuration : spinDuration;
+        StartCoroutine(SpinAnimationCoroutine(finalSymbols, duration));
     }
 
-    private IEnumerator SpinAnimationCoroutine(SymbolType[] finalSymbols)
+    private IEnumerator SpinAnimationCoroutine(SymbolType[] finalSymbols, float duration)
     {
         float elapsedTime = 0f;
-        float spinningPhaseTime = spinDuration * finalSymbolsStartTime;
+        float spinningPhaseTime = duration * finalSymbolsStartTime;
         
         // Fast spinning phase
         while (elapsedTime < spinningPhaseTime)
@@ -128,7 +133,7 @@ public class SlotGridUI : MonoBehaviour
         UpdateGrid(finalSymbols);
         
         // Wait for the remaining duration
-        float remainingTime = spinDuration * (1 - finalSymbolsStartTime);
+        float remainingTime = duration * (1 - finalSymbolsStartTime);
         yield return new WaitForSeconds(remainingTime);
         
         isSpinning = false;
@@ -168,5 +173,15 @@ public class SlotGridUI : MonoBehaviour
     public void SetFinalSymbolsStartTime(float time) 
     { 
         finalSymbolsStartTime = Mathf.Clamp(time, 0.6f, 0.9f); 
+    }
+
+    public float GetEnemySpinDuration()
+    {
+        return enemySpinDuration;
+    }
+
+    public void SetEnemySpinDuration(float duration)
+    {
+        enemySpinDuration = Mathf.Clamp(duration, 0.5f, 5f);
     }
 } 

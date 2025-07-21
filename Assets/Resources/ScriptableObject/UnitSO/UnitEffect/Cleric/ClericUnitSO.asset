@@ -12,10 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae3f48536174bf64a82442a0e1e19f19, type: 3}
   m_Name: ClericUnitSO
   m_EditorClassIdentifier: 
-  unitName: 
+  unitName: Cleric
   hp: 50
   attack: 50
   shield: 0
   res: 0
   critRate: 0
   critMulti: 0
+  singleMatchDescription: Heal lowest HP ally for 3
+  horizontalMatchDescription: All allies gain +2 HP
+  diagonalMatchDescription: Boost all ally's Crit Rate by + 2%
+  zigzagMatchDescription: Revive 1 random fallen ally (1 HP) and heal all allies
+    for 5HP.
+  xShapeMatchDescription: Cleanse all negative effects from allies and heal 3 HP.
+  fullGridMatchDescription: All allies +1 Res and heal 4 HP
