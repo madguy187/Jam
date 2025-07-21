@@ -51,14 +51,8 @@ public class UnitDetailsPanel : MonoBehaviour
         foreach (MockRelic relic in currentUnit.equippedRelics) {
             var go = Instantiate(relicSlotPrefab, equippedRelicContainer);
             var slot = go.GetComponent<MockRelicSlot>();
-            slot.Init(relic, OnEquippedRelicClicked);
+            slot.Init(relic);
         }
-    }
-
-    private void OnEquippedRelicClicked(MockRelic relic) 
-    {
-        Debug.Log($"Clicked equipped relic: {relic.relicName}");
-        // Optionally: unequip logic, tooltip, etc.
     }
 
     public MockUnit GetCurrentUnit() => currentUnit;

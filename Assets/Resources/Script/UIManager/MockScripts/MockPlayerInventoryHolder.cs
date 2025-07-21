@@ -19,7 +19,11 @@ public class MockPlayerInventoryHolder : MonoBehaviour
         playerInventory.bagRelics = new List<MockRelic>()
         {
             new MockRelic("Amulet of Power", MockRelicRarity.Rare),
-            new MockRelic("Shield of Light", MockRelicRarity.Common)
+            new MockRelic("Shield of Light", MockRelicRarity.Common),
+            new MockRelic("Ring of Wisdom", MockRelicRarity.Epic),
+            new MockRelic("Crown of Kings", MockRelicRarity.Legendary),
+            new MockRelic("Staff of Ages", MockRelicRarity.Legendary),
+            new MockRelic("Boots of Speed", MockRelicRarity.Rare)
         };
     }
 }
