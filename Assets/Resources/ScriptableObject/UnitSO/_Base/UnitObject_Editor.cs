@@ -7,7 +7,7 @@ public class UnitObject_Editor : Editor {
     {
         var castedTarget = (target as UnitObject);
 
-        castedTarget.GetComponent<RectTransform>().hideFlags = HideFlags.None;
+        castedTarget.GetComponent<RectTransform>().hideFlags = HideFlags.HideInInspector;
         castedTarget.GetComponent<SPUM_Prefabs>().hideFlags = HideFlags.HideInInspector;
     }
 }
