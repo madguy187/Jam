@@ -28,6 +28,16 @@ public class ResourceManager : MonoBehaviour {
         Global.DEBUG_PRINT("[Resources] Loaded Relics: " + _mapRelicSO.Count());
     }
 
+    public GameObject Debug_RandUnit() {
+        int rand = Random.Range(0, _mapUnitSO.Count);
+        return _mapUnitSO.ElementAt(rand).Value;
+    }
+
+    public RelicScriptableObject Debug_RandRelic() {
+        int rand = Random.Range(0, _mapRelicSO.Count);
+        return _mapRelicSO.ElementAt(rand).Value;
+    }
+
     public UnitObject CreateUnit(GameObject objPrefab) {
         GameObject obj = Instantiate(objPrefab);
         if (obj == null) {

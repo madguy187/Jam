@@ -15,22 +15,13 @@ public class Deck : IEnumerable<UnitObject> {
         }
     }
 
-    public UnitObject AddUnit(string unitName) {
-        if (IsFullDeck()) {
-            return null;
-        }
-
+    public UnitObject AddUnit(GameObject prefab) {
         int nIndex = _GetEmptySlotIndex();
         if (nIndex < 0) {
             return null;
         }
 
-        GameObject objUnitPrefab = ResourceManager.instance.GetUnit(unitName);
-        if (objUnitPrefab == null) {
-            return null;
-        }
-
-        UnitObject unit = ResourceManager.instance.CreateUnit(objUnitPrefab);
+        UnitObject unit = ResourceManager.instance.CreateUnit(prefab);
         if (unit == null) {
             return null;
         }
@@ -48,6 +39,19 @@ public class Deck : IEnumerable<UnitObject> {
 
         _vecUnit[nIndex] = unit;
         return unit;
+    }
+
+    public UnitObject AddUnit(string unitName) {
+        if (IsFullDeck()) {
+            return null;
+        }
+
+        GameObject objUnitPrefab = ResourceManager.instance.GetUnit(unitName);
+        if (objUnitPrefab == null) {
+            return null;
+        }
+        
+        return AddUnit(objUnitPrefab);
     }
 
     public UnitObject GetUnitObject(int index) {

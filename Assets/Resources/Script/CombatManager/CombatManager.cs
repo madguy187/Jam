@@ -38,7 +38,7 @@ public class CombatManager : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.Alpha3)) {
+        if (Input.GetKeyDown(KeyCode.Alpha5)) {
             InitRound();
             StartBattleLoop(null);
         }

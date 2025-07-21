@@ -25,19 +25,31 @@ public class DeckManager : MonoBehaviour {
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            cPlayerDeck.AddUnit("Paladin");
+            GameObject prefab = ResourceManager.instance.Debug_RandUnit();
+            cPlayerDeck.AddUnit(prefab);
+            Global.DEBUG_PRINT("Loaded " + prefab.name + " into Player Team");
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            cEnemyDeck.AddUnit("Paladin");
+            GameObject prefab = ResourceManager.instance.Debug_RandUnit();
+            cEnemyDeck.AddUnit(prefab);
+            Global.DEBUG_PRINT("Loaded " + prefab.name + " into Enemy Team");
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3)) {
+            List<UnitObject> listPlayer = cPlayerDeck.GetAllAliveUnit();
+            int rand = Random.Range(0, listPlayer.Count);
+            RelicScriptableObject relic = ResourceManager.instance.Debug_RandRelic();
+            listPlayer[rand].LoadRelic(relic);
+            Global.DEBUG_PRINT("Loaded " + relic.name + " into " + listPlayer[rand].name + " index:" + rand + " team: Player");
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha4)) {
-            cEnemyDeck.AddUnit("Cleric");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha5)) {
-            cPlayerDeck.GetUnitObject(0).LoadRelic(ResourceManager.instance.GetRelic("IronShard"));
+            List<UnitObject> listEnemy = cEnemyDeck.GetAllAliveUnit();
+            int rand = Random.Range(0, listEnemy.Count);
+            RelicScriptableObject relic = ResourceManager.instance.Debug_RandRelic();
+            listEnemy[rand].LoadRelic(relic);
+            Global.DEBUG_PRINT("Loaded " + relic.name + " into " + listEnemy[rand].name + " index:" + rand + " team: Enemy");
         }
     }
 
