@@ -62,6 +62,38 @@ public class PanelManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        // Only update if panel is visible and we have a unit
+        if (gameObject.activeSelf && currentUnit != null)
+        {
+            if (currentUnit.IsDead())
+            {
+                // If current unit died, hide the panel
+                HidePanel();
+            }
+            else
+            {
+                // Update stats for the currently selected unit
+                UpdateUnitStats();
+            }
+        }
+    }
+
+    private void UpdateUnitStats()
+    {
+        if (statsText != null && currentUnit != null)
+        {
+            statsText.text = string.Format(STATS_FORMAT,
+                currentUnit.GetHealth(), currentUnit.unitSO.hp,
+                currentUnit.GetShield(), currentUnit.unitSO.shield,
+                currentUnit.GetAttack(),
+                currentUnit.GetRes(),
+                currentUnit.GetCritRate(),
+                currentUnit.GetCritMulti());
+        }
+    }
+
     private void InitializeRelics()
     {
         if (relicsInitialized) return;
@@ -138,7 +170,7 @@ public class PanelManager : MonoBehaviour
 
     public void ShowUnitInfo(UnitObject unit)
     {
-        if (unit == null) 
+        if (unit == null || unit.IsDead()) 
         {
             HidePanel();
             return;
@@ -155,17 +187,7 @@ public class PanelManager : MonoBehaviour
             }
         }
 
-        if (statsText != null)
-        {
-            statsText.text = string.Format(STATS_FORMAT,
-                unit.GetHealth(), unit.unitSO.hp,
-                unit.GetShield(), unit.unitSO.shield,
-                unit.GetAttack(),
-                unit.GetRes(),
-                unit.GetCritRate(),
-                unit.GetCritMulti());
-        }
-
+        UpdateUnitStats();
         UpdateSkillBoxes(unit);
         UpdateRelicBoxes();
 
