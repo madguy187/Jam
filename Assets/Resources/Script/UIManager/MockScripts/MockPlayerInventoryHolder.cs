@@ -12,11 +12,11 @@ public class MockPlayerInventoryHolder : MonoBehaviour
 
         playerInventory.teamUnits = new List<MockUnit>()
         {
-            new MockUnit("Warrior", 100),
-            new MockUnit("Mage", 60),
-            new MockUnit("Paladin", 500),
-            new MockUnit("Rogue", 80),
-            new MockUnit("Archer", 70)
+            new MockUnit("Warrior", 100, Resources.Load<Sprite>("Sprites/game-icons.net/brute")),
+            new MockUnit("Mage", 60, Resources.Load<Sprite>("Sprites/game-icons.net/monk-face")),
+            new MockUnit("Paladin", 500, Resources.Load<Sprite>("Sprites/game-icons.net/mounted-knight")),
+            new MockUnit("Rogue", 80, Resources.Load<Sprite>("Sprites/game-icons.net/orc-head")),
+            new MockUnit("Archer", 70, Resources.Load<Sprite>("Sprites/game-icons.net/troll"))
         };
 
         playerInventory.bagRelics = new List<MockRelic>()

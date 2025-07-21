@@ -2,49 +2,28 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
+using TMPro;
 
-public class UnitButton : MonoBehaviour, IPointerClickHandler 
+public class UnitButton : MonoBehaviour
 {
-    [Header("UI Elements")]
-    public Text nameText;
     public Image unitIcon;
-    public GameObject selectionHighlight;
+    public TMP_Text nameText;
 
     private MockUnit unitData;
-    private Action<MockUnit> onClickCallback;
+    private System.Action<MockUnit> onClickCallback;
 
-    public void Init(MockUnit unit, Action<MockUnit> onClick) 
+    public void Init(MockUnit unit, System.Action<MockUnit> onClick)
     {
         unitData = unit;
         onClickCallback = onClick;
-
-        if (nameText != null) {
-            nameText.text = unit.unitName;
-        }
-
-        if (unitIcon != null) {
-            unitIcon.sprite = unit.icon; // optional if you're using portraits
-        }
-
-        if (selectionHighlight != null) {
-            selectionHighlight.SetActive(false);
-        }
+        nameText.text = unit.unitName;
+        if (unit.icon != null)
+            unitIcon.sprite = unit.icon;
     }
 
-    public void OnPointerClick(PointerEventData eventData) 
+    public void OnClick()
     {
         onClickCallback?.Invoke(unitData);
-        if (selectionHighlight != null) {
-            selectionHighlight.SetActive(true); // or toggle
-        }
     }
-
-    public void Deselect() {
-        if (selectionHighlight != null) 
-        {
-            selectionHighlight.SetActive(false);
-        }
-    }
-
-    public MockUnit GetUnit() => unitData;
 }
+

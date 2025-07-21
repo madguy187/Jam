@@ -321,23 +321,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 93362765}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 59f8146938fff824cb5fd77236b75775, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a8695521f0d02e499659fee002a26c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 50
+    m_Left: 0
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 3
-  m_Spacing: 0
-  m_ChildForceExpandWidth: 1
-  m_ChildForceExpandHeight: 1
-  m_ChildControlWidth: 0
-  m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
-  m_ReverseArrangement: 0
+  m_ChildAlignment: 7
+  m_StartCorner: 0
+  m_StartAxis: 1
+  m_CellSize: {x: 80, y: 80}
+  m_Spacing: {x: 0, y: 0}
+  m_Constraint: 2
+  m_ConstraintCount: 2
 --- !u!1 &243183178
 GameObject:
   m_ObjectHideFlags: 0
@@ -2307,7 +2305,7 @@ MonoBehaviour:
   teamUnitContainer: {fileID: 93362766}
   bagContainer: {fileID: 243183179}
   unitButtonPrefab: {fileID: 3509845748852257446, guid: ef604a5014ac239489515a9566df5df2, type: 3}
-  relicSlotPrefab: {fileID: 0}
+  relicSlotPrefab: {fileID: 9127127546863566636, guid: 38869c19c1bd6c743bbcd939e66d25a1, type: 3}
   unitDetailsPanel: {fileID: 2135231188}
 --- !u!114 &1995729003
 MonoBehaviour:
@@ -2348,7 +2346,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.5882353}
+  m_Color: {r: 0.6320754, g: 0.38286468, b: 0.08050018, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
