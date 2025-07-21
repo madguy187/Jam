@@ -30,7 +30,11 @@ namespace Map
         private void Awake() 
         {
             /// Sets the singleton instance on Awake
+            if (Instance != null) {
+                Destroy(Instance);
+            }
             Instance = this;
+            Locked = false; // Reset lock on scene load
         }
 
         /// Attempts to select a node. Only allows selection if the node is accessible from the current path.
@@ -81,7 +85,7 @@ namespace Map
         }
 
         /// Handles the logic for entering a node, such as loading a new scene or triggering events based on node type
-        private static void EnterNode(MapNode mapNode) 
+        private void EnterNode(MapNode mapNode) 
         {
             // We have access to blueprint name here as well
             Global.DEBUG_PRINT("[MapPlayerTracker::EnterNode] Entering node: " + mapNode.Node.blueprintName + " of type: " + mapNode.Node.nodeType);
@@ -89,7 +93,7 @@ namespace Map
             // If choose to show GUI in some of these cases, do not forget to set "Locked" in MapPlayerTracker back to false
             switch (mapNode.Node.nodeType) {
                 case NodeType.Enemy:
-                    MapPlayerTracker.Instance.mapManager.SaveMap();
+                    mapManager.SaveMap();
                     SceneManager.LoadScene("Game");
                     break;
                 case NodeType.Encounter:
@@ -112,6 +116,7 @@ namespace Map
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            Locked = false;
         }
 
         // Example stub for starting the boss fight (implement as needed)
