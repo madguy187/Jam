@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class UnitClickHandler : MonoBehaviour
 {
@@ -21,11 +22,10 @@ public class UnitClickHandler : MonoBehaviour
     {
         Global.DEBUG_PRINT("[UnitClickHandler] Unit clicked!");
         
-        var panelManager = PanelManager.GetInstance();
-        if (panelManager != null)
+        if (unit != null)
         {
             Global.DEBUG_PRINT("[UnitClickHandler] Showing info for unit: " + unit.unitSO.unitName);
-            panelManager.ShowUnitInfo(unit);
+            PanelManager.instance.ShowUnitInfo(unit);
         }
         else
         {

@@ -16,24 +16,13 @@ public class UIRollButton : MonoBehaviour
             enabled = false;
             return;
         }
-
     }
     
     void Start()
     {
         InitializeComponents();
-
         if (!enabled) return;
-        
-        if (SlotController.instance == null)
-        {
-            Debug.LogError("[UIRollButton] SlotController instance not found!");
-            enabled = false;
-            return;
-        }
-        
         button.onClick.AddListener(OnClick);
-        Global.DEBUG_PRINT("[UIRollButton] Click listener added");
     }
     
     void OnDestroy()
@@ -47,10 +36,7 @@ public class UIRollButton : MonoBehaviour
     private void OnClick()
     {
         Global.DEBUG_PRINT("[UIRollButton] Button clicked!");
-        if (SlotController.instance != null)
-        {
-            SlotController.instance.FillGridWithRandomSymbols();
-        }
+        SlotController.instance.FillGridWithRandomSymbols();
     }
     
     public void TriggerRoll()

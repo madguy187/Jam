@@ -21,10 +21,7 @@ public class UIEndTurnButton : MonoBehaviour
 
     void OnEndTurnClicked()
     {
-        if (SlotController.instance != null)
-        {
-            SlotController.instance.EndPlayerTurn();
-        }
+        SlotController.instance.EndPlayerTurn();
     }
 
     public void SetInteractable(bool interactable)

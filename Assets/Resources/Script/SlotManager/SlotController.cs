@@ -30,31 +30,51 @@ public class SlotController : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            InitializeSlotController();
         }
-        else if (instance != this)
+        else
         {
             Destroy(gameObject);
-            return;
         }
+    }
 
+    private void InitializeSlotController()
+    {
+        ValidateReferences();
+        InitializeComponents();
+        StartPlayerTurn();
+    }
+
+    private void ValidateReferences()
+    {
         if (slotConfig == null)
         {
-            Debug.LogWarning("[SlotController] Slot configuration is missing");
+            Debug.LogError("[SlotController] Slot configuration is missing!");
             return;
         }
 
         if (gridUI == null)
         {
-            Debug.LogWarning("[SlotController] SlotGridUI reference is missing");
+            Debug.LogError("[SlotController] SlotGridUI reference is missing!");
             return;
         }
-        
+
+        if (rollButton == null)
+        {
+            Debug.LogError("[SlotController] Roll button reference is missing!");
+        }
+
+        if (endTurnButton == null)
+        {
+            Debug.LogError("[SlotController] End turn button reference is missing!");
+        }
+    }
+
+    private void InitializeComponents()
+    {
         slotGrid = new SlotGrid(slotConfig.gridRows, slotConfig.gridColumns);
         matchDetector = new MatchDetector(slotGrid);
         spinResult = new SpinResult(new List<Match>(), 0);
-
-        // Start with player's turn
-        StartPlayerTurn();
     }
 
     public void StartPlayerTurn()

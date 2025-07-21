@@ -16,11 +16,15 @@ public class GoldManager : MonoBehaviour
         {
             instance = this;
             DontDestroyOnLoad(gameObject);
+            
+            if (config == null)
+            {
+                Debug.LogWarning("[GoldManager] Gold configuration is missing");
+            }
         }
-        else if (instance != this)
+        else
         {
             Destroy(gameObject);
-            return;
         }
     }
 

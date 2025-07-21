@@ -3,12 +3,7 @@ using TMPro;
 
 public class TooltipSystem : MonoBehaviour
 {
-    private static TooltipSystem instance;
-    
-    public static TooltipSystem GetInstance()
-    {
-        return instance;
-    }
+    public static TooltipSystem instance { get; private set; }
 
     [Header("UI References")]
     [SerializeField] private GameObject tooltipContainer;
@@ -32,21 +27,41 @@ public class TooltipSystem : MonoBehaviour
         else
         {
             Destroy(gameObject);
-            return;
         }
     }
 
     private void InitializeComponents()
     {
-        if (tooltipContainer == null || tooltipText == null)
+        ValidateReferences();
+        SetupContainer();
+        HideTooltip();
+    }
+
+    private void ValidateReferences()
+    {
+        if (tooltipContainer == null)
         {
-            Global.DEBUG_PRINT("[TooltipSystem] objects not assigned");
+            Debug.LogError("[TooltipSystem] Tooltip container not assigned!");
+            return;
+        }
+
+        if (tooltipText == null)
+        {
+            Debug.LogError("[TooltipSystem] Tooltip text not assigned!");
             return;
         }
 
         containerRect = tooltipContainer.GetComponent<RectTransform>();
+        if (containerRect == null)
+        {
+            Debug.LogError("[TooltipSystem] RectTransform not found on tooltip container!");
+            return;
+        }
+    }
+
+    private void SetupContainer()
+    {
         canvasGroup = tooltipContainer.GetComponent<CanvasGroup>();
-        
         if (canvasGroup == null)
         {
             canvasGroup = tooltipContainer.AddComponent<CanvasGroup>();
@@ -54,14 +69,11 @@ public class TooltipSystem : MonoBehaviour
 
         canvasGroup.blocksRaycasts = false;
         canvasGroup.interactable = false;
-
-        HideTooltip();
     }
 
     public static void Show(string content, Vector2 position)
     {
-        if (instance == null || string.IsNullOrEmpty(content)) return;
-        
+        if (string.IsNullOrEmpty(content)) return;
         instance.ShowTooltip(content, position);
     }
 
@@ -98,10 +110,7 @@ public class TooltipSystem : MonoBehaviour
 
     public static void Hide()
     {
-        if (instance != null)
-        {
-            instance.HideTooltip();
-        }
+        instance.HideTooltip();
     }
 
     private void HideTooltip()

@@ -16,7 +16,6 @@ public class GoldUI : MonoBehaviour
     private void Start()
     {
         InitializeComponents();
-        
         currentGold = GoldManager.instance.GetCurrentGold();
         UpdateGoldText();
     }
@@ -39,13 +38,10 @@ public class GoldUI : MonoBehaviour
     {
         if (!enabled) return;
         
-        if (GoldManager.instance != null)
+        int newGold = GoldManager.instance.GetCurrentGold();
+        if (newGold != currentGold)
         {
-            int newGold = GoldManager.instance.GetCurrentGold();
-            if (newGold != currentGold)
-            {
-                UpdateGoldDisplay(newGold);
-            }
+            UpdateGoldDisplay(newGold);
         }
     }
 

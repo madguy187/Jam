@@ -7,12 +7,7 @@ using System.Collections.Generic;
 
 public class PanelManager : MonoBehaviour
 {
-    private static PanelManager instance;
-    
-    public static PanelManager GetInstance()
-    {
-        return instance;
-    }
+    public static PanelManager instance { get; private set; }
 
     [Header("Panel References")]
     [SerializeField] private Image unitIconImage;
@@ -52,14 +47,77 @@ public class PanelManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            InitializeRelics();  
-            ValidateReferences();
+            InitializePanel();
         }
         else
         {
             Destroy(gameObject);
-            return;
         }
+    }
+
+    private void InitializePanel()
+    {
+        ValidateReferences();
+        InitializeRelics();
+        HidePanel(); 
+    }
+
+    private void ValidateReferences()
+    {
+        if (unitIconImage == null) 
+        {
+            Debug.LogError("[PanelManager] Unit icon image not assigned!");
+        }
+        
+        if (statsText == null) 
+        {
+            Debug.LogError("[PanelManager] Stats text not assigned!");
+        }
+        
+        if (skillBoxes == null || skillBoxes.Length == 0) 
+        {
+            Debug.LogError("[PanelManager] No skill boxes assigned!");
+        }
+        
+        if (skillMapping == null) 
+        {
+            Debug.LogError("[PanelManager] Skill mapping not assigned!");
+        }
+
+        if (relicBoxes == null || relicBoxes.Length == 0)
+        {
+            Debug.LogError("[PanelManager] No relic boxes assigned!");
+        }
+
+        if (relicConfig == null)
+        {
+            Debug.LogError("[PanelManager] Relic config not assigned!");
+        }
+    }
+
+    private void InitializeRelics()
+    {
+        if (relicsInitialized) return;
+        if (relicBoxes == null || relicConfig == null) return;
+
+        relicBoxMap = new Dictionary<string, RelicBoxUI>();
+        foreach (var relicBox in relicBoxes)
+        {
+            if (relicBox != null)
+            {
+                relicBoxMap[relicBox.GetRelicName()] = relicBox;
+            }
+        }
+
+        relicsByTier = new Dictionary<RelicTier, RelicConfig.RelicData[]>
+        {
+            { RelicTier.Basic, relicConfig.basicRelics },
+            { RelicTier.AdvancedSelf, relicConfig.advancedSelfRelics },
+            { RelicTier.AdvancedMixed, relicConfig.advancedMixedRelics },
+            { RelicTier.Legendary, relicConfig.legendaryRelics }
+        };
+
+        relicsInitialized = true;
     }
 
     private void Update()
@@ -92,55 +150,6 @@ public class PanelManager : MonoBehaviour
                 currentUnit.GetCritRate(),
                 currentUnit.GetCritMulti());
         }
-    }
-
-    private void InitializeRelics()
-    {
-        if (relicsInitialized) return;
-
-        if (relicBoxes == null || relicBoxes.Length == 0)
-        {
-            Debug.LogError("[PanelManager] No relic boxes assigned!");
-            return;
-        }
-
-        if (relicConfig == null)
-        {
-            Debug.LogError("[PanelManager] Relic config not assigned!");
-            return;
-        }
-
-        relicBoxMap = new Dictionary<string, RelicBoxUI>();
-        foreach (var relicBox in relicBoxes)
-        {
-            if (relicBox != null)
-            {
-                relicBoxMap[relicBox.GetRelicName()] = relicBox;
-            }
-        }
-
-        relicsByTier = new Dictionary<RelicTier, RelicConfig.RelicData[]>
-        {
-            { RelicTier.Basic, relicConfig.basicRelics },
-            { RelicTier.AdvancedSelf, relicConfig.advancedSelfRelics },
-            { RelicTier.AdvancedMixed, relicConfig.advancedMixedRelics },
-            { RelicTier.Legendary, relicConfig.legendaryRelics }
-        };
-
-        relicsInitialized = true;
-    }
-
-    private void ValidateReferences()
-    {
-        if (unitIconImage == null) Global.DEBUG_PRINT("Unit icon image not assigned!");
-        if (statsText == null) Global.DEBUG_PRINT("Stats text not assigned!");
-        if (skillBoxes == null || skillBoxes.Length == 0) Global.DEBUG_PRINT("No skill boxes assigned!");
-        if (skillMapping == null) Global.DEBUG_PRINT("Skill mapping not assigned!");
-    }
-
-    private void Start()
-    {
-        HidePanel();
     }
 
     private void UpdateRelicBoxes()
