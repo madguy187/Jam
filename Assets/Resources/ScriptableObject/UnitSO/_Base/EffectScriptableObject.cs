@@ -4,15 +4,23 @@ using UnityEngine;
 public class EffectScriptableObject : ScriptableObject {
     [SerializeField] EffectType _eType;
     [SerializeField] EffectTargetType _eTargetType;
-    [SerializeField] EffectExecType _eExecType;
+    [SerializeField] EffectExecType _eExecType = EffectExecType.TRIGGER_ONCE;
+    [SerializeField] EffectAffinityType _effectAffinityType = EffectAffinityType.NONE;
+    [SerializeField] EffectResolveType _effectResolveType = EffectResolveType.RESOLVE_TURN;
+
     [SerializeField] float _fEffectVal = 0;
 
-    [Header("This will only be used if exec type is turn specified, Default: Start of round")]
+    [Header("This will only be used if exec type is turn specified", order=0)]
+    [Space(-10, order = 1)]
+    [Header("0 = For entire round", order=2)]
+    [Space(10, order = 3)]
     [SerializeField] int _fEffectTurn = 0;
 
     public EffectType GetEffectType() { return _eType; }
     public EffectTargetType GetTargetType() { return _eTargetType; }
     public EffectExecType GetExecType() { return _eExecType; }
+    public EffectAffinityType GetEffectAffinityType() { return _effectAffinityType; }
+    public EffectResolveType GetEffectResolveType() { return _effectResolveType; }
     public int GetEffectTurn() { return _fEffectTurn; }
 
     public bool IsEffectType(EffectType eEffectType) {

@@ -14,11 +14,6 @@ public class UIHealthBar : MonoBehaviour
             return;
         }
 
-        RectTransform rect = GetComponent<RectTransform>();
-        Vector3 pos = _unit.transform.position;
-        pos.y += 0.8f;
-        rect.position = pos;
-
         _slider.value = _unit.GetHealthPercentage();
     }
 }

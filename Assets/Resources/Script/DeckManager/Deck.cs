@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,30 +17,18 @@ public class Deck : IEnumerable<UnitObject> {
         }
     }
 
-    public UnitObject AddUnit(string unitName) {
-        if (IsFullDeck()) {
-            return null;
-        }
-
+    public UnitObject AddUnit(GameObject prefab) {
         int nIndex = _GetEmptySlotIndex();
         if (nIndex < 0) {
             return null;
         }
 
-        GameObject objUnitPrefab = ResourceManager.instance.GetUnit(unitName);
-        if (objUnitPrefab == null) {
-            return null;
-        }
-
-        UnitObject unit = ResourceManager.instance.CreateUnit(objUnitPrefab);
+        UnitObject unit = ResourceManager.instance.CreateUnit(prefab);
         if (unit == null) {
             return null;
         }
 
         unit.index = nIndex;
-        unit.onDeath = () => {
-            _vecUnit[unit.index] = null;
-        };
 
         Transform pos = _GetPosition(nIndex);
         unit.transform.position = pos.position;
@@ -48,8 +37,20 @@ public class Deck : IEnumerable<UnitObject> {
         unit.SetUnitPosition(eUnitPos);
 
         _vecUnit[nIndex] = unit;
-        Global.DEBUG_PRINT("[Deck] Added Unit: " + unitName + " at index: " + nIndex);
         return unit;
+    }
+
+    public UnitObject AddUnit(string unitName) {
+        if (IsFullDeck()) {
+            return null;
+        }
+
+        GameObject objUnitPrefab = ResourceManager.instance.GetUnit(unitName);
+        if (objUnitPrefab == null) {
+            return null;
+        }
+        
+        return AddUnit(objUnitPrefab);
     }
 
     public UnitObject GetUnitObject(int index) {
@@ -67,6 +68,10 @@ public class Deck : IEnumerable<UnitObject> {
                 continue;
             }
 
+            if (unit.IsDead()) {
+                continue;
+            }
+
             if (eUnitPos != eUnitPosition.NONE) {
                 if (unit.GetUnitPosition() != eUnitPos) {
                     continue;
@@ -78,6 +83,10 @@ public class Deck : IEnumerable<UnitObject> {
         return arrUnit;
     }
 
+    public List<UnitObject> GetUnitByPredicate(Predicate<UnitObject> predicate) {
+        return _vecUnit.FindAll(predicate);
+    }
+
     public bool IsValidUnitIndex(int index) {
         if (index < 0 || index >= _vecUnit.Count) {
             return false;
@@ -87,12 +96,20 @@ public class Deck : IEnumerable<UnitObject> {
             return false;
         }
 
+        if (_vecUnit[index].IsDead()) {
+            return false;
+        }
+
         return true;
     }
 
     public bool HasFrontUnit() {
         foreach (UnitObject unit in _vecUnit) {
             if (unit == null) {
+                continue;
+            }
+
+            if (unit.IsDead()) {
                 continue;
             }
 
@@ -114,13 +131,17 @@ public class Deck : IEnumerable<UnitObject> {
         return true;
     }
 
-    public void Resolve() {
+    public void ResolveTurn() {
         foreach (UnitObject unit in _vecUnit) {
             if (unit == null) {
                 continue;
             }
+
+            if (unit.IsDead()) {
+                continue;
+            }
             
-            unit.Resolve();
+            unit.Resolve(EffectResolveType.RESOLVE_TURN);
         }
     }
 

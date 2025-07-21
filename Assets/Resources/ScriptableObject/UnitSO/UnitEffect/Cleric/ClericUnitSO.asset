@@ -13,16 +13,16 @@ MonoBehaviour:
   m_Name: ClericUnitSO
   m_EditorClassIdentifier: 
   unitName: Cleric
-  hp: 50
-  attack: 50
-  shield: 0
-  res: 0
-  critRate: 0
-  critMulti: 0
-  singleMatchDescription: Heal lowest HP ally for 3
-  horizontalMatchDescription: All allies gain +2 HP
-  diagonalMatchDescription: Boost all ally's Crit Rate by + 2%
-  zigzagMatchDescription: Revive 1 random fallen ally (1 HP) and heal all allies
-    for 5HP.
-  xShapeMatchDescription: Cleanse all negative effects from allies and heal 3 HP.
-  fullGridMatchDescription: All allies +1 Res and heal 4 HP
+  eUnitArchetype: 1
+  hp: 22
+  attack: 2
+  shield: 2
+  res: 4
+  critRate: 5
+  critMulti: 125
+  singleMatchDescription: 
+  horizontalMatchDescription: 
+  diagonalMatchDescription: 
+  zigzagMatchDescription: 
+  xShapeMatchDescription: 
+  fullGridMatchDescription: 

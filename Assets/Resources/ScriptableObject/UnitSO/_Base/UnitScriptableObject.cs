@@ -1,8 +1,18 @@
 using UnityEngine;
 
+public enum eUnitArchetype {
+    NONE,
+    HOLY,
+    UNDEAD,
+    ELF,
+}
+
 [CreateAssetMenu(menuName = "Scriptable Object/Unit/UnitScriptableObject")]
 public class UnitScriptableObject : ScriptableObject {
     public string unitName;
+
+    [Header("Main Stats")]
+    public eUnitArchetype eUnitArchetype = eUnitArchetype.NONE;
 
     [Header("Main Stats")]
     public float hp;

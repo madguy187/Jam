@@ -6,9 +6,24 @@ public class EffectInfo {
 }
 
 public class EffectObject {
-
-    public EffectType effectType;
+    public EffectScriptableObject effectSO;
     List<EffectInfo> vecEffectInfo = new List<EffectInfo>();
+
+    public EffectType GetEffectType() {
+        return effectSO.GetEffectType();
+    }
+
+    public EffectAffinityType GetEffectAffinityType() {
+        return effectSO.GetEffectAffinityType();
+    }
+
+    public EffectResolveType GetEffectResolveType() {
+        return effectSO.GetEffectResolveType();
+    }
+
+    public EffectTargetType GetEffectTargetType() {
+        return effectSO.GetTargetType();
+    }
 
     public void Add(float val, int turn) {
         EffectInfo effectInfo = new EffectInfo();
@@ -29,6 +44,10 @@ public class EffectObject {
 
     public void Resolve() {
         for (int i = vecEffectInfo.Count - 1; i >= 0; i--) {
+            if (GetEffectResolveType() != EffectResolveType.RESOLVE_TURN) {
+                continue;
+            }
+
             if (vecEffectInfo[i].turn == Global.TEMP_EFFECT_ONLY_THIS_ROUND) {
                 continue;
             }

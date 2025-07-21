@@ -13,16 +13,16 @@ MonoBehaviour:
   m_Name: PaladinUnitSO
   m_EditorClassIdentifier: 
   unitName: Paladin
-  hp: 100
-  attack: 10
-  shield: 0
-  res: 0
-  critRate: 0
-  critMulti: 0
-  singleMatchDescription: Gain 3 Shield
-  horizontalMatchDescription: Heal lowest-HP ally for 4
-  diagonalMatchDescription: Gain Taunt (forces targeting for 1 turn), Enemy attacking
-    the paladin will recieve 20% of their damage back.
-  zigzagMatchDescription: Gain 10 Shield
-  xShapeMatchDescription: All allies gain +2 Shield
-  fullGridMatchDescription: All Holy units gain +2 RES this round
+  eUnitArchetype: 1
+  hp: 28
+  attack: 3
+  shield: 3
+  res: 1
+  critRate: 5
+  critMulti: 125
+  singleMatchDescription: 
+  horizontalMatchDescription: 
+  diagonalMatchDescription: 
+  zigzagMatchDescription: 
+  xShapeMatchDescription: 
+  fullGridMatchDescription: 

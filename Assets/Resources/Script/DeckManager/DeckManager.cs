@@ -25,22 +25,40 @@ public class DeckManager : MonoBehaviour {
 
     void Update() {
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            Global.DEBUG_PRINT("[Deck] Adding Paladin to Player Deck");
-            cPlayerDeck.AddUnit("Paladin");
+            GameObject prefab = ResourceManager.instance.Debug_RandUnit();
+            if (prefab == null) {
+                Global.DEBUG_PRINT("Error loading");
+                return;
+            }
+            
+            cPlayerDeck.AddUnit(prefab);
+            Global.DEBUG_PRINT("Loaded " + prefab.name + " into Player Team");
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            Global.DEBUG_PRINT("[Deck] Adding Paladin to Enemy Deck");
-            cEnemyDeck.AddUnit("Paladin");
+            GameObject prefab = ResourceManager.instance.Debug_RandUnit();
+            if (prefab == null) {
+                Global.DEBUG_PRINT("Error loading");
+                return;
+            }
+            cEnemyDeck.AddUnit(prefab);
+            Global.DEBUG_PRINT("Loaded " + prefab.name + " into Enemy Team");
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3)) {
+            List<UnitObject> listPlayer = cPlayerDeck.GetAllAliveUnit();
+            int rand = Random.Range(0, listPlayer.Count);
+            RelicScriptableObject relic = ResourceManager.instance.Debug_RandRelic();
+            listPlayer[rand].LoadRelic(relic);
+            Global.DEBUG_PRINT("Loaded " + relic.name + " into " + listPlayer[rand].name + " index:" + rand + " team: Player");
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha4)) {
-            Global.DEBUG_PRINT("[Deck] Adding Cleric to Enemy Deck");
-            cEnemyDeck.AddUnit("Cleric");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha5)) {
-            cPlayerDeck.GetUnitObject(0).LoadRelic(ResourceManager.instance.GetRelic("IronShard"));
+            List<UnitObject> listEnemy = cEnemyDeck.GetAllAliveUnit();
+            int rand = Random.Range(0, listEnemy.Count);
+            RelicScriptableObject relic = ResourceManager.instance.Debug_RandRelic();
+            listEnemy[rand].LoadRelic(relic);
+            Global.DEBUG_PRINT("Loaded " + relic.name + " into " + listEnemy[rand].name + " index:" + rand + " team: Enemy");
         }
     }
 
@@ -90,9 +108,9 @@ public class DeckManager : MonoBehaviour {
         return cDeck;
     }
 
-    public void ResolveTempEffect() {
-        cPlayerDeck.Resolve();
-        cEnemyDeck.Resolve();
+    public void ResolveTurnTempEffect() {
+        cPlayerDeck.ResolveTurn();
+        cEnemyDeck.ResolveTurn();
     }
 
     public void InitDeckEffect() {
