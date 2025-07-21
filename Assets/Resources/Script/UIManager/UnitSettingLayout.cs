@@ -20,6 +20,7 @@ public class UnitSettingLayout : MonoBehaviour
     {
         inventory = playerInventory;
         gameObject.SetActive(true);
+        SetupDropZones();
         RefreshUI();
         Debug.Log("UnitSettingLayout initialized with player inventory.");
     }
@@ -27,8 +28,8 @@ public class UnitSettingLayout : MonoBehaviour
     void RefreshUI() 
     {
         goldText.text = $"Gold: {inventory.gold}";
-
-        // Populate team
+    
+        // Clear and populate team units
         foreach (Transform child in teamUnitContainer) {
             Destroy(child.gameObject);
         }
@@ -36,14 +37,27 @@ public class UnitSettingLayout : MonoBehaviour
             var go = Instantiate(unitButtonPrefab, teamUnitContainer);
             go.GetComponent<UnitButton>().Init(unit, ShowDetails);
         }
-
-        // Populate bag
+    
+        // Clear and populate bag with mixed items
         foreach (Transform child in bagContainer) {
             Destroy(child.gameObject);
         }
-        foreach (MockRelic relic in inventory.bagRelics) {
-            var go = Instantiate(relicSlotPrefab, bagContainer);
-            go.GetComponent<MockRelicSlot>().Init(relic);
+    
+        foreach (MockInventoryItem item in inventory.bagItems) 
+        {
+            GameObject go;
+            if (item.itemType == MockItemType.Unit) 
+            {
+                go = Instantiate(unitButtonPrefab, bagContainer);
+                go.GetComponent<UnitButton>().Init(item.unitData, item, ShowDetails);
+                // Assign the bound item so you can drag/drop later
+                go.GetComponent<UnitButton>().boundItem = item;
+            }
+            else // Relic
+            {
+                go = Instantiate(relicSlotPrefab, bagContainer);
+                go.GetComponent<MockRelicSlot>().Init(item.relicData, item);
+            }
         }
     }
 
@@ -55,6 +69,15 @@ public class UnitSettingLayout : MonoBehaviour
     public void CloseLayout() 
     {
         gameObject.SetActive(false);
+    }
+
+    public void SetupDropZones()
+    {
+        // TeamUnitContainer only accepts units
+        DropZoneSetup.AddDropZone(teamUnitContainer.gameObject, DropZone.AllowedItemType.UnitsOnly);
+
+        // BagContainer accepts both units and relics
+        DropZoneSetup.AddDropZone(bagContainer.gameObject, DropZone.AllowedItemType.UnitsAndRelics);
     }
 }
 

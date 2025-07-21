@@ -87,6 +87,8 @@ GameObject:
   - component: {fileID: 7266757001639518741}
   - component: {fileID: 8846226261472401517}
   - component: {fileID: -51723732742466797}
+  - component: {fileID: 1292442768437039321}
+  - component: {fileID: -9026483200880191086}
   m_Layer: 5
   m_Name: RelicSlot
   m_TagString: Untagged
@@ -165,3 +167,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   iconImage: {fileID: 2462608439608920181}
+--- !u!225 &1292442768437039321
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9127127546863566636}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 1
+--- !u!114 &-9026483200880191086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9127127546863566636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 01f90d071923ee6458a8720d5b5933a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

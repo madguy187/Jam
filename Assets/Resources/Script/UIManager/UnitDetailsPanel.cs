@@ -44,15 +44,14 @@ public class UnitDetailsPanel : MonoBehaviour
 
     private void UpdateEquippedRelics() 
     {
-        foreach (Transform child in equippedRelicContainer) {
-            Destroy(child.gameObject);
-        }
-
-        foreach (MockRelic relic in currentUnit.equippedRelics) {
-            var go = Instantiate(relicSlotPrefab, equippedRelicContainer);
-            var slot = go.GetComponent<MockRelicSlot>();
-            slot.Init(relic);
-        }
+        // foreach (Transform child in equippedRelicContainer) {
+        //     Destroy(child.gameObject);
+        // }
+        // foreach (MockRelic relic in currentUnit.equippedRelics) {
+        //     var go = Instantiate(relicSlotPrefab, equippedRelicContainer);
+        //     var slot = go.GetComponent<MockRelicSlot>();
+        //     slot.Init(relic);
+        // }
     }
 
     public MockUnit GetCurrentUnit() => currentUnit;

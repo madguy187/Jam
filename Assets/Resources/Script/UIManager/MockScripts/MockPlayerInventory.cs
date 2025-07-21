@@ -6,6 +6,6 @@ public class MockPlayerInventory
 {
     public int gold;
     public List<MockUnit> teamUnits;
-    public List<MockRelic> bagRelics;
+    public List<MockInventoryItem> bagItems = new List<MockInventoryItem>();
 }
 

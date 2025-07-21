@@ -19,14 +19,16 @@ public class MockPlayerInventoryHolder : MonoBehaviour
             new MockUnit("Archer", 70, Resources.Load<Sprite>("Sprites/game-icons.net/troll"))
         };
 
-        playerInventory.bagRelics = new List<MockRelic>()
+        playerInventory.bagItems = new List<MockInventoryItem>()
         {
-            new MockRelic("Amulet of Power", MockRelicRarity.Rare),
-            new MockRelic("Shield of Light", MockRelicRarity.Common),
-            new MockRelic("Ring of Wisdom", MockRelicRarity.Epic),
-            new MockRelic("Crown of Kings", MockRelicRarity.Legendary),
-            new MockRelic("Staff of Ages", MockRelicRarity.Legendary),
-            new MockRelic("Boots of Speed", MockRelicRarity.Rare)
+            new MockInventoryItem(new MockUnit("Goblin", 90,  Resources.Load<Sprite>("Sprites/game-icons.net/troll"))),
+            new MockInventoryItem(new MockRelic("Amulet of Power", MockRelicRarity.Rare)),
+            new MockInventoryItem(new MockRelic("Shield of Light", MockRelicRarity.Common)),
+            new MockInventoryItem(new MockRelic("Ring of Wisdom", MockRelicRarity.Epic)),
+            new MockInventoryItem(new MockRelic("Crown of Kings", MockRelicRarity.Legendary)),
+            new MockInventoryItem(new MockRelic("Staff of Ages", MockRelicRarity.Legendary)),
+            new MockInventoryItem(new MockRelic("Boots of Speed", MockRelicRarity.Rare))
+
         };
     }
 }
