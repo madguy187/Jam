@@ -13,7 +13,9 @@ MonoBehaviour:
   m_Name: IceProphet_ZigZag_Atk
   m_EditorClassIdentifier: 
   _eType: 0
-  _eTargetType: 0
+  _eTargetType: 8
   _eExecType: 0
-  _fEffectVal: 0
+  _effectAffinityType: 0
+  _effectResolveType: 0
+  _fEffectVal: 3
   _fEffectTurn: 0

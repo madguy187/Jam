@@ -1,7 +1,8 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
-public class EffectMap {
+public class EffectMap : IEnumerable<EffectObject> {
     Dictionary<EffectType, EffectObject> _dictEffect = new Dictionary<EffectType, EffectObject>();
 
     public void AddEffect(EffectType eType, EffectObject objEffect) {
@@ -39,17 +40,17 @@ public class EffectMap {
         _dictEffect.Clear();
     }
 
-    public void Resolve() {
+    public void Resolve(EffectResolveType eResolveType) {
         List<EffectType> listRemove = new List<EffectType>();
         foreach (EffectObject effect in _dictEffect.Values) {
-            if (effect.eResolveType != EffectResolveType.RESOLVE_TURN) {
+            if (effect.GetEffectResolveType() != eResolveType) {
                 continue;
             }
-            
+
             effect.Resolve();
 
             if (effect.IsEmpty()) {
-                listRemove.Add(effect.effectType);
+                listRemove.Add(effect.GetEffectType());
             }
         }
 
@@ -69,4 +70,8 @@ public class EffectMap {
             _dictEffect.Remove(eType);
         }
     }
+
+    // For IEnumerable<EffectObject>
+    public IEnumerator<EffectObject> GetEnumerator() { return _dictEffect.Values.GetEnumerator(); }
+    IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
 }

@@ -108,9 +108,9 @@ public class DeckManager : MonoBehaviour {
         return cDeck;
     }
 
-    public void ResolveTempEffect() {
-        cPlayerDeck.Resolve();
-        cEnemyDeck.Resolve();
+    public void ResolveTurnTempEffect() {
+        cPlayerDeck.ResolveTurn();
+        cEnemyDeck.ResolveTurn();
     }
 
     public void InitDeckEffect() {

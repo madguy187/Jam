@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: IceProphet_Diagonal_CritRate
   m_EditorClassIdentifier: 
   _eType: 3
-  _eTargetType: 0
+  _eTargetType: 7
   _eExecType: 0
   _effectAffinityType: 0
   _effectResolveType: 0
-  _fEffectVal: 0
+  _fEffectVal: 10
   _fEffectTurn: 0

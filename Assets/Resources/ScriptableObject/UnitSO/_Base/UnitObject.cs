@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class UnitStat {
@@ -16,7 +17,7 @@ public class UnitStat {
         if (_val < 0) {
             _val = 0;
         }
-        
+
         val = _val;
     }
 
@@ -91,9 +92,7 @@ public class UnitObject : MonoBehaviour {
 
     public void AddTempEffect(EffectScriptableObject effectSO) {
         EffectObject effect = new EffectObject();
-        effect.effectType = effectSO.GetEffectType();
-        effect.eAffinity = effectSO.GetEffectAffinityType();
-        effect.eResolveType = effectSO.GetEffectResolveType();
+        effect.effectSO = effectSO;
         effect.Add(effectSO.GetEffectVal(), effectSO.GetEffectTurn());
 
         _listTempEffect.AddEffect(effectSO.GetEffectType(), effect);
@@ -105,6 +104,10 @@ public class UnitObject : MonoBehaviour {
 
     public void RemoveTempEffectByPredicate(Predicate<EffectObject> predicate) {
         _listTempEffect.RemoveEffectByPredicate(predicate);
+    }
+
+    public EffectMap GetAllTempEffect() {
+        return _listTempEffect;
     }
 
     public bool GetEffectParam(EffectType eType, out float val) {
@@ -186,8 +189,8 @@ public class UnitObject : MonoBehaviour {
         return null;
     }
 
-    public void Resolve() {
-        _listTempEffect.Resolve();
+    public void Resolve(EffectResolveType eResolveType) {
+        _listTempEffect.Resolve(eResolveType);
     }
 
     public void LoadRelic(RelicScriptableObject relicSO) {

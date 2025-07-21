@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &3377823016039805148
+--- !u!1001 &6277354972928281268
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -11,7 +11,7 @@ PrefabInstance:
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: <unitSO>k__BackingField
       value: 
-      objectReference: {fileID: 11400000, guid: ae8fa0aefe993124ea498b657aa9d03d, type: 2}
+      objectReference: {fileID: 11400000, guid: a27a9622bd620da4da73dc324ef7960b, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: _listSingleEffect._listScriptableObject.Array.size
       value: 1
@@ -22,36 +22,32 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: _listZigZagEffect._listScriptableObject.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
-      propertyPath: _listDiagonalEffect._listScriptableObject.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
-      propertyPath: _listFullGridEffect._listScriptableObject.Array.size
+      propertyPath: _listDiagonalEffect._listScriptableObject.Array.size
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
+      propertyPath: _listFullGridEffect._listScriptableObject.Array.size
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listSingleEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: ac035d9cd0bc4b6478c2a3760f001a02, type: 2}
+      objectReference: {fileID: 11400000, guid: a3bb7067b187c9245be24868c26990cd, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listXShapeEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 8abd8513b2ea32c4c91e8d2a86befb30, type: 2}
+      objectReference: {fileID: 11400000, guid: 4a79a4c38b4ce5c40b100dafc5111f82, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listXShapeEffect._listScriptableObject.Array.data[1]'
       value: 
-      objectReference: {fileID: 11400000, guid: cc86ede2b8df2e641ba0f7529089af18, type: 2}
+      objectReference: {fileID: 11400000, guid: 1de6fe9b05548b84d884c8a84a80752e, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listZigZagEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: cc062f3fe186c8a4388f3e1c1b07ee52, type: 2}
-    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
-      propertyPath: '_listZigZagEffect._listScriptableObject.Array.data[1]'
-      value: 
-      objectReference: {fileID: 11400000, guid: ca047522ec11d7140bc75b6a1f00b9e2, type: 2}
+      objectReference: {fileID: 11400000, guid: 56660eac40e162b4fb927b236cba329b, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: _listHorizontalEffect._listScriptableObject.Array.size
       value: 1
@@ -59,22 +55,22 @@ PrefabInstance:
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listDiagonalEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 3030c6aad4249ca48bac4f4ad1d6ecd5, type: 2}
+      objectReference: {fileID: 11400000, guid: 7d6d2e1a72a7fb94e8bba633f74b4410, type: 2}
+    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
+      propertyPath: '_listDiagonalEffect._listScriptableObject.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 6cbeecad2f014b24697de06411e42173, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listFullGridEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: ff0073696cca81c4db6dc590bda02d74, type: 2}
-    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
-      propertyPath: '_listFullGridEffect._listScriptableObject.Array.data[1]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 82071907792e2d04e943be245b2172b9, type: 2}
+      objectReference: {fileID: 11400000, guid: bfb7c7b9802db5246af4610f00f6120f, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listHorizontalEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: cef8b3729b5e3d246ab81f3b3bde655e, type: 2}
+      objectReference: {fileID: 11400000, guid: 69ec12476a8dd874b92d312cd68a6667, type: 2}
     - target: {fileID: 1406099063929599068, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: m_Name
-      value: Cleric
+      value: HolyBlade
       objectReference: {fileID: 0}
     - target: {fileID: 4330433073072854577, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: m_Pivot.x

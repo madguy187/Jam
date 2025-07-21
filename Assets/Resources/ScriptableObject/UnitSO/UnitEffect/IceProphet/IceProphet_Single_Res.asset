@@ -12,8 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: IceProphet_Single_Res
   m_EditorClassIdentifier: 
-  _eType: 0
+  _eType: 1
   _eTargetType: 0
   _eExecType: 0
-  _fEffectVal: 0
+  _effectAffinityType: 0
+  _effectResolveType: 0
+  _fEffectVal: 1
   _fEffectTurn: 0

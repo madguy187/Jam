@@ -131,7 +131,7 @@ public class Deck : IEnumerable<UnitObject> {
         return true;
     }
 
-    public void Resolve() {
+    public void ResolveTurn() {
         foreach (UnitObject unit in _vecUnit) {
             if (unit == null) {
                 continue;
@@ -141,7 +141,7 @@ public class Deck : IEnumerable<UnitObject> {
                 continue;
             }
             
-            unit.Resolve();
+            unit.Resolve(EffectResolveType.RESOLVE_TURN);
         }
     }
 

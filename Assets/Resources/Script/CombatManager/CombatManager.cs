@@ -55,7 +55,7 @@ public class CombatManager : MonoBehaviour {
             case eCombatState.FINISH:
                 _state = eCombatState.WAIT;
                 _listMatch = null;
-                DeckManager.instance.ResolveTempEffect();
+                DeckManager.instance.ResolveTurnTempEffect();
                 break;
         }
     }
@@ -158,8 +158,21 @@ public class CombatManager : MonoBehaviour {
             return;
         }
 
+        bool bCanAttack = true;
+        if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_FREEZE)) {
+            bCanAttack = false;
+        }
+
+        cAttackerUnit.Resolve(EffectResolveType.RESOLVE_PRE_ATTACK);
+        if (!bCanAttack) {
+            return;
+        }
+
         Global.DEBUG_PRINT("attacker_deck=" + eType + " attacker_index=" + nAttackerIndex + " defender_index=" + nTarget);
         _ExecBattleOne(cAttackerUnit, cDefenderUnit, _GetRollType(cAttackerUnit.unitSO.unitName));
+
+        cAttackerUnit.Resolve(EffectResolveType.RESOLVE_ATTACK);
+        cDefenderUnit.Resolve(EffectResolveType.RESOLVE_ATTACK);
     }
 
     MatchType _GetRollType(string unitName) {
@@ -185,10 +198,6 @@ public class CombatManager : MonoBehaviour {
             return;
         }
 
-        if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_FREEZE, true)) {
-            return;
-        }
-
         EffectList effects = cAttackerUnit.GetRollEffectList(eRoll);
         if (effects != null) {
             foreach (EffectScriptableObject effect in effects) {
@@ -197,7 +206,7 @@ public class CombatManager : MonoBehaviour {
         }
 
         float fAttack = cAttackerUnit.GetAttack();
-        if (_IsCrit(cAttackerUnit.GetCritRate())) {
+        if (_IsCrit(cAttackerUnit)) {
             fAttack *= _GetCritRatio(cAttackerUnit);
         }
 
@@ -212,6 +221,9 @@ public class CombatManager : MonoBehaviour {
 
         fAttack = Mathf.Floor(fAttack);
         cDefenderUnit.ReceiveDamage(fAttack);
+
+        _ActivatePostEffect(cAttackerUnit, fAttack);
+        
         Global.DEBUG_PRINT("Final Damage=" + fAttack);
     }
 
@@ -252,6 +264,10 @@ public class CombatManager : MonoBehaviour {
                 continue;
             }
 
+            if (unit.HasEffectParam(EffectType.EFFECT_INVISIBLITY)) {
+                continue;
+            }
+
             if (bHasFrontUnit && !unit.IsFrontPosition()) {
                 continue;
             }
@@ -263,7 +279,16 @@ public class CombatManager : MonoBehaviour {
         return nIndex;
     }
 
-    bool _IsCrit(int nCritRate) {
+    bool _IsCrit(UnitObject cAttackerUnit) {
+        int nCritRate = (int)cAttackerUnit._currentCritRate.GetVal();
+        if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_STAT_INCREASE_CRIT_RATE_TURN, out float val)) {
+            nCritRate += (int)val;
+        }
+        
+        if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_DAMAGE_CRIT_HIT)) {
+            return true;
+        }
+        
         int nRand = Random.Range(0, Global.PERCENTAGE_CONSTANT + 1); // +1 coz exclusive
         if (nRand < nCritRate) {
             return true;
@@ -273,7 +298,12 @@ public class CombatManager : MonoBehaviour {
     }
 
     float _GetCritRatio(UnitObject cAttackerUnit) {
-        return cAttackerUnit.GetCritMulti() / Global.PERCENTAGE_CONSTANT;
+        int critMulti = cAttackerUnit.GetCritMulti();
+        if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_STAT_INCREASE_CRIT_MULTI_TURN, out float val)) {
+            critMulti += (int)val;
+        }
+
+        return critMulti / Global.PERCENTAGE_CONSTANT;
     }
 
     float _GetResRatio(UnitObject cDefenderUnit) {
@@ -289,6 +319,9 @@ public class CombatManager : MonoBehaviour {
                 continue;
             }
 
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_ATK)) {
+                unit._currentAttack.AddVal(cEffect.GetEffectVal());
+            }
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_REDUCE_ATK)) {
                 unit._currentAttack.MinusVal(cEffect.GetEffectVal());
             }
@@ -299,6 +332,10 @@ public class CombatManager : MonoBehaviour {
 
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_RES)) {
                 unit._currentRes.AddVal(cEffect.GetEffectVal());
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_DAMAGE_IGNORE_SHIELD)) {
+                unit._currentHealth.MinusVal(cEffect.GetEffectVal());
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_HEAL)) {
@@ -319,7 +356,7 @@ public class CombatManager : MonoBehaviour {
 
             if (cEffect.IsEffectType(EffectType.EFFECT_CLEANSE)) {
                 unit.RemoveTempEffectByPredicate(delegate (EffectObject obj) {
-                    if (obj.eAffinity == EffectAffinityType.NEGATIVE) {
+                    if (obj.GetEffectAffinityType() == EffectAffinityType.NEGATIVE) {
                         return true;
                     }
 
@@ -331,15 +368,38 @@ public class CombatManager : MonoBehaviour {
                 unit.AddTempEffect(cEffect);
             }
 
-            if (cEffect.IsEffectType(EffectType.EFFECT_TAUNT)) {
-
-            }
-
             Global.DEBUG_PRINT("[Effect] Triggered " + cEffect.GetTypeName() +
                                 " val=" + cEffect.GetEffectVal() +
                                 " unit_index=" + unit.index);
         }
+    }
 
+    void _ActivatePostEffect(UnitObject unitObj, float fAttack) {
+        EffectMap mapTempEffect = unitObj.GetAllTempEffect();
+        foreach (EffectObject effectObj in mapTempEffect) {
+            EffectTargetType eTargetType = effectObj.GetEffectTargetType();
+            List<UnitObject> arrTargetUnit = _GetTargetUnitBasedOnTargetType(eTargetType, effectObj.effectSO);
+
+            if (unitObj == null) {
+                return;
+            }
+
+            foreach (UnitObject target in arrTargetUnit) {
+                if (target == null) {
+                    continue;
+                }
+
+                if (unitObj.HasEffectParam(EffectType.EFFECT_ATTACK_HEAL)) {
+                    target._currentHealth.AddVal(fAttack);
+                }
+
+                if (unitObj.HasEffectParam(EffectType.EFFECT_DOUBLE_DAMAGE)) {
+                    target._currentHealth.MinusVal(fAttack);
+                }
+            }
+        }
+
+        unitObj.Resolve(EffectResolveType.RESOLVE_POST_ATTACK);
     }
 
     List<UnitObject> _GetTargetUnitBasedOnTargetType(EffectTargetType eTargetType, EffectScriptableObject cEffect) {

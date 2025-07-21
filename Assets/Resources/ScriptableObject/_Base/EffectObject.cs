@@ -6,11 +6,24 @@ public class EffectInfo {
 }
 
 public class EffectObject {
-
-    public EffectType effectType;
-    public EffectAffinityType eAffinity = EffectAffinityType.NONE;
-    public EffectResolveType eResolveType = EffectResolveType.RESOLVE_TURN;
+    public EffectScriptableObject effectSO;
     List<EffectInfo> vecEffectInfo = new List<EffectInfo>();
+
+    public EffectType GetEffectType() {
+        return effectSO.GetEffectType();
+    }
+
+    public EffectAffinityType GetEffectAffinityType() {
+        return effectSO.GetEffectAffinityType();
+    }
+
+    public EffectResolveType GetEffectResolveType() {
+        return effectSO.GetEffectResolveType();
+    }
+
+    public EffectTargetType GetEffectTargetType() {
+        return effectSO.GetTargetType();
+    }
 
     public void Add(float val, int turn) {
         EffectInfo effectInfo = new EffectInfo();
@@ -31,7 +44,7 @@ public class EffectObject {
 
     public void Resolve() {
         for (int i = vecEffectInfo.Count - 1; i >= 0; i--) {
-            if (eResolveType != EffectResolveType.RESOLVE_TURN) {
+            if (GetEffectResolveType() != EffectResolveType.RESOLVE_TURN) {
                 continue;
             }
 
