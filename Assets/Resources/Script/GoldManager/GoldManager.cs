@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class GoldManager : MonoBehaviour
 {
-    public static GoldManager instance;
+    public static GoldManager instance { get; private set; }
     
     [Header("Configuration")]
     [SerializeField] private GoldConfig config;
@@ -12,21 +12,47 @@ public class GoldManager : MonoBehaviour
 
     void Awake()
     {
-        instance = this;
-        
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+            
+            if (config == null)
+            {
+                Debug.LogWarning("[GoldManager] Gold configuration is missing");
+            }
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    void Start()
+    {
         if (config == null)
         {
             Debug.LogWarning("[GoldManager] Gold configuration is missing");
         }
     }
 
+    public void StartNewTurn()
+    {
+        CalculateInterest();
+        // Add base income
+        OnRoundStart(false); 
+    }
+
+    public void OnVictory()
+    {
+        AddGold(config.winRoundBonus);
+    }
+
     public void CalculateInterest()
     {
-        if (config == null) return;
-
         int interestAmount = Mathf.Min(currentGold / config.goldPerInterest, config.maxInterest);
         
-        Global.DEBUG_PRINT($"[GoldManager] Calculate interest: {interestAmount} gold");
+        Global.DEBUG_PRINT($"[GoldManager] Calculate interest: Current gold={currentGold}, Interest amount={interestAmount}");
         
         if (interestAmount > 0)
         {
@@ -36,14 +62,12 @@ public class GoldManager : MonoBehaviour
 
     public void OnRoundStart(bool isVictory)
     {
-        if (config == null) return;
-
-        Global.DEBUG_PRINT($"Adding base income: +{config.baseIncomePerRound} gold");
+        Global.DEBUG_PRINT($"[GoldManager] Adding base income: +{config.baseIncomePerRound} gold (Current: {currentGold})");
         AddGold(config.baseIncomePerRound);
         
         if (isVictory)
         {
-            Global.DEBUG_PRINT($"Victory bonus: +{config.winRoundBonus} gold!");
+            Global.DEBUG_PRINT($"[GoldManager] Victory bonus: +{config.winRoundBonus} gold!");
             AddGold(config.winRoundBonus);
         }
     }
@@ -58,11 +82,12 @@ public class GoldManager : MonoBehaviour
 
         if (currentGold < amount)
         {
-            Global.DEBUG_PRINT("[GoldManager] Not enough gold");
+            Global.DEBUG_PRINT($"[GoldManager] Not enough gold (Have: {currentGold}, Need: {amount})");
             return false;
         }
 
         currentGold -= amount;
+        Global.DEBUG_PRINT($"[GoldManager] Spent {amount} gold, remaining: {currentGold}");
         return true;
     }
 
@@ -75,6 +100,7 @@ public class GoldManager : MonoBehaviour
         }
 
         currentGold += amount;
+        Global.DEBUG_PRINT($"[GoldManager] Added {amount} gold, new total: {currentGold}");
     }
 
     public int GetCurrentGold()
@@ -85,5 +111,43 @@ public class GoldManager : MonoBehaviour
     public bool HasEnoughGold(int amount)
     {
         return currentGold >= amount;
+    }
+
+    public int GetGoldRewardForMatch(MatchType type)
+    {
+        if (config == null)
+        {
+            Debug.LogWarning("[GoldManager] Gold configuration is missing!");
+            return 0;
+        }
+
+        int reward = 0;
+        switch (type)
+        {
+            case MatchType.HORIZONTAL:
+                reward = config.horizontalReward;
+                break;
+            case MatchType.VERTICAL:
+                reward = config.verticalReward;
+                break;
+            case MatchType.DIAGONAL:
+                reward = config.diagonalReward;
+                break;
+            case MatchType.ZIGZAG:
+                reward = config.zigzagReward;
+                break;
+            case MatchType.XSHAPE:
+                reward = config.xShapeReward;
+                break;
+            case MatchType.FULLGRID:
+                reward = config.fullGridReward;
+                break;
+        }
+        
+        if (reward > 0)
+        {
+            Global.DEBUG_PRINT($"[GoldManager] Match reward for {type}: +{reward} gold");
+        }
+        return reward;
     }
 } 

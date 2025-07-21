@@ -10,8 +10,7 @@ public enum SymbolType
 
 public class SymbolGenerator : MonoBehaviour
 {
-    private const string TAG = "SymbolGenerator";
-    public static SymbolGenerator instance;
+    public static SymbolGenerator instance { get; private set; }
     
     [Header("Symbol Probabilities")]
     [SerializeField] [Range(0f, 1f)] private float emptyProbability = 0.2f;    
@@ -21,15 +20,16 @@ public class SymbolGenerator : MonoBehaviour
 
     void Awake()
     {
-        if (instance != null && instance != this)
+        if (instance == null)
         {
-            Debug.LogWarning("Another instance exists");
-            Destroy(gameObject);
-            return;
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+            ValidateProbabilities();
         }
-        instance = this;
-
-        ValidateProbabilities();
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void OnValidate()
@@ -98,7 +98,6 @@ public class SymbolGenerator : MonoBehaviour
     public SymbolType[] GenerateSymbolsForUnit(UnitObject unit)
     {
         if (unit == null) return null;
-        if (unit.IsDead()) return null;
 
         float tempEmptyProb = emptyProbability;
         float tempAttackProb = attackProbability;
