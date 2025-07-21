@@ -10,16 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ae3f48536174bf64a82442a0e1e19f19, type: 3}
-  m_Name: ClericUnitSO
+  m_Name: IceProphetUnitSO
   m_EditorClassIdentifier: 
-  unitName: Cleric
-  eUnitArchetype: 1
-  hp: 22
-  attack: 2
-  shield: 2
-  res: 4
-  critRate: 5
-  critMulti: 125
+  unitName: 
+  eUnitArchetype: 0
+  hp: 0
+  attack: 0
+  shield: 0
+  res: 0
+  critRate: 0
+  critMulti: 0
   singleMatchDescription: 
   horizontalMatchDescription: 
   diagonalMatchDescription: 

@@ -42,6 +42,10 @@ public class EffectMap {
     public void Resolve() {
         List<EffectType> listRemove = new List<EffectType>();
         foreach (EffectObject effect in _dictEffect.Values) {
+            if (effect.eResolveType != EffectResolveType.RESOLVE_TURN) {
+                continue;
+            }
+            
             effect.Resolve();
 
             if (effect.IsEmpty()) {
@@ -51,6 +55,18 @@ public class EffectMap {
 
         foreach (EffectType type in listRemove) {
             _dictEffect.Remove(type);
+        }
+    }
+
+    public void ResolveOne(EffectType eType) {
+        if (!_dictEffect.ContainsKey(eType)) {
+            return;
+        }
+
+        EffectObject effect = _dictEffect[eType];
+        effect.Resolve();
+        if (effect.IsEmpty()) {
+            _dictEffect.Remove(eType);
         }
     }
 }

@@ -163,7 +163,6 @@ public class CombatManager : MonoBehaviour {
     }
 
     MatchType _GetRollType(string unitName) {
-        return MatchType.HORIZONTAL;
         if (_listMatch == null) {
             return MatchType.NONE;
         }
@@ -183,6 +182,10 @@ public class CombatManager : MonoBehaviour {
         }
 
         if (cDefenderUnit == null || cDefenderUnit.IsDead()) {
+            return;
+        }
+
+        if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_FREEZE, true)) {
             return;
         }
 
@@ -279,19 +282,23 @@ public class CombatManager : MonoBehaviour {
 
     void _ActivateRollEffect(EffectScriptableObject cEffect) {
         EffectTargetType eTargetType = cEffect.GetTargetType();
-        List<UnitObject> arrTargetUnit = _GetTargetUnitBasedOnTargetType(eTargetType);
+        List<UnitObject> arrTargetUnit = _GetTargetUnitBasedOnTargetType(eTargetType, cEffect);
 
         foreach (UnitObject unit in arrTargetUnit) {
             if (unit == null) {
                 continue;
             }
 
-            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_SHIELD)) {
-                unit._currentShield.AddVal(cEffect.GetEffectVal());
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_REDUCE_ATK)) {
+                unit._currentAttack.MinusVal(cEffect.GetEffectVal());
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_SHIELD)) {
                 unit._currentShield.AddVal(cEffect.GetEffectVal());
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_RES)) {
+                unit._currentRes.AddVal(cEffect.GetEffectVal());
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_HEAL)) {
@@ -300,6 +307,9 @@ public class CombatManager : MonoBehaviour {
 
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_CRIT_RATE)) {
                 unit._currentCritRate.AddVal(cEffect.GetEffectVal());
+            }
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_REDUCE_CRIT_RATE)) {
+                unit._currentCritRate.MinusVal(cEffect.GetEffectVal());
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_REVIVE)) {
@@ -322,7 +332,7 @@ public class CombatManager : MonoBehaviour {
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_TAUNT)) {
-                
+
             }
 
             Global.DEBUG_PRINT("[Effect] Triggered " + cEffect.GetTypeName() +
@@ -332,7 +342,7 @@ public class CombatManager : MonoBehaviour {
 
     }
 
-    List<UnitObject> _GetTargetUnitBasedOnTargetType(EffectTargetType eTargetType) {
+    List<UnitObject> _GetTargetUnitBasedOnTargetType(EffectTargetType eTargetType, EffectScriptableObject cEffect) {
         List<UnitObject> arrTarget = new List<UnitObject>();
         Deck cDeck = DeckManager.instance.GetDeckByType(_eAttackerDeck);
 
@@ -347,10 +357,11 @@ public class CombatManager : MonoBehaviour {
             case EffectTargetType.SELF:
                 arrTarget.Add(cDeck.GetUnitObject(_nAttackerIndex));
                 break;
-            case EffectTargetType.TEAM_LOWEST_HP:
-                int nLowestHealthIndex = GetLowestHealth(cDeck);
-                arrTarget.Add(cDeck.GetUnitObject(nLowestHealthIndex));
-                break;
+            case EffectTargetType.TEAM_LOWEST_HP: {
+                    int nLowestHealthIndex = GetLowestHealth(cDeck);
+                    arrTarget.Add(cDeck.GetUnitObject(nLowestHealthIndex));
+                    break;
+                }
             case EffectTargetType.TEAM_HOLY:
                 arrTarget = _GetUnitByArchetype(cDeck, eUnitArchetype.HOLY);
                 break;
@@ -363,6 +374,24 @@ public class CombatManager : MonoBehaviour {
             case EffectTargetType.ENEMY_DECK:
                 arrTarget = cOtherDeck.GetAllAliveUnit();
                 break;
+            case EffectTargetType.ENEMY_LOWEST_HP: {
+                    int nLowestHealthIndex = GetLowestHealth(cOtherDeck);
+                    arrTarget.Add(cOtherDeck.GetUnitObject(nLowestHealthIndex));
+                    break;
+                }
+            case EffectTargetType.ENEMY_FRONTLINE:
+                arrTarget = _GetAllUnitFrontLine(cOtherDeck);
+                break;
+            case EffectTargetType.ENEMY_RANDOM:
+                arrTarget = _GetRandomEnemy(cOtherDeck, 1);
+                break;
+            case EffectTargetType.ENEMY_RANDOM_3:
+                arrTarget = _GetRandomEnemy(cOtherDeck, 3);
+                break;
+            case EffectTargetType.ENEMY_BELOW_HP:
+                arrTarget = _GetAllUnitBelowHp(cOtherDeck, cEffect.GetEffectVal());
+                break;
+
         }
 
         return arrTarget;
@@ -385,7 +414,7 @@ public class CombatManager : MonoBehaviour {
             return true;
         });
     }
-    
+
     List<UnitObject> _GetAllDeadUnit(Deck cDeck) {
         return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
             if (unit == null) {
@@ -395,6 +424,63 @@ public class CombatManager : MonoBehaviour {
             if (!unit.IsDead()) {
                 return false;
             }
+
+            return true;
+        });
+    }
+
+    List<UnitObject> _GetAllUnitFrontLine(Deck cDeck) {
+        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
+            if (unit == null) {
+                return false;
+            }
+
+            if (!unit.IsDead()) {
+                return false;
+            }
+
+            if (!unit.IsFrontPosition()) {
+                return false;
+            }
+
+            return true;
+        });
+    }
+
+    List<UnitObject> _GetAllUnitBelowHp(Deck cDeck, float hp) {
+        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
+            if (unit == null) {
+                return false;
+            }
+
+            if (!unit.IsDead()) {
+                return false;
+            }
+
+            if (unit._currentHealth.GetVal() > hp) {
+                return false;
+            }
+
+            return true;
+        });
+    }
+
+    List<UnitObject> _GetRandomEnemy(Deck cDeck, int count) {
+        int i = 0;
+        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
+            if (unit == null) {
+                return false;
+            }
+
+            if (!unit.IsDead()) {
+                return false;
+            }
+
+            if (i == count) {
+                return false;
+            }
+
+            i++;
 
             return true;
         });

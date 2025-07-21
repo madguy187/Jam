@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &1966360212605269107
+--- !u!1001 &27621533388889069
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -11,7 +11,7 @@ PrefabInstance:
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: <unitSO>k__BackingField
       value: 
-      objectReference: {fileID: 11400000, guid: ba0ea497fe29ca342a4e71277e885cc7, type: 2}
+      objectReference: {fileID: 11400000, guid: c34b3f7ccfe3b34409a17fe04a47953c, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: _listSingleEffect._listScriptableObject.Array.size
       value: 1
@@ -26,7 +26,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: _listDiagonalEffect._listScriptableObject.Array.size
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: _listFullGridEffect._listScriptableObject.Array.size
@@ -35,15 +35,15 @@ PrefabInstance:
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listSingleEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 9c8f7c0e28670324db85246e3a7f5f84, type: 2}
+      objectReference: {fileID: 11400000, guid: 5294c961084806747b241eaa5a588c0e, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listXShapeEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: a6871aeb9ae4f314a9503d80cfa8efd7, type: 2}
+      objectReference: {fileID: 11400000, guid: 2399a4e37c3081042b71a8958f82a0ac, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listZigZagEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: c323a7d23726c7d428fc5bf420936210, type: 2}
+      objectReference: {fileID: 11400000, guid: e81ecdec56ad3904a9e89b358c4fa54a, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: _listHorizontalEffect._listScriptableObject.Array.size
       value: 1
@@ -51,22 +51,18 @@ PrefabInstance:
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listDiagonalEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: c5343c0a726775c41a94f14a49697710, type: 2}
-    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
-      propertyPath: '_listDiagonalEffect._listScriptableObject.Array.data[1]'
-      value: 
-      objectReference: {fileID: 11400000, guid: 2716528cf3deacd43a0f9e3acf71cf4f, type: 2}
+      objectReference: {fileID: 11400000, guid: 71455293969f068469d007ad4e8d4a0a, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listFullGridEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 738c3803eb4666645ae81d8dc409b7f2, type: 2}
+      objectReference: {fileID: 11400000, guid: 1efa4c9ef7c36a44a8d72bb9f452d53d, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listHorizontalEffect._listScriptableObject.Array.data[0]'
       value: 
-      objectReference: {fileID: 11400000, guid: 3bffb843bd387e341a1ea0847e24d1db, type: 2}
+      objectReference: {fileID: 11400000, guid: fff44529f2bdcce43aaf2787a3e3bf28, type: 2}
     - target: {fileID: 1406099063929599068, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: m_Name
-      value: Paladin
+      value: IceProphet
       objectReference: {fileID: 0}
     - target: {fileID: 4330433073072854577, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: m_Pivot.x

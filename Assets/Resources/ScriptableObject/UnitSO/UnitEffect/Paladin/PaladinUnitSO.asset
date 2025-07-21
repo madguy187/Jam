@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae3f48536174bf64a82442a0e1e19f19, type: 3}
   m_Name: PaladinUnitSO
   m_EditorClassIdentifier: 
-  unitName: 
-  eUnitArchetype: 0
-  hp: 0
-  attack: 0
-  shield: 0
-  res: 0
-  critRate: 0
-  critMulti: 0
+  unitName: Paladin
+  eUnitArchetype: 1
+  hp: 28
+  attack: 3
+  shield: 3
+  res: 1
+  critRate: 5
+  critMulti: 125
   singleMatchDescription: 
   horizontalMatchDescription: 
   diagonalMatchDescription: 

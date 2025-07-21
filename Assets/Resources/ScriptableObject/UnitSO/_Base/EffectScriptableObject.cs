@@ -6,6 +6,8 @@ public class EffectScriptableObject : ScriptableObject {
     [SerializeField] EffectTargetType _eTargetType;
     [SerializeField] EffectExecType _eExecType = EffectExecType.TRIGGER_ONCE;
     [SerializeField] EffectAffinityType _effectAffinityType = EffectAffinityType.NONE;
+    [SerializeField] EffectResolveType _effectResolveType = EffectResolveType.RESOLVE_TURN;
+
     [SerializeField] float _fEffectVal = 0;
 
     [Header("This will only be used if exec type is turn specified", order=0)]
@@ -18,6 +20,7 @@ public class EffectScriptableObject : ScriptableObject {
     public EffectTargetType GetTargetType() { return _eTargetType; }
     public EffectExecType GetExecType() { return _eExecType; }
     public EffectAffinityType GetEffectAffinityType() { return _effectAffinityType; }
+    public EffectResolveType GetEffectResolveType() { return _effectResolveType; }
     public int GetEffectTurn() { return _fEffectTurn; }
 
     public bool IsEffectType(EffectType eEffectType) {

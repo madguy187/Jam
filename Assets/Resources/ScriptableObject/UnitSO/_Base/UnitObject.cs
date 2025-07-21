@@ -12,6 +12,11 @@ public class UnitStat {
         if (max > 0 && _val > max) {
             _val = max;
         }
+
+        if (_val < 0) {
+            _val = 0;
+        }
+        
         val = _val;
     }
 
@@ -23,7 +28,12 @@ public class UnitStat {
         }
         val += _val;
     }
-    public void MinusVal(float _val) { val -= _val; }
+    public void MinusVal(float _val) {
+        if (val - _val < 0) {
+            _val = _val - val;
+        }
+        val -= _val;
+    }
 }
 
 public class UnitObject : MonoBehaviour {
@@ -83,6 +93,7 @@ public class UnitObject : MonoBehaviour {
         EffectObject effect = new EffectObject();
         effect.effectType = effectSO.GetEffectType();
         effect.eAffinity = effectSO.GetEffectAffinityType();
+        effect.eResolveType = effectSO.GetEffectResolveType();
         effect.Add(effectSO.GetEffectVal(), effectSO.GetEffectTurn());
 
         _listTempEffect.AddEffect(effectSO.GetEffectType(), effect);
@@ -105,9 +116,12 @@ public class UnitObject : MonoBehaviour {
         return false;
     }
 
-    public bool HasEffectParam(EffectType eType) {
+    public bool HasEffectParam(EffectType eType, bool bShouldResolveIfTrue = false) {
         float val = _listTempEffect.GetParam(eType);
         if (val > 0) {
+            if (bShouldResolveIfTrue) {
+                _listTempEffect.ResolveOne(eType);
+            }
             return true;
         }
 
