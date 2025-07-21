@@ -13,7 +13,10 @@ public class MockPlayerInventoryHolder : MonoBehaviour
         playerInventory.teamUnits = new List<MockUnit>()
         {
             new MockUnit("Warrior", 100),
-            new MockUnit("Mage", 60)
+            new MockUnit("Mage", 60),
+            new MockUnit("Paladin", 500),
+            new MockUnit("Rogue", 80),
+            new MockUnit("Archer", 70)
         };
 
         playerInventory.bagRelics = new List<MockRelic>()
