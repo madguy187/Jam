@@ -78,6 +78,9 @@ namespace Map
         private void Awake() 
         {
             /// Sets the singleton instance and initializes the camera reference
+            if (Instance != null) {
+                Destroy(Instance);
+            }
             Instance = this;
             cam = Camera.main;
         }
