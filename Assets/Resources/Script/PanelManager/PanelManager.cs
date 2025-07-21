@@ -26,10 +26,6 @@ public class PanelManager : MonoBehaviour
     private Dictionary<string, RelicBoxUI> relicBoxMap;
     private Dictionary<RelicTier, RelicConfig.RelicData[]> relicsByTier;
     private bool relicsInitialized;
-
-    [Header("Unit Skill Descriptions")]
-    [Tooltip("Assign the UnitSkillMapping asset here")]
-    [SerializeField] private UnitSkillMapping skillMapping;
     
     private UnitObject currentUnit;
     
@@ -77,11 +73,6 @@ public class PanelManager : MonoBehaviour
         if (skillBoxes == null || skillBoxes.Length == 0) 
         {
             Debug.LogError("[PanelManager] No skill boxes assigned!");
-        }
-        
-        if (skillMapping == null) 
-        {
-            Debug.LogError("[PanelManager] Skill mapping not assigned!");
         }
 
         if (relicBoxes == null || relicBoxes.Length == 0)
@@ -207,19 +198,16 @@ public class PanelManager : MonoBehaviour
     private void UpdateSkillBoxes(UnitObject unit)
     {
         if (skillBoxes == null || skillBoxes.Length == 0) return;
-
-        UnitSkillConfig skillConfig = GetSkillConfigForUnit(unit);
-        bool hasSkillConfig = (skillConfig != null);
+        if (unit?.unitSO == null) return;
 
         foreach (var skillBox in skillBoxes)
         {
             if (skillBox != null)
             {
-                if (hasSkillConfig)
+                string description = unit.unitSO.GetSkillDescription(skillBox.GetMatchType());
+                if (!string.IsNullOrEmpty(description))
                 {
-                    string description = skillConfig.GetDescription(skillBox.GetMatchType());
-                    float value = skillConfig.GetValue(skillBox.GetMatchType());
-                    skillBox.SetupForUnit(description, value);
+                    skillBox.SetupForUnit(description, 0);
                     skillBox.gameObject.SetActive(true);
                 }
                 else
@@ -228,14 +216,6 @@ public class PanelManager : MonoBehaviour
                 }
             }
         }
-    }
-
-    private UnitSkillConfig GetSkillConfigForUnit(UnitObject unit)
-    {
-        if (unit?.unitSO == null || skillMapping == null) return null;
-
-        return skillMapping.GetSkillConfig(unit.unitSO.name) 
-            ?? skillMapping.GetSkillConfig(unit.name);
     }
 
     public void HidePanel()

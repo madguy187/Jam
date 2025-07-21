@@ -24,12 +24,7 @@ public class UnitClickHandler : MonoBehaviour
         
         if (unit != null)
         {
-            Global.DEBUG_PRINT("[UnitClickHandler] Showing info for unit: " + unit.unitSO.unitName);
             PanelManager.instance.ShowUnitInfo(unit);
-        }
-        else
-        {
-            Global.DEBUG_PRINT("[UnitClickHandler] ERROR: PanelManager instance not found in scene!");
         }
     }
 }   

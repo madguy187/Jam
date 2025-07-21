@@ -488,8 +488,7 @@ MonoBehaviour:
   effectDuration: 0.5
   scaleAmount: 1.2
   matchGlowColor: {r: 1, g: 0.92, b: 0.016, a: 0.5}
-  slotGridUI: {fileID: 0}
-  slotController: {fileID: 0}
+  slotGridUI: {fileID: 2048698675}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
