@@ -76,7 +76,7 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
         }
 
         // Should not fail here but just in case...
-        if (!SnapToClosestEmptySlot(eventData.pointerDrag, eventData)) {
+        if (!SnapToFirstAvailableSlot(eventData.pointerDrag/*, eventData*/)) {
             dragHandler.OnDropRejected();
             return;
         }
@@ -87,44 +87,64 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
         itemTracker.AddItem(draggedItemType);
         dragHandler.OnDropAccepted();
     }
-    
-    public bool SnapToClosestEmptySlot(GameObject draggedGO, PointerEventData eventData)
-    {
-        Vector2 mousePos = eventData.position;
-        Transform closestSlot = null;
-        float closestDistance = float.MaxValue;
 
+    public bool SnapToFirstAvailableSlot(GameObject draggedGO)
+    {
         foreach (Transform slot in contentParent)
         {
-            if (slot.childCount > 0)
-                continue;
-
-            Vector2 slotScreenPos = RectTransformUtility.WorldToScreenPoint(eventData.pressEventCamera, slot.position);
-            float distance = Vector2.Distance(mousePos, slotScreenPos);
-
-            if (distance < closestDistance)
+            if (slot.childCount == 0)
             {
-                closestDistance = distance;
-                closestSlot = slot;
+                // Snap to this slot
+                draggedGO.transform.SetParent(slot, false);
+
+                // Stretch to fit
+                RectTransform rt = draggedGO.GetComponent<RectTransform>();
+                rt.anchorMin = Vector2.zero;
+                rt.anchorMax = Vector2.one;
+                rt.offsetMin = Vector2.zero;
+                rt.offsetMax = Vector2.zero;
+
+                return true;
             }
         }
 
-        if (closestSlot == null)
-        {
-            Global.DEBUG_PRINT("[DropZone::SnapToClosestEmptySlot] Snap failed: No available empty slot.");
-            return false;
-        }
-
-        // Snap into the closest empty slot
-        draggedGO.transform.SetParent(closestSlot, false);
-
-        // Stretch the dragged item to fit the slot
-        RectTransform rt = draggedGO.GetComponent<RectTransform>();
-        rt.anchorMin = Vector2.zero;
-        rt.anchorMax = Vector2.one;
-        rt.offsetMin = Vector2.zero;
-        rt.offsetMax = Vector2.zero;
-
-        return true;
+        Global.DEBUG_PRINT("[DropZone::SnapToFirstAvailableSlot] No empty slot found.");
+        return false;
     }
+
+
+    // This method attempts to snap the dragged item to the closest empty slot, commenting it first
+    // maybe useful for future reference.
+    // public bool SnapToClosestEmptySlot(GameObject draggedGO, PointerEventData eventData)
+    // {
+    //     Vector2 mousePos = eventData.position;
+    //     Transform closestSlot = null;
+    //     float closestDistance = float.MaxValue;
+    //     foreach (Transform slot in contentParent)
+    //     {
+    //         if (slot.childCount > 0)
+    //             continue;
+    //         Vector2 slotScreenPos = RectTransformUtility.WorldToScreenPoint(eventData.pressEventCamera, slot.position);
+    //         float distance = Vector2.Distance(mousePos, slotScreenPos);
+    //         if (distance < closestDistance)
+    //         {
+    //             closestDistance = distance;
+    //             closestSlot = slot;
+    //         }
+    //     }
+    //     if (closestSlot == null)
+    //     {
+    //         Global.DEBUG_PRINT("[DropZone::SnapToClosestEmptySlot] Snap failed: No available empty slot.");
+    //         return false;
+    //     }
+    //     // Snap into the closest empty slot
+    //     draggedGO.transform.SetParent(closestSlot, false);
+    //     // Stretch the dragged item to fit the slot
+    //     RectTransform rt = draggedGO.GetComponent<RectTransform>();
+    //     rt.anchorMin = Vector2.zero;
+    //     rt.anchorMax = Vector2.one;
+    //     rt.offsetMin = Vector2.zero;
+    //     rt.offsetMax = Vector2.zero;
+    //     return true;
+    // }
 }
