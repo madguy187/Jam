@@ -11,12 +11,18 @@ public class MatchDetector
     private List<List<Vector2Int>> zigzagPatterns;
     private List<Vector2Int> xShapePattern;
     private List<Vector2Int> fullGridPattern;
+    private bool excludeSinglesInLargerPatterns = true; 
 
     // - Initialisation
     public MatchDetector(SlotGrid grid)
     {
         this.grid = grid;
         InitializePatterns();
+    }
+
+    public void SetExcludeSinglesInLargerPatterns(bool exclude)
+    {
+        excludeSinglesInLargerPatterns = exclude;
     }
 
     private void InitializePatterns()
@@ -115,7 +121,7 @@ public class MatchDetector
         }
     }
 
-    // - Public Fcuntions
+    // - Public Functions
     public List<Match> DetectMatches()
     {
         List<Match> allMatches = new List<Match>();
@@ -141,7 +147,7 @@ public class MatchDetector
         AddUniqueSingles(allMatches, singlesBySymbol, positionsInComplexPatterns);
 
         // Then add complex matches if configured
-        if (Global.EXCLUDE_SINGLES_IN_LARGER_PATTERNS)
+        if (excludeSinglesInLargerPatterns)
         {
             allMatches.AddRange(complexMatches);
         }
