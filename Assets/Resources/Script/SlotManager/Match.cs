@@ -33,7 +33,7 @@ public class Match
     private List<GridPosition> readablePositions;
     private SymbolType symbol;
     private string unitName;
-    private eUnitArchetype archetype; // Add archetype field
+    private eUnitArchetype archetype;
 
     public MatchType GetMatchType() {
         return type;
