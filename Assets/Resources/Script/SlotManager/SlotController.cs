@@ -32,6 +32,7 @@ public class SlotController : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            transform.parent = null; 
             DontDestroyOnLoad(gameObject);
             InitializeSlotController();
         }
@@ -338,7 +339,8 @@ public class SlotController : MonoBehaviour
         for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
         {
             UnitObject unit = playerDeck.GetUnitObject(i);
-            if (unit != null && unit.unitSO != null)
+            if (unit != null && unit.unitSO != null && 
+                unit.unitSO.eUnitArchetype == match.GetArchetype())
             {
                 int targetIndex = CombatManager.instance.GetLowestHealth(enemyDeck);
                 UnitObject target = enemyDeck.GetUnitObject(targetIndex);

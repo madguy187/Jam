@@ -21,6 +21,7 @@ public class ProbabilityCalculator : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            transform.parent = null; 
             DontDestroyOnLoad(gameObject);
             InitializeProbabilities();
         }

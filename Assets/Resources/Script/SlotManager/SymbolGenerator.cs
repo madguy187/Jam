@@ -19,6 +19,7 @@ public class SymbolGenerator : MonoBehaviour
         if (instance == null)
         {
             instance = this;
+            transform.parent = null;
             DontDestroyOnLoad(gameObject);
         }
         else
