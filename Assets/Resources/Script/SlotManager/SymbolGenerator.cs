@@ -12,6 +12,21 @@ public enum SymbolType
 
 public class SymbolGenerator : MonoBehaviour
 {
+    public static eUnitArchetype GetArchetypeForSymbol(SymbolType symbol)
+    {
+        switch (symbol)
+        {
+            case SymbolType.HOLY:
+                return eUnitArchetype.HOLY;
+            case SymbolType.UNDEAD:
+                return eUnitArchetype.UNDEAD;
+            case SymbolType.ELF:
+                return eUnitArchetype.ELF;
+            default:
+                return eUnitArchetype.NONE;
+        }
+    }
+
     public static SymbolGenerator instance { get; private set; }
     
     [Header("Symbol Probabilities")]
@@ -118,7 +133,7 @@ public class SymbolGenerator : MonoBehaviour
         int currentSlot = 0;
         foreach (UnitObject unit in uniqueUnits)
         {
-            if (currentSlot >= 9) break; // Safety check
+            if (currentSlot >= 9) break; 
 
             // Convert unit's archetype to symbol
             switch (unit.unitSO.eUnitArchetype)
@@ -185,20 +200,5 @@ public class SymbolGenerator : MonoBehaviour
         }
 
         return symbols;
-    }
-
-    public static eUnitArchetype GetArchetypeForSymbol(SymbolType symbol)
-    {
-        switch (symbol)
-        {
-            case SymbolType.HOLY:
-                return eUnitArchetype.HOLY;
-            case SymbolType.UNDEAD:
-                return eUnitArchetype.UNDEAD;
-            case SymbolType.ELF:
-                return eUnitArchetype.ELF;
-            default:
-                return eUnitArchetype.NONE;
-        }
     }
 } 

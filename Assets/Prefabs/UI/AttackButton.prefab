@@ -148,7 +148,6 @@ GameObject:
   - component: {fileID: 7629667192236853568}
   - component: {fileID: 2885257432725268784}
   - component: {fileID: 5913785593846620001}
-  - component: {fileID: 4940332720923433831}
   m_Layer: 5
   m_Name: AttackButton
   m_TagString: Untagged
@@ -258,15 +257,3 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &4940332720923433831
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5862487402954914756}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1fdb9e4e1fc774701bae689bd9580842, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

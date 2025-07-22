@@ -7,13 +7,16 @@ public class SlotController : MonoBehaviour
 {
     public static SlotController instance { get; private set; }
     
+    public static System.Action OnTurnChanged;
+    public static System.Action OnMatchesProcessed;  
+
     [Header("Configuration")]
     [SerializeField] private SlotConfig slotConfig;
 
     [Header("References")]
     [SerializeField] private SlotGridUI gridUI;
-    [SerializeField] private UIRollButton rollButton;
-    [SerializeField] private UIEndTurnButton endTurnButton;
+    [SerializeField] private UIRerollButton rerollButton;  
+    [SerializeField] private UIAttack attackButton;  
     
     private SlotGrid slotGrid;
     private MatchDetector matchDetector;
@@ -59,14 +62,14 @@ public class SlotController : MonoBehaviour
             return;
         }
 
-        if (rollButton == null)
+        if (rerollButton == null)
         {
-            Debug.LogError("[SlotController] Roll button reference is missing!");
+            Debug.LogError("[SlotController] Reroll button reference is missing!");
         }
 
-        if (endTurnButton == null)
+        if (attackButton == null)
         {
-            Debug.LogError("[SlotController] End turn button reference is missing!");
+            Debug.LogError("[SlotController] Attack button reference is missing!");
         }
     }
 
@@ -75,6 +78,52 @@ public class SlotController : MonoBehaviour
         slotGrid = new SlotGrid(slotConfig.gridRows, slotConfig.gridColumns);
         matchDetector = new MatchDetector(slotGrid);
         spinResult = new SpinResult(new List<Match>(), 0);
+    }
+
+    private void Update()
+    {
+        // Don't check during enemy turn
+        if (isEnemyTurn) return;
+
+        // Check player units state
+        Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
+        bool hasAlivePlayerUnits = false;
+
+        for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
+        {
+            UnitObject unit = playerDeck.GetUnitObject(i);
+            if (unit != null && !unit.IsDead())
+            {
+                hasAlivePlayerUnits = true;
+                break;
+            }
+        }
+
+        // Check enemy units state
+        Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+        bool hasAliveEnemyUnits = false;
+
+        for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
+        {
+            UnitObject unit = enemyDeck.GetUnitObject(i);
+            if (unit != null && !unit.IsDead())
+            {
+                hasAliveEnemyUnits = true;
+                break;
+            }
+        }
+
+        // Update button states
+        if (rerollButton != null)
+        {
+            rerollButton.SetInteractable(hasAlivePlayerUnits);
+        }
+
+        if (attackButton != null)
+        {
+            // Only enable attack if both players and enemies are alive
+            attackButton.SetInteractable(hasAlivePlayerUnits && hasAliveEnemyUnits);
+        }
     }
 
     public void StartPlayerTurn()
@@ -87,15 +136,13 @@ public class SlotController : MonoBehaviour
         // Add base income at start of turn
         Debug.Log("[SlotController] Adding base income for new turn");
         GoldManager.instance.OnRoundStart(false);
-        
-        // Enable buttons for player turn
-        if (rollButton != null) rollButton.SetInteractable(true);
-        if (endTurnButton != null) endTurnButton.SetInteractable(true);
+
+        // Notify turn changed
+        OnTurnChanged?.Invoke();
     }
 
     public void EndPlayerTurn()
     {
-        Debug.Log("[SlotController] EndPlayerTurn called");
         Debug.Log("=== PLAYER TURN COMBAT EXECUTION ===");
 
         // Execute combat with current matches
@@ -139,20 +186,70 @@ public class SlotController : MonoBehaviour
         }
         Debug.Log("=== END OF PLAYER COMBAT ===\n");
 
+        // Notify that matches have been processed
+        OnMatchesProcessed?.Invoke();
+
         // Calculate interest at end of player's turn
         GoldManager.instance.CalculateInterest();
+
+        // Check if all enemies are dead before transitioning to enemy turn
+        var enemyDeckCheck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+        bool allEnemiesDead = true;
+
+        for (int i = 0; i < enemyDeckCheck.GetDeckMaxSize(); i++)
+        {
+            UnitObject unit = enemyDeckCheck.GetUnitObject(i);
+            if (unit != null && !unit.IsDead()) 
+            {
+                allEnemiesDead = false;
+                break;
+            }
+        }
+
+        if (allEnemiesDead)
+        {
+            Debug.Log("[SlotController] All enemy units are dead after combat, starting new player turn");
+            StartPlayerTurn();
+            return;
+        }
+
         StartEnemyTurn();
     }
 
     public void StartEnemyTurn()
     {
+        // Check if all enemy units are dead
+        Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+        bool allEnemiesDead = true;
+
+        for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
+        {
+            UnitObject unit = enemyDeck.GetUnitObject(i);
+            if (unit != null && !unit.IsDead())  
+            {
+                allEnemiesDead = false;
+                break;
+            }
+        }
+
+        // If all enemies are dead, don't start enemy turn
+        if (allEnemiesDead)
+        {
+            Debug.Log("[SlotController] All enemy units are dead, skipping enemy turn");
+            StartPlayerTurn();
+            return;
+        }
+
         isEnemyTurn = true;
         spinsThisTurn = 0;
         spinResult.Clear();
 
         // Disable buttons during enemy turn
-        if (rollButton != null) rollButton.SetInteractable(false);
-        if (endTurnButton != null) endTurnButton.SetInteractable(false);
+        if (rerollButton != null) rerollButton.SetInteractable(false);  
+        if (attackButton != null) attackButton.SetInteractable(false);  // Changed from endTurnButton
+
+        // Notify turn changed
+        OnTurnChanged?.Invoke();
 
         // Execute enemy's single spin
         StartCoroutine(ExecuteEnemyTurn());
@@ -187,7 +284,10 @@ public class SlotController : MonoBehaviour
             // For each match
             foreach (Match match in matches)
             {
-                eUnitArchetype matchArchetype = match.GetArchetype();
+                // Set archetype for each match based on symbol
+                eUnitArchetype matchArchetype = SymbolGenerator.GetArchetypeForSymbol(match.GetSymbol());
+                match.SetArchetype(matchArchetype);
+
                 MatchType matchType = match.GetMatchType();
 
                 Debug.Log($"[SlotController] Enemy processing match: {matchType} for archetype: {matchArchetype}");
@@ -214,6 +314,9 @@ public class SlotController : MonoBehaviour
 
         spinResult.SetMatches(matches, 0); // Enemy doesn't earn gold
         isSpinning = false;
+
+        // Notify that matches have been processed
+        OnMatchesProcessed?.Invoke();
 
         yield return new WaitForSeconds(1f); 
         StartPlayerTurn();
@@ -277,10 +380,10 @@ public class SlotController : MonoBehaviour
         }
 
         isSpinning = true;
-        // Disable roll button during spin
-        if (rollButton != null)
+        // Disable reroll button during spin
+        if (rerollButton != null)  
         {
-            rollButton.SetInteractable(false);
+            rerollButton.SetInteractable(false);  
         }
         
         IncrementSpins();
@@ -293,10 +396,10 @@ public class SlotController : MonoBehaviour
         {
             Debug.LogError("Failed to generate symbols!");
             isSpinning = false;
-            // Re-enable roll button if spin fails
-            if (rollButton != null)
+            // Re-enable reroll button if spin fails
+            if (rerollButton != null)  
             {
-                rollButton.SetInteractable(true);
+                rerollButton.SetInteractable(true);  
             }
             return;
         }
@@ -338,10 +441,10 @@ public class SlotController : MonoBehaviour
         spinResult.SetMatches(matches, totalGold);
         isSpinning = false;
 
-        // Re-enable roll button after spin completes
-        if (rollButton != null)
+        // Re-enable reroll button after spin completes
+        if (rerollButton != null)  
         {
-            rollButton.SetInteractable(true);
+            rerollButton.SetInteractable(true);  
         }
     }
 
@@ -349,6 +452,26 @@ public class SlotController : MonoBehaviour
     {
         if (isSpinning) 
         {
+            return false;
+        }
+
+        // Check if all player units are dead
+        Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
+        bool hasAliveUnits = false;
+
+        for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
+        {
+            UnitObject unit = playerDeck.GetUnitObject(i);
+            if (unit != null && !unit.IsDead())
+            {
+                hasAliveUnits = true;
+                break;
+            }
+        }
+
+        if (!hasAliveUnits)
+        {
+            Debug.Log("[SlotController] Cannot spin - all player units are dead");
             return false;
         }
         

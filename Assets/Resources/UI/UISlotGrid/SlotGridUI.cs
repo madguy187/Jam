@@ -11,16 +11,14 @@ public class SlotGridUI : MonoBehaviour
 
     [Header("Slot Images")]
     [SerializeField] private Image[] slots;
-    [SerializeField] private TextMeshProUGUI[] debugTexts;
-
-    [Header("Symbol Sprites")]
-    [SerializeField] private Sprite holySprite;
-    [SerializeField] private Sprite undeadSprite;
-    [SerializeField] private Sprite elfSprite;
-    [SerializeField] private Sprite emptySprite;
 
     [Header("Debug Settings")]
+    [Tooltip("Show debug information in console after spins")]
     [SerializeField] private bool showDebugInfo = true;
+
+    [Header("Debug Visualization")]
+    [SerializeField] [TextArea(5,10)] 
+    private string debugGridState = "Current Grid State:\n-------------\n| - - - |\n| - - - |\n| - - - |\n-------------\n\nCurrent Deck: None";
 
     [Header("Animation Settings")]
     [SerializeField] [Range(0.5f, 5f)] private float spinDuration = 2.0f;
@@ -134,7 +132,7 @@ public class SlotGridUI : MonoBehaviour
                 {
                     // Empty slot
                     slots[index].sprite = null;
-                    slots[index].color = new Color(1, 1, 1, 0.2f); // Semi-transparent white
+                    slots[index].color = new Color(1, 1, 1, 0.2f);
                 }
             }
             else
@@ -143,32 +141,6 @@ public class SlotGridUI : MonoBehaviour
                 slots[index].sprite = null;
                 slots[index].color = new Color(1, 1, 1, 0.2f);
             }
-
-            // Update debug text
-            if (showDebugInfo && debugTexts != null && index < debugTexts.Length)
-            {
-                if (debugTexts[index] != null)
-                {
-                    debugTexts[index].text = symbolType.ToString();
-                    debugTexts[index].gameObject.SetActive(true);
-                }
-            }
-        }
-    }
-
-    private Sprite GetSpriteForSymbol(SymbolType symbolType)
-    {
-        switch (symbolType)
-        {
-            case SymbolType.HOLY:
-                return holySprite;
-            case SymbolType.UNDEAD:
-                return undeadSprite;
-            case SymbolType.ELF:
-                return elfSprite;
-            case SymbolType.EMPTY:
-            default:
-                return emptySprite;
         }
     }
     
@@ -192,6 +164,50 @@ public class SlotGridUI : MonoBehaviour
         // Use custom duration if provided, otherwise use default
         float duration = customDuration > 0 ? customDuration : spinDuration;
         StartCoroutine(SpinAnimationCoroutine(finalSymbols, duration));
+    }
+
+    private void LogSpinResult(SpinResult result)
+    {
+        if (!showDebugInfo) return;
+
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        
+        // Get current deck info
+        bool isEnemyTurn = SlotController.instance.IsEnemyTurn();
+        Deck currentDeck = DeckManager.instance.GetDeckByType(
+            isEnemyTurn ? eDeckType.ENEMY : eDeckType.PLAYER
+        );
+
+        // Add deck info
+        if (currentDeck != null)
+        {
+            HashSet<eUnitArchetype> archetypes = new HashSet<eUnitArchetype>();
+            foreach (UnitObject unit in currentDeck)
+            {
+                if (unit != null && unit.unitSO != null)
+                {
+                    archetypes.Add(unit.unitSO.eUnitArchetype);
+                }
+            }
+            sb.AppendLine($"Current Deck ({(isEnemyTurn ? "Enemy" : "Player")}): {string.Join(", ", archetypes)}");
+        }
+
+        // Add matches info
+        if (result != null && result.GetAllMatches().Count > 0)
+        {
+            sb.AppendLine("\nMatches Found:");
+            foreach (Match match in result.GetAllMatches())
+            {
+                sb.AppendLine($"- {match.GetMatchType()} match for {match.GetSymbol()} (Archetype: {match.GetArchetype()})");
+                sb.AppendLine($"  Positions: {string.Join(", ", match.GetReadablePositions())}");
+            }
+        }
+
+        // Update inspector visualization
+        debugGridState = sb.ToString();
+        #if UNITY_EDITOR
+        UnityEditor.EditorUtility.SetDirty(this);
+        #endif
     }
 
     private IEnumerator SpinAnimationCoroutine(SymbolType[] finalSymbols, float duration)
@@ -223,7 +239,25 @@ public class SlotGridUI : MonoBehaviour
         yield return new WaitForSeconds(remainingTime);
         
         isSpinning = false;
-        Global.DEBUG_PRINT("Spin complete");
+    }
+
+    // Subscribe to match processing events
+    private void OnEnable()
+    {
+        SlotController.OnMatchesProcessed += UpdateDebugVisualization;
+    }
+
+    private void OnDisable()
+    {
+        SlotController.OnMatchesProcessed -= UpdateDebugVisualization;
+    }
+
+    private void UpdateDebugVisualization()
+    {
+        if (showDebugInfo)
+        {
+            LogSpinResult(SlotController.instance.GetSpinResult());
+        }
     }
     
     public bool GetIsSpinning()
@@ -274,15 +308,9 @@ public class SlotGridUI : MonoBehaviour
     public void SetShowDebugInfo(bool show)
     {
         showDebugInfo = show;
-        if (debugTexts != null)
-        {
-            foreach (var text in debugTexts)
-            {
-                if (text != null)
-                {
-                    text.gameObject.SetActive(show);
-                }
-            }
-        }
     }
+
+    public Image[] GetSlots() => slots;
+
+    private void Update() { }
 } 
