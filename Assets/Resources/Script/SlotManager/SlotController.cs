@@ -336,19 +336,28 @@ public class SlotController : MonoBehaviour
         Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
         Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
 
+        //Debug.Log($"[SlotController] Match archetype: {match.GetArchetype()}");
+
         for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
         {
             UnitObject unit = playerDeck.GetUnitObject(i);
-            if (unit != null && unit.unitSO != null && 
-                unit.unitSO.eUnitArchetype == match.GetArchetype())
+            if (unit != null && unit.unitSO != null)
             {
+                // Debug.Log($"[SlotController] Unit {i} archetype: {unit.unitSO.eUnitArchetype}");
+                
                 int targetIndex = CombatManager.instance.GetLowestHealth(enemyDeck);
                 UnitObject target = enemyDeck.GetUnitObject(targetIndex);
                 
                 if (target != null)
                 {
-                    Debug.Log($"Player unit {unit.unitSO.unitName} attacking target {target.unitSO.unitName}");
-                    match.SetUnitName(unit.unitSO.unitName);
+                    // Only set match name (enabling skills) if archetype matches
+                    if (unit.unitSO.eUnitArchetype == match.GetArchetype())
+                    {
+                        // Debug.Log($"[SlotController] Unit {unit.unitSO.unitName} archetype matches {match.GetArchetype()}, will use skills");
+                        match.SetUnitName(unit.unitSO.unitName);
+                    }
+                    
+                    // Debug.Log($"Player unit {unit.unitSO.unitName} attacking target {target.unitSO.unitName}");
                     CombatManager.instance.ExecBattle(eDeckType.PLAYER, i);
                 }
             }
@@ -420,16 +429,31 @@ public class SlotController : MonoBehaviour
     private void ExecuteEnemyCombat(Match match)
     {
         Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+
+        // Debug.Log($"[SlotController] Enemy match archetype: {match.GetArchetype()}");
+
         for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
         {
             UnitObject unit = enemyDeck.GetUnitObject(i);
-            if (unit != null && unit.unitSO != null && 
-                unit.unitSO.eUnitArchetype == match.GetArchetype())
+            if (unit != null && unit.unitSO != null)
             {
-                Debug.Log($"[SlotController] Enemy unit {unit.unitSO.unitName} (index {i}) executing {match.GetMatchType()}");
-                Debug.Log($"Enemy unit {unit.unitSO.unitName} executing {match.GetMatchType()} attack");
-                match.SetUnitName(unit.unitSO.unitName);
-                CombatManager.instance.ExecBattle(eDeckType.ENEMY, i);
+                // Debug.Log($"[SlotController] Enemy unit {i} archetype: {unit.unitSO.eUnitArchetype}");
+                
+                int targetIndex = CombatManager.instance.GetLowestHealth(DeckManager.instance.GetDeckByType(eDeckType.PLAYER));
+                UnitObject target = DeckManager.instance.GetDeckByType(eDeckType.PLAYER).GetUnitObject(targetIndex);
+                
+                if (target != null)
+                {
+                    // Only set match name (enabling skills) if archetype matches
+                    if (unit.unitSO.eUnitArchetype == match.GetArchetype())
+                    {
+                        // Debug.Log($"[SlotController] Enemy unit {unit.unitSO.unitName} archetype matches {match.GetArchetype()}, will use skills");
+                        match.SetUnitName(unit.unitSO.unitName);
+                    }
+                    
+                    //Debug.Log($"Enemy unit {unit.unitSO.unitName} attacking target {target.unitSO.unitName}");
+                    CombatManager.instance.ExecBattle(eDeckType.ENEMY, i);
+                }
             }
         }
     }
