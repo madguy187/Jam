@@ -97,14 +97,13 @@ public class MatchDetector
         List<Match> allMatches = new List<Match>();
         HashSet<Vector2Int> positionsInComplexPatterns = new HashSet<Vector2Int>();
 
-        // First detect all complex patterns
         var complexMatches = new List<Match>();
-        complexMatches.AddRange(DetectFullGridMatches());
-        complexMatches.AddRange(DetectXShapeMatches());
-        complexMatches.AddRange(DetectDiagonalMatches());
-        complexMatches.AddRange(DetectZigzagMatches());
-        complexMatches.AddRange(DetectHorizontalMatches());
-        complexMatches.AddRange(DetectVerticalMatches());
+        complexMatches.AddRange(DetectHorizontalMatches());  
+        complexMatches.AddRange(DetectVerticalMatches());   
+        complexMatches.AddRange(DetectDiagonalMatches());    
+        complexMatches.AddRange(DetectZigzagMatches());      
+        complexMatches.AddRange(DetectXShapeMatches());      
+        complexMatches.AddRange(DetectFullGridMatches());    
 
         // Track all positions that are part of complex patterns
         foreach (var match in complexMatches)
@@ -114,20 +113,6 @@ public class MatchDetector
                 positionsInComplexPatterns.Add(pos);
             }
         }
-
-        // Add complex matches
-        if (Global.EXCLUDE_SINGLES_IN_LARGER_PATTERNS)
-        {
-            allMatches.AddRange(complexMatches);
-        }
-        /*else
-        {
-            // Group matches by symbol and type to get unique matches
-            var uniqueMatches = complexMatches
-                .GroupBy(m => new { Symbol = m.GetSymbol(), Type = m.GetMatchType() })
-                .Select(g => g.First());
-            allMatches.AddRange(uniqueMatches);
-        }*/
 
         // Handle singles detection
         var potentialSingles = DetectSingleMatches();
@@ -155,6 +140,12 @@ public class MatchDetector
                     break; // Only add one single per symbol type
                 }
             }
+        }
+
+        // Then add complex matches
+        if (Global.EXCLUDE_SINGLES_IN_LARGER_PATTERNS)
+        {
+            allMatches.AddRange(complexMatches);
         }
 
         return allMatches;
