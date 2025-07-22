@@ -267,6 +267,8 @@ GameObject:
   - component: {fileID: 93362769}
   - component: {fileID: 93362770}
   - component: {fileID: 93362771}
+  - component: {fileID: 93362772}
+  - component: {fileID: 93362773}
   m_Layer: 5
   m_Name: TeamUnitContainer
   m_TagString: Untagged
@@ -349,6 +351,36 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &93362772
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93362765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9905ccb3caa27644961c378faafcec4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxUnits: 5
+  maxRelics: 0
+--- !u!114 &93362773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93362765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 949ab9dcc0a88db42b33eef8c45b41fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allowedType: 0
+  contentParent: {fileID: 93362766}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &243183178
 GameObject:
   m_ObjectHideFlags: 0
@@ -362,6 +394,8 @@ GameObject:
   - component: {fileID: 243183180}
   - component: {fileID: 243183182}
   - component: {fileID: 243183183}
+  - component: {fileID: 243183184}
+  - component: {fileID: 243183185}
   m_Layer: 5
   m_Name: BagContainer
   m_TagString: Untagged
@@ -459,6 +493,36 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &243183184
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 243183178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9905ccb3caa27644961c378faafcec4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxUnits: 20
+  maxRelics: 20
+--- !u!114 &243183185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 243183178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 949ab9dcc0a88db42b33eef8c45b41fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allowedType: 2
+  contentParent: {fileID: 243183179}
+  normalColor: {r: 1, g: 1, b: 1, a: 1}
+  highlightColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &392498829
 GameObject:
   m_ObjectHideFlags: 0
@@ -2419,6 +2483,7 @@ MonoBehaviour:
   goldText: {fileID: 565245212}
   teamUnitContainer: {fileID: 93362766}
   bagContainer: {fileID: 243183179}
+  unitSlotPrefab: {fileID: 7207538382697179757, guid: 0861cfd253b540946ae30c8d957f80ea, type: 3}
   unitButtonPrefab: {fileID: 3509845748852257446, guid: ef604a5014ac239489515a9566df5df2, type: 3}
   relicSlotPrefab: {fileID: 9127127546863566636, guid: 38869c19c1bd6c743bbcd939e66d25a1, type: 3}
   unitDetailsPanel: {fileID: 2135231188}

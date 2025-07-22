@@ -3,8 +3,7 @@ using System.Collections.Generic;
 public enum MockItemType { Unit, Relic, None }
 
 [System.Serializable]
-public class MockInventoryItem
-{
+public class MockInventoryItem {
     public MockItemType itemType;
     public MockUnit unitData;
     public MockRelic relicData;
@@ -19,5 +18,9 @@ public class MockInventoryItem
         itemType = MockItemType.Relic;
         relicData = relic;
         unitData = null;
+    }
+
+    public MockItemType GetItemType() {
+        return itemType;
     }
 }

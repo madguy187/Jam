@@ -53,6 +53,15 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         originalPosition = rectTransform.position;
         originalParent = transform.parent;
 
+        if (originalParent != null) {
+            var tracker = originalParent.GetComponentInParent<ItemTracker>();
+            if (tracker != null) {
+                tracker.RemoveItem(draggedItem.GetItemType());
+            } else {
+                Global.DEBUG_PRINT("[DragHandler::OnBeginDrag] ItemTracker cannot be found in parent.");
+            }
+        }
+
         canvasGroup.alpha = 0.6f;  // make transparent while dragging
         canvasGroup.blocksRaycasts = false; // so drop targets can receive events
 

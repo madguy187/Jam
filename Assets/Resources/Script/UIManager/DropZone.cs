@@ -19,16 +19,18 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
     public Color normalColor = Color.white;
     public Color highlightColor = Color.yellow;
     private UnityEngine.UI.Image image;
-    private int MAX_UNITS = 5; // This is temp, should get from deck
+    private ItemTracker itemTracker;
 
-    private void Awake()
-    {
+    private void Awake() {
         image = GetComponent<UnityEngine.UI.Image>();
         if (image != null)
             image.color = normalColor;
 
         if (contentParent == null)
             contentParent = this.transform;
+            
+        if (itemTracker == null)
+            itemTracker = GetComponent<ItemTracker>();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -75,10 +77,9 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
             return;
         }
     
-        // Check max items for UnitsOnly drop zone (if you have that logic)
-        if (allowedType == AllowedItemType.UnitsOnly && contentParent.childCount >= MAX_UNITS)
+        if (!itemTracker.CanAccept(draggedItemType))
         {
-            Global.DEBUG_PRINT("Cannot drop more units, max limit reached.");
+            Global.DEBUG_PRINT("Cannot drop more items, max limit reached.");
             dragHandler.OnDropRejected();
             return;
         }
@@ -86,6 +87,7 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
         // If passed all checks, accept drop
         eventData.pointerDrag.transform.SetParent(contentParent, false);
         LayoutRebuilder.MarkLayoutForRebuild(contentParent.GetComponent<RectTransform>());
+        itemTracker.AddItem(draggedItemType);
         dragHandler.OnDropAccepted();
     }
 }
