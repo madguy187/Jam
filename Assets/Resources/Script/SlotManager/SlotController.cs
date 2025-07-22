@@ -24,8 +24,18 @@ public class SlotController : MonoBehaviour
     private SpinResult spinResult;
     private int spinsThisTurn = 0;
     private bool isEnemyTurn = false;
+    private bool isFirstRoll = true;
     
     public bool IsEnemyTurn() => isEnemyTurn;
+
+    public void InitializeProbabilitiesIfNeeded()
+    {
+        if (isFirstRoll)
+        {
+            SymbolGenerator.instance.UpdateProbabilities();
+            isFirstRoll = false;
+        }
+    }
 
     private void Awake()
     {
