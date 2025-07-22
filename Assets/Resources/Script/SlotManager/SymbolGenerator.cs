@@ -12,29 +12,14 @@ public enum SymbolType
 
 public class SymbolGenerator : MonoBehaviour
 {
-    public static SymbolGenerator instance;
-
-    [SerializeField] private ProbabilityCalculator probabilityCalculator;
+    public static SymbolGenerator Instance { get; private set; }
 
     private void Awake()
     {
-        if (instance == null)
+        if (Instance == null)
         {
-            instance = this;
+            Instance = this;
             DontDestroyOnLoad(gameObject);
-
-            // Ensure we have a ProbabilityCalculator
-            if (probabilityCalculator == null)
-            {
-                // First try to find an existing one
-                probabilityCalculator = GetComponent<ProbabilityCalculator>();
-                
-                // If none exists, create one
-                if (probabilityCalculator == null)
-                {
-                    probabilityCalculator = gameObject.AddComponent<ProbabilityCalculator>();
-                }
-            }
         }
         else
         {
@@ -52,13 +37,13 @@ public class SymbolGenerator : MonoBehaviour
         Deck currentDeck = DeckManager.instance.GetDeckByType(
             SlotController.instance.IsEnemyTurn() ? eDeckType.ENEMY : eDeckType.PLAYER
         );
-        probabilityCalculator.CalculateProbabilities(currentDeck);
+        ProbabilityCalculator.Instance.CalculateProbabilities(currentDeck);
     }
 
     public SymbolType GenerateRandomSymbol()
     {
         UpdateProbabilities(); 
-        return probabilityCalculator.GenerateRandomSymbol();
+        return ProbabilityCalculator.Instance.GenerateRandomSymbol();
     }
 
     public static eUnitArchetype GetArchetypeForSymbol(SymbolType symbolType)
@@ -148,8 +133,7 @@ public class SymbolGenerator : MonoBehaviour
         // Fill remaining slots randomly
         for (int i = currentSlot; i < 9; i++)
         {
-            // 20% chance for empty slot
-            if (Random.value < probabilityCalculator.GetProbabilityForSymbol(SymbolType.EMPTY))
+            if (Random.value < ProbabilityCalculator.Instance.GetProbabilityForSymbol(SymbolType.EMPTY))
             {
                 symbols[i] = SymbolType.EMPTY;
                 continue;

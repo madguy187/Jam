@@ -32,7 +32,7 @@ public class SlotController : MonoBehaviour
     {
         if (isFirstRoll)
         {
-            SymbolGenerator.instance.UpdateProbabilities();
+            SymbolGenerator.Instance.UpdateProbabilities();
             isFirstRoll = false;
         }
     }
@@ -273,7 +273,7 @@ public class SlotController : MonoBehaviour
         
         // Generate symbols based on enemy deck archetypes
         Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
-        SymbolType[] finalSymbols = SymbolGenerator.instance.GenerateSymbolsForDeck(enemyDeck);
+        SymbolType[] finalSymbols = SymbolGenerator.Instance.GenerateSymbolsForDeck(enemyDeck);
         
         isSpinning = true;
         gridUI.StartSpinAnimation(finalSymbols);
@@ -400,7 +400,7 @@ public class SlotController : MonoBehaviour
         
         // Get current deck's archetypes
         Deck currentDeck = DeckManager.instance.GetDeckByType(isEnemyTurn ? eDeckType.ENEMY : eDeckType.PLAYER);
-        SymbolType[] finalSymbols = SymbolGenerator.instance.GenerateSymbolsForDeck(currentDeck);
+        SymbolType[] finalSymbols = SymbolGenerator.Instance.GenerateSymbolsForDeck(currentDeck);
         
         if (finalSymbols == null || finalSymbols.Length != slotConfig.TotalGridSize)
         {
