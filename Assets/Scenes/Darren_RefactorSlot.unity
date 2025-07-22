@@ -2401,6 +2401,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 9220052400780551148, guid: 53b212e6ccfac8a44893b2d70458004d, type: 3}
     - target: {fileID: 8313275753077245064, guid: e037c54729ca6497c8b6ca7ae98cf13c, type: 3}
+      propertyPath: showDebugInfo
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8313275753077245064, guid: e037c54729ca6497c8b6ca7ae98cf13c, type: 3}
       propertyPath: enemySpinDuration
       value: 0.5
       objectReference: {fileID: 0}

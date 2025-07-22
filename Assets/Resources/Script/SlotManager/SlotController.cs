@@ -79,13 +79,13 @@ public class SlotController : MonoBehaviour
 
     public void StartPlayerTurn()
     {
-        Global.DEBUG_PRINT("[SlotController] Starting player turn");
+        Debug.Log("[SlotController] Starting player turn");
         isEnemyTurn = false;
         spinsThisTurn = 0;
         spinResult.Clear();
         
         // Add base income at start of turn
-        Global.DEBUG_PRINT("[SlotController] Adding base income for new turn");
+        Debug.Log("[SlotController] Adding base income for new turn");
         GoldManager.instance.OnRoundStart(false);
         
         // Enable buttons for player turn
@@ -95,14 +95,49 @@ public class SlotController : MonoBehaviour
 
     public void EndPlayerTurn()
     {
-        Global.DEBUG_PRINT("[SlotController] EndPlayerTurn called");
+        Debug.Log("[SlotController] EndPlayerTurn called");
+        Debug.Log("=== PLAYER TURN COMBAT EXECUTION ===");
 
         // Execute combat with current matches
         List<Match> currentMatches = spinResult.GetAllMatches();
         if (currentMatches.Count > 0)
         {
-            CombatManager.instance.StartBattleLoop(currentMatches);
+            // For each match
+            foreach (Match match in currentMatches)
+            {
+                eUnitArchetype matchArchetype = match.GetArchetype();
+                MatchType matchType = match.GetMatchType();
+
+                Debug.Log($"[SlotController] Processing match: {matchType} for archetype: {matchArchetype}");
+                Debug.Log($"Processing match: Type={matchType}, Archetype={matchArchetype}");
+
+                // Get current deck
+                Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
+                Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+
+                // Find all units of matching archetype
+                for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
+                {
+                    UnitObject unit = playerDeck.GetUnitObject(i);
+                    if (unit != null && unit.unitSO != null)
+                    {
+                        // Find target
+                        int targetIndex = CombatManager.instance.GetLowestHealth(enemyDeck);
+                        UnitObject target = enemyDeck.GetUnitObject(targetIndex);
+                        
+                        if (target != null)
+                        {
+                            Debug.Log($"Player unit {unit.unitSO.unitName} attacking target {target.unitSO.unitName}");
+                            // Set match info before executing battle
+                            match.SetUnitName(unit.unitSO.unitName);
+                            // Execute battle for this unit
+                            CombatManager.instance.ExecBattle(eDeckType.PLAYER, i);
+                        }
+                    }
+                }
+            }
         }
+        Debug.Log("=== END OF PLAYER COMBAT ===\n");
 
         // Calculate interest at end of player's turn
         GoldManager.instance.CalculateInterest();
@@ -125,6 +160,7 @@ public class SlotController : MonoBehaviour
 
     private IEnumerator ExecuteEnemyTurn()
     {
+        Debug.Log("=== ENEMY TURN COMBAT EXECUTION ===");
         // Small delay before enemy acts
         yield return new WaitForSeconds(1f); 
         
@@ -145,20 +181,38 @@ public class SlotController : MonoBehaviour
         // Check for matches
         List<Match> matches = CheckForMatches();
         
-        // Set archetypes for matches
-        foreach (Match match in matches)
-        {
-            match.SetArchetype(SymbolGenerator.GetArchetypeForSymbol(match.GetSymbol()));
-        }
-
         // Execute combat with matches
         if (matches.Count > 0)
         {
-            CombatManager.instance.StartBattleLoop(matches);
-        }
+            // For each match
+            foreach (Match match in matches)
+            {
+                eUnitArchetype matchArchetype = match.GetArchetype();
+                MatchType matchType = match.GetMatchType();
 
-        // Enemy doesn't earn gold
-        spinResult.SetMatches(matches, 0); 
+                Debug.Log($"[SlotController] Enemy processing match: {matchType} for archetype: {matchArchetype}");
+                Debug.Log($"Enemy processing match: Type={matchType}, Archetype={matchArchetype}");
+
+                // Find all enemy units of matching archetype
+                for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
+                {
+                    UnitObject unit = enemyDeck.GetUnitObject(i);
+                    if (unit != null && unit.unitSO != null && 
+                        unit.unitSO.eUnitArchetype == matchArchetype)
+                    {
+                        Debug.Log($"[SlotController] Enemy unit {unit.unitSO.unitName} (index {i}) executing {matchType}");
+                        Debug.Log($"Enemy unit {unit.unitSO.unitName} executing {matchType} attack");
+                        // Set match info before executing battle
+                        match.SetUnitName(unit.unitSO.unitName);
+                        // Execute battle for this unit
+                        CombatManager.instance.ExecBattle(eDeckType.ENEMY, i);
+                    }
+                }
+            }
+        }
+        Debug.Log("=== END OF ENEMY COMBAT ===\n");
+
+        spinResult.SetMatches(matches, 0); // Enemy doesn't earn gold
         isSpinning = false;
 
         yield return new WaitForSeconds(1f); 
@@ -213,13 +267,13 @@ public class SlotController : MonoBehaviour
             int spinCost = GetCurrentSpinCost();
             if (!GoldManager.instance.SpendGold(spinCost))
             {
-                Global.DEBUG_PRINT("Cannot afford spin, cost: " + spinCost);
+                Debug.Log("Cannot afford spin, cost: " + spinCost);
                 return;
             }
         }
         else
         {
-            Global.DEBUG_PRINT("Using free spin!");
+            Debug.Log("Using free spin!");
         }
 
         isSpinning = true;

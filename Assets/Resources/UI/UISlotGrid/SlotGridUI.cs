@@ -11,7 +11,7 @@ public class SlotGridUI : MonoBehaviour
 
     [Header("Slot Images")]
     [SerializeField] private Image[] slots;
-    [SerializeField] private TextMeshProUGUI[] debugTexts; // Add debug text for each slot
+    [SerializeField] private TextMeshProUGUI[] debugTexts;
 
     [Header("Symbol Sprites")]
     [SerializeField] private Sprite holySprite;
@@ -21,41 +21,22 @@ public class SlotGridUI : MonoBehaviour
 
     [Header("Debug Settings")]
     [SerializeField] private bool showDebugInfo = true;
-    [SerializeField] private Color holyColor = Color.yellow;
-    [SerializeField] private Color undeadColor = new Color(0.5f, 0f, 0.5f, 1f); // Purple (R=0.5, G=0, B=0.5)
-    [SerializeField] private Color elfColor = Color.green;
 
     [Header("Animation Settings")]
-    [SerializeField] [Range(0.5f, 5f)] private float spinDuration = 2.0f; 
-     // Enemy spins faster
-    [SerializeField] [Range(0.5f, 5f)] private float enemySpinDuration = 0.5f; 
+    [SerializeField] [Range(0.5f, 5f)] private float spinDuration = 2.0f;
+    // Enemy spins faster
+    [SerializeField] [Range(0.5f, 5f)] private float enemySpinDuration = 0.5f;
     [SerializeField] [Range(0.1f, 1f)] private float symbolDropDelay = 0.1f;
     [SerializeField] [Range(0.6f, 0.9f)] private float finalSymbolsStartTime = 0.7f;
 
     private bool isSpinning = false;
-    private SymbolType[,] symbolCache;
-    private Dictionary<UnitObject, RenderTexture> previewCache = new Dictionary<UnitObject, RenderTexture>();
-    private List<GameObject> previewCameras = new List<GameObject>();
-
-    private void OnDestroy()
-    {
-        // Cleanup preview textures and cameras
-        foreach (var rt in previewCache.Values)
-        {
-            if (rt != null)
-                rt.Release();
-        }
-        foreach (var cam in previewCameras)
-        {
-            if (cam != null)
-                Destroy(cam);
-        }
-        previewCache.Clear();
-        previewCameras.Clear();
-    }
+    private float spinTimer = 0f;
+    private float nextSymbolDropTime = 0f;
+    private SymbolType[,] currentSymbols;
+    private SymbolType[,] finalSymbols;
 
     // Return both RenderTexture and camera GameObject
-    private RenderTexture RenderUnitToTexture(UnitObject unit)
+    (RenderTexture, GameObject) RenderUnitToTexture(UnitObject unit)
     {
         // Create a preview layer
         int previewLayer = 31;
@@ -67,8 +48,6 @@ public class SlotGridUI : MonoBehaviour
         SetLayerRecursively(unit.gameObject, previewLayer);
 
         GameObject camObj = new GameObject("UnitPreviewCamera");
-        previewCameras.Add(camObj); // Track for cleanup
-
         Camera cam = camObj.AddComponent<Camera>();
         cam.clearFlags = CameraClearFlags.Color;
         cam.backgroundColor = Color.clear;
@@ -91,11 +70,11 @@ public class SlotGridUI : MonoBehaviour
         cam.enabled = false;
         camObj.SetActive(false);
 
-        return rt;
+        return (rt, camObj);
     }
 
     // Helper to set layer recursively
-    private void SetLayerRecursively(GameObject obj, int newLayer)
+    void SetLayerRecursively(GameObject obj, int newLayer)
     {
         obj.layer = newLayer;
         foreach (Transform child in obj.transform)
@@ -104,76 +83,26 @@ public class SlotGridUI : MonoBehaviour
         }
     }
 
-    private void Awake()
-    {
-        if (slotConfig == null)
-        {
-            Debug.LogWarning("[SlotGridUI] SlotConfig is missing");
-            return;
-        }
-
-        // Initialize symbolCache with configured grid size
-        symbolCache = new SymbolType[slotConfig.gridRows, slotConfig.gridColumns];
-        
-        // Validate slot count matches grid size
-        int requiredSlots = slotConfig.TotalGridSize;
-        if (slots == null || slots.Length != requiredSlots)
-        {
-            Debug.LogWarning($"[SlotGridUI] Number of slot images ({(slots == null ? 0 : slots.Length)}) does not match grid size ({requiredSlots})!");
-            return;
-        }
-
-        // Initialize debug texts if needed
-        if (debugTexts == null || debugTexts.Length != requiredSlots)
-        {
-            debugTexts = new TextMeshProUGUI[requiredSlots];
-            for (int i = 0; i < requiredSlots; i++)
-            {
-                // Create debug text objects
-                GameObject textObj = new GameObject($"DebugText_{i}");
-                textObj.transform.SetParent(slots[i].transform);
-                TextMeshProUGUI tmp = textObj.AddComponent<TextMeshProUGUI>();
-                tmp.fontSize = 12;
-                tmp.alignment = TextAlignmentOptions.Center;
-                RectTransform rt = tmp.GetComponent<RectTransform>();
-                rt.anchoredPosition = Vector2.zero;
-                rt.sizeDelta = slots[i].rectTransform.sizeDelta;
-                debugTexts[i] = tmp;
-            }
-        }
-
-        // Initialize symbolCache
-        for (int row = 0; row < slotConfig.gridRows; row++)
-        {
-            for (int col = 0; col < slotConfig.gridColumns; col++)
-            {
-                symbolCache[row, col] = SymbolType.EMPTY;
-            }
-        }
-    }
-
     private void UpdateSlotSymbol(int row, int col, SymbolType symbolType)
     {
-        symbolCache[row, col] = symbolType;
-        int index = row * slotConfig.gridColumns + col;
-    
+        int index = row * 3 + col;
         if (index < slots.Length && slots[index] != null)
         {
-            // Get current deck
             Deck currentDeck = DeckManager.instance.GetDeckByType(
                 SlotController.instance.IsEnemyTurn() ? eDeckType.ENEMY : eDeckType.PLAYER
             );
 
             if (currentDeck != null && symbolType != SymbolType.EMPTY)
             {
-                // Find a unit of matching archetype
                 UnitObject matchingUnit = null;
                 foreach (UnitObject unit in currentDeck)
                 {
                     if (unit != null && unit.unitSO != null)
                     {
                         eUnitArchetype unitArchetype = unit.unitSO.eUnitArchetype;
-                        if (SymbolGenerator.GetArchetypeForSymbol(symbolType) == unitArchetype)
+                        if ((symbolType == SymbolType.HOLY && unitArchetype == eUnitArchetype.HOLY) ||
+                            (symbolType == SymbolType.UNDEAD && unitArchetype == eUnitArchetype.UNDEAD) ||
+                            (symbolType == SymbolType.ELF && unitArchetype == eUnitArchetype.ELF))
                         {
                             matchingUnit = unit;
                             break;
@@ -181,43 +110,48 @@ public class SlotGridUI : MonoBehaviour
                     }
                 }
 
-                // If we found a matching unit, use its preview
                 if (matchingUnit != null)
                 {
-                    if (!previewCache.ContainsKey(matchingUnit))
-                    {
-                        previewCache[matchingUnit] = RenderUnitToTexture(matchingUnit);
-                    }
-
-                    RenderTexture rt = previewCache[matchingUnit];
-                    RenderTexture.active = rt;
-                    Texture2D tex = new Texture2D(rt.width, rt.height);
-                    tex.ReadPixels(new Rect(0, 0, rt.width, rt.height), 0, 0);
+                    // Render unit to texture
+                    var (renderTexture, cameraObj) = RenderUnitToTexture(matchingUnit);
+                    
+                    // Create sprite from render texture
+                    Texture2D tex = new Texture2D(renderTexture.width, renderTexture.height);
+                    RenderTexture.active = renderTexture;
+                    tex.ReadPixels(new Rect(0, 0, renderTexture.width, renderTexture.height), 0, 0);
                     tex.Apply();
-                    RenderTexture.active = null;
-
-                    slots[index].sprite = Sprite.Create(tex, 
-                        new Rect(0, 0, tex.width, tex.height), 
-                        new Vector2(0.5f, 0.5f));
+                    
+                    // Create and assign sprite
+                    slots[index].sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
                     slots[index].color = Color.white;
+
+                    // Cleanup
+                    RenderTexture.active = null;
+                    Destroy(cameraObj);
+                    renderTexture.Release();
+                }
+                else
+                {
+                    // Empty slot
+                    slots[index].sprite = null;
+                    slots[index].color = new Color(1, 1, 1, 0.2f); // Semi-transparent white
                 }
             }
             else
             {
                 // Empty slot
                 slots[index].sprite = null;
-                slots[index].color = new Color(1, 1, 1, 0.2f); // Semi-transparent white
+                slots[index].color = new Color(1, 1, 1, 0.2f);
             }
 
             // Update debug text
-            if (showDebugInfo && debugTexts[index] != null)
+            if (showDebugInfo && debugTexts != null && index < debugTexts.Length)
             {
-                debugTexts[index].text = symbolType.ToString();
-                debugTexts[index].gameObject.SetActive(true);
-            }
-            else if (debugTexts[index] != null)
-            {
-                debugTexts[index].gameObject.SetActive(false);
+                if (debugTexts[index] != null)
+                {
+                    debugTexts[index].text = symbolType.ToString();
+                    debugTexts[index].gameObject.SetActive(true);
+                }
             }
         }
     }
