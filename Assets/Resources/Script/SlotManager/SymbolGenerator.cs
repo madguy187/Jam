@@ -12,13 +12,13 @@ public enum SymbolType
 
 public class SymbolGenerator : MonoBehaviour
 {
-    public static SymbolGenerator Instance { get; private set; }
+    public static SymbolGenerator instance { get; private set; }
 
     private void Awake()
     {
-        if (Instance == null)
+        if (instance == null)
         {
-            Instance = this;
+            instance = this;
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -37,13 +37,13 @@ public class SymbolGenerator : MonoBehaviour
         Deck currentDeck = DeckManager.instance.GetDeckByType(
             SlotController.instance.IsEnemyTurn() ? eDeckType.ENEMY : eDeckType.PLAYER
         );
-        ProbabilityCalculator.Instance.CalculateProbabilities(currentDeck);
+        ProbabilityCalculator.instance.CalculateProbabilities(currentDeck);
     }
 
     public SymbolType GenerateRandomSymbol()
     {
         UpdateProbabilities(); 
-        return ProbabilityCalculator.Instance.GenerateRandomSymbol();
+        return ProbabilityCalculator.instance.GenerateRandomSymbol();
     }
 
     public static eUnitArchetype GetArchetypeForSymbol(SymbolType symbolType)
@@ -67,13 +67,10 @@ public class SymbolGenerator : MonoBehaviour
         
         Debug.Log("[SymbolGenerator] Starting to fill grid with random symbols");
         
-        // Update probabilities based on current deck
         UpdateProbabilities();
         
-        // Clear existing symbols to prevent any leftover state
         grid.ClearGrid();
         
-        // Fill each position with a new random symbol
         for (int row = 0; row < 3; row++) 
         {
             for (int col = 0; col < 3; col++) 
@@ -87,12 +84,10 @@ public class SymbolGenerator : MonoBehaviour
         Debug.Log("[SymbolGenerator] Finished filling grid");
     }
 
-    // Generate symbols based on unit archetypes in deck
     public SymbolType[] GenerateSymbolsForDeck(Deck deck)
     {
         if (deck == null) return null;
 
-        // Get all unique units from deck
         HashSet<UnitObject> uniqueUnits = new HashSet<UnitObject>();
         foreach (UnitObject unit in deck)
         {
@@ -102,16 +97,13 @@ public class SymbolGenerator : MonoBehaviour
             }
         }
 
-        // Create array for 9 slots
         SymbolType[] symbols = new SymbolType[9];
         
-        // First, ensure each unique unit appears once
         int currentSlot = 0;
         foreach (UnitObject unit in uniqueUnits)
         {
             if (currentSlot >= 9) break; 
 
-            // Convert unit's archetype to symbol
             switch (unit.unitSO.eUnitArchetype)
             {
                 case eUnitArchetype.HOLY:
@@ -130,16 +122,14 @@ public class SymbolGenerator : MonoBehaviour
             currentSlot++;
         }
 
-        // Fill remaining slots randomly
         for (int i = currentSlot; i < 9; i++)
         {
-            if (Random.value < ProbabilityCalculator.Instance.GetProbabilityForSymbol(SymbolType.EMPTY))
+            if (Random.value < ProbabilityCalculator.instance.GetProbabilityForSymbol(SymbolType.EMPTY))
             {
                 symbols[i] = SymbolType.EMPTY;
                 continue;
             }
 
-            // Pick random unit from deck for archetype
             if (uniqueUnits.Count > 0)
             {
                 UnitObject randomUnit = uniqueUnits.ElementAt(Random.Range(0, uniqueUnits.Count));
@@ -165,7 +155,6 @@ public class SymbolGenerator : MonoBehaviour
             }
         }
 
-        // Shuffle the array to randomize positions
         for (int i = symbols.Length - 1; i > 0; i--)
         {
             int randomIndex = Random.Range(0, i + 1);

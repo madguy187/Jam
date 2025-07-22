@@ -3,10 +3,8 @@ using System.Collections.Generic;
 
 public class ProbabilityCalculator : MonoBehaviour
 {
-    // - Static Instance
-    public static ProbabilityCalculator Instance { get; private set; }
+    public static ProbabilityCalculator instance { get; private set; }
 
-    // - Serialized Fields
     [Header("Base Probabilities")]
     [Tooltip("Base prob for empty slots (10-60%). Higher values mean more empty slots.")]
     [SerializeField] [Range(0.1f, 0.6f)] 
@@ -16,15 +14,13 @@ public class ProbabilityCalculator : MonoBehaviour
     [SerializeField] [Range(0.1f, 0.5f)] 
     private float minArchetypeProbability = 0.2f;
 
-    // - Private Fields
     private Dictionary<SymbolType, float> currentProbabilities = new Dictionary<SymbolType, float>();
 
-    // - Initialisation
     private void Awake()
     {
-        if (Instance == null)
+        if (instance == null)
         {
-            Instance = this;
+            instance = this;
             DontDestroyOnLoad(gameObject);
             InitializeProbabilities();
         }
@@ -48,7 +44,6 @@ public class ProbabilityCalculator : MonoBehaviour
         currentProbabilities[SymbolType.ELF] = 0f;
     }
 
-    // - Public Functions
     public float GetEmptyProbability()
     {
         return GetProbabilityForSymbol(SymbolType.EMPTY);
@@ -82,9 +77,6 @@ public class ProbabilityCalculator : MonoBehaviour
         NormalizeProbabilities();
     }
 
-    /// <summary>
-    /// Generates a random symbol based on current probabilities.
-    /// </summary>
     public SymbolType GenerateRandomSymbol()
     {
         float random = Random.value;
@@ -111,7 +103,6 @@ public class ProbabilityCalculator : MonoBehaviour
         return currentProbabilities.TryGetValue(symbolType, out float probability) ? probability : 0f;
     }
 
-    // - Private Methods
     private (HashSet<eUnitArchetype> archetypes, Dictionary<eUnitArchetype, int> counts, int total) AnalyzeDeck(Deck deck)
     {
         HashSet<eUnitArchetype> archetypes = new HashSet<eUnitArchetype>();
