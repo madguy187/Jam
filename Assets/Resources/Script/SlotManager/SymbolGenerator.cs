@@ -12,9 +12,58 @@ public enum SymbolType
 
 public class SymbolGenerator : MonoBehaviour
 {
-    public static eUnitArchetype GetArchetypeForSymbol(SymbolType symbol)
+    public static SymbolGenerator instance;
+
+    [SerializeField] private ProbabilityCalculator probabilityCalculator;
+
+    private void Awake()
     {
-        switch (symbol)
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            // Ensure we have a ProbabilityCalculator
+            if (probabilityCalculator == null)
+            {
+                // First try to find an existing one
+                probabilityCalculator = GetComponent<ProbabilityCalculator>();
+                
+                // If none exists, create one
+                if (probabilityCalculator == null)
+                {
+                    probabilityCalculator = gameObject.AddComponent<ProbabilityCalculator>();
+                }
+            }
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void Start()
+    {
+        UpdateProbabilities();
+    }
+
+    public void UpdateProbabilities()
+    {
+        Deck currentDeck = DeckManager.instance.GetDeckByType(
+            SlotController.instance.IsEnemyTurn() ? eDeckType.ENEMY : eDeckType.PLAYER
+        );
+        probabilityCalculator.CalculateProbabilities(currentDeck);
+    }
+
+    public SymbolType GenerateRandomSymbol()
+    {
+        UpdateProbabilities(); 
+        return probabilityCalculator.GenerateRandomSymbol();
+    }
+
+    public static eUnitArchetype GetArchetypeForSymbol(SymbolType symbolType)
+    {
+        switch (symbolType)
         {
             case SymbolType.HOLY:
                 return eUnitArchetype.HOLY;
@@ -26,77 +75,15 @@ public class SymbolGenerator : MonoBehaviour
                 return eUnitArchetype.NONE;
         }
     }
-
-    public static SymbolGenerator instance { get; private set; }
-    
-    [Header("Symbol Probabilities")]
-    [SerializeField] [Range(0f, 1f)] private float emptyProbability = 0.2f;    
-    [SerializeField] [Range(0f, 1f)] private float holyProbability = 0.3f;   
-    [SerializeField] [Range(0f, 1f)] private float undeadProbability = 0.25f; 
-    [SerializeField] [Range(0f, 1f)] private float elfProbability = 0.25f; 
-
-    void Awake()
-    {
-        if (instance == null)
-        {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-            ValidateProbabilities();
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    private void OnValidate()
-    {
-        ValidateProbabilities();
-    }
-
-    private void ValidateProbabilities()
-    {
-        float total = emptyProbability + holyProbability + undeadProbability + elfProbability;
-        if (Mathf.Abs(total - 1f) > 0.01f)
-        {
-            Debug.LogWarning("Symbol probabilities sum != 1.0!");
-        }
-    }
-
-    private SymbolType GenerateSymbolFromProbabilities(float emptyProb, float holyProb, float undeadProb)
-    {
-        float roll = Random.value;
-        float currentThreshold = 0f;
-
-        currentThreshold += emptyProb;
-        if (roll <= currentThreshold)
-        {
-            return SymbolType.EMPTY;
-        }
-
-        currentThreshold += holyProb;
-        if (roll <= currentThreshold)
-        {
-            return SymbolType.HOLY;
-        }
-
-        currentThreshold += undeadProb;
-        if (roll <= currentThreshold)
-        {
-            return SymbolType.UNDEAD;
-        }
-
-        return SymbolType.ELF;
-    }
-
-    public SymbolType GenerateRandomSymbol()
-    {
-        return GenerateSymbolFromProbabilities(emptyProbability, holyProbability, undeadProbability);
-    }
     
     public void FillGridWithRandomSymbols(SlotGrid grid)
     {
         if (grid == null) return;
+        
+        Debug.Log("[SymbolGenerator] Starting to fill grid with random symbols");
+        
+        // Update probabilities based on current deck
+        UpdateProbabilities();
         
         // Clear existing symbols to prevent any leftover state
         grid.ClearGrid();
@@ -106,9 +93,13 @@ public class SymbolGenerator : MonoBehaviour
         {
             for (int col = 0; col < 3; col++) 
             {
-                grid.SetSlot(row, col, GenerateRandomSymbol());
+                SymbolType symbol = GenerateRandomSymbol();
+                Debug.Log($"[SymbolGenerator] Setting position ({row}, {col}) to {symbol}");
+                grid.SetSlot(row, col, symbol);
             }
         }
+
+        Debug.Log("[SymbolGenerator] Finished filling grid");
     }
 
     // Generate symbols based on unit archetypes in deck
@@ -158,7 +149,7 @@ public class SymbolGenerator : MonoBehaviour
         for (int i = currentSlot; i < 9; i++)
         {
             // 20% chance for empty slot
-            if (Random.value < emptyProbability)
+            if (Random.value < probabilityCalculator.GetProbabilityForSymbol(SymbolType.EMPTY))
             {
                 symbols[i] = SymbolType.EMPTY;
                 continue;
