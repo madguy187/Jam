@@ -48,7 +48,6 @@ public class CreatePrefabFromMenu {
     }
 
     static GameObject GetPrefabUnit(string path) {
-        Debug.Log(path);
         // Create a new GameObject (or use an existing one)
         GameObject prefab = Resources.Load<GameObject>(path);
         return prefab;

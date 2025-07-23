@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: HolyBlade_FullGrid_DoubleDmg
   m_EditorClassIdentifier: 
-  _eType: 19
-  _eTargetType: 10
+  _eType: 22
+  _fEffectVal: 2
+  _eTargetType: 2
+  _eTargetCondition: 10
+  _eTargetParam: 30
   _eExecType: 0
   _effectAffinityType: 0
   _effectResolveType: 3
-  _fEffectVal: 30
-  _fEffectTurn: 0
+  _fEffectCount: 0

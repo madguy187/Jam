@@ -93,7 +93,7 @@ public class UnitObject : MonoBehaviour {
     public void AddTempEffect(EffectScriptableObject effectSO) {
         EffectObject effect = new EffectObject();
         effect.effectSO = effectSO;
-        effect.Add(effectSO.GetEffectVal(), effectSO.GetEffectTurn());
+        effect.Add(effectSO.GetEffectVal(), effectSO.GetEffectCount());
 
         _listTempEffect.AddEffect(effectSO.GetEffectType(), effect);
     }
@@ -113,6 +113,15 @@ public class UnitObject : MonoBehaviour {
     public bool GetEffectParam(EffectType eType, out float val) {
         val = _listTempEffect.GetParam(eType);
         if (val > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool GetEffectSO(EffectType eType, out EffectScriptableObject val) {
+        val = _listTempEffect.GetEffectSO(eType);
+        if (val != null) {
             return true;
         }
 

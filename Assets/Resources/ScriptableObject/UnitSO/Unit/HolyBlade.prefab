@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: _listZigZagEffect._listScriptableObject.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: _listDiagonalEffect._listScriptableObject.Array.size
@@ -46,6 +46,10 @@ PrefabInstance:
       objectReference: {fileID: 11400000, guid: 1de6fe9b05548b84d884c8a84a80752e, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listZigZagEffect._listScriptableObject.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 9d0eeea8f0f9fa84db66b01f32c9a499, type: 2}
+    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
+      propertyPath: '_listZigZagEffect._listScriptableObject.Array.data[1]'
       value: 
       objectReference: {fileID: 11400000, guid: 56660eac40e162b4fb927b236cba329b, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}

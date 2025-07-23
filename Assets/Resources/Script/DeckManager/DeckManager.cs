@@ -69,7 +69,7 @@ public class DeckManager : MonoBehaviour {
             foreach (UnitPosition playerPos in vecPlayerUnitPos) {
                 vecPos.Add(playerPos);
             }
-            cPlayerDeck.Init(vecPos);
+            cPlayerDeck.Init(eDeckType.PLAYER, vecPos);
             Global.DEBUG_PRINT("[Deck] Loaded PlayerPos: " + vecPos.Count);
         }
 
@@ -79,7 +79,7 @@ public class DeckManager : MonoBehaviour {
             foreach (UnitPosition enemyPos in vecEnemyUnitPos) {
                 vecPos.Add(enemyPos);
             }
-            cEnemyDeck.Init(vecPos);
+            cEnemyDeck.Init(eDeckType.ENEMY, vecPos);
             Global.DEBUG_PRINT("[Deck] Loaded EnemyPos: " + vecPos.Count);
         }
     }

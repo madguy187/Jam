@@ -12,8 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: Cleric_FullGrid_Heal
   m_EditorClassIdentifier: 
-  _eType: 0
-  _eTargetType: 0
+  _eType: 12
+  _fEffectVal: 4
+  _eTargetType: 1
+  _eTargetCondition: 2
+  _eTargetParam: 0
   _eExecType: 0
-  _fEffectVal: 0
-  _fEffectTurn: 0
+  _effectAffinityType: 0
+  _effectResolveType: 0
+  _fEffectCount: 0
