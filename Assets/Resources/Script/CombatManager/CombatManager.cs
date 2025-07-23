@@ -145,6 +145,9 @@ public class CombatManager : MonoBehaviour {
         if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_FREEZE)) {
             bCanAttack = false;
         }
+        if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_STUN)) {
+            bCanAttack = false;
+        }
 
         cAttackerUnit.Resolve(EffectResolveType.RESOLVE_PRE_ATTACK);
         if (!bCanAttack) {
@@ -260,7 +263,14 @@ public class CombatManager : MonoBehaviour {
 
         fAttack *= _GetResRatio(cDefenderUnit);
 
-        fAttack = _GetDamageAfterShield(cDefenderUnit, fAttack);
+        bool bIgnoreShield = false;
+        if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_IGNORE_SHIELD)) {
+            bIgnoreShield = true;
+        }
+
+        if (!bIgnoreShield) {
+            fAttack = _GetDamageAfterShield(cDefenderUnit, fAttack);
+        }
 
         fAttack = Mathf.Floor(fAttack);
 
@@ -393,8 +403,19 @@ public class CombatManager : MonoBehaviour {
                 unit._currentShield.AddVal(cEffect.GetEffectVal());
             }
 
+            if (cEffect.IsEffectType(EffectType.EFFECT_SHIELD_REMOVE)) {
+                unit._currentShield.MinusVal(unit._currentShield.GetVal());
+            }
+
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_RES)) {
                 unit._currentRes.AddVal(cEffect.GetEffectVal());
+            }
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_REDUCE_RES_PERCENT)) {
+                float fReduceVal = unit._currentRes.GetVal() * cEffect.GetEffectVal() * Global.PERCENTAGE_CONSTANT;
+                unit._currentRes.AddVal(fReduceVal);
+            }
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_REDUCE_RES)) {
+                unit._currentRes.MinusVal(cEffect.GetEffectVal());
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_DAMAGE_IGNORE_SHIELD)) {
@@ -408,6 +429,10 @@ public class CombatManager : MonoBehaviour {
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_CRIT_RATE)) {
                 unit._currentCritRate.AddVal(cEffect.GetEffectVal());
             }
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_REDUCE_CRIT_RATE_PERCENT)) {
+                float fReduceVal = unit._currentCritRate.GetVal() * cEffect.GetEffectVal() * Global.PERCENTAGE_CONSTANT;
+                unit._currentCritRate.AddVal(fReduceVal);
+            }
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_REDUCE_CRIT_RATE)) {
                 unit._currentCritRate.MinusVal(cEffect.GetEffectVal());
             }
@@ -415,6 +440,13 @@ public class CombatManager : MonoBehaviour {
             if (cEffect.IsEffectType(EffectType.EFFECT_REVIVE)) {
                 unit.Revive();
                 unit._currentHealth.SetVal(cEffect.GetEffectVal());
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_TRIGGER_ALL_SINGLE)) {
+                EffectList listEffect = unit.GetRollEffectList(MatchType.SINGLE);
+                foreach (EffectScriptableObject singleEffect in listEffect) {
+                    _ActivateRollEffect(cDeck, singleEffect);
+                }
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_CLEANSE)) {
@@ -500,7 +532,7 @@ public class CombatManager : MonoBehaviour {
                 arrTarget = DeckHelperFunc.GetUnitByArchetype(cTargetDeck, eUnitArchetype.ELF);
                 break;
             case EffectTargetCondition.DECK:
-                arrTarget = cTargetDeck.GetAllAliveUnit();
+                arrTarget = DeckHelperFunc.GetAllAliveUnit(cTargetDeck);
                 break;
             case EffectTargetCondition.DEAD:
                 arrTarget = DeckHelperFunc.GetAllDeadUnit(cTargetDeck);

@@ -46,7 +46,7 @@ public class DeckManager : MonoBehaviour {
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha3)) {
-            List<UnitObject> listPlayer = cPlayerDeck.GetAllAliveUnit();
+            List<UnitObject> listPlayer = DeckHelperFunc.GetAllAliveUnit(cPlayerDeck);
             int rand = Random.Range(0, listPlayer.Count);
             RelicScriptableObject relic = ResourceManager.instance.Debug_RandRelic();
             listPlayer[rand].LoadRelic(relic);
@@ -54,7 +54,7 @@ public class DeckManager : MonoBehaviour {
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha4)) {
-            List<UnitObject> listEnemy = cEnemyDeck.GetAllAliveUnit();
+            List<UnitObject> listEnemy = DeckHelperFunc.GetAllAliveUnit(cEnemyDeck);
             int rand = Random.Range(0, listEnemy.Count);
             RelicScriptableObject relic = ResourceManager.instance.Debug_RandRelic();
             listEnemy[rand].LoadRelic(relic);

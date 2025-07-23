@@ -65,28 +65,6 @@ public class Deck : IEnumerable<UnitObject> {
         return _vecUnit[index];
     }
 
-    public List<UnitObject> GetAllAliveUnit(eUnitPosition eUnitPos = eUnitPosition.NONE) {
-        List<UnitObject> arrUnit = new List<UnitObject>();
-        foreach (UnitObject unit in _vecUnit) {
-            if (unit == null) {
-                continue;
-            }
-
-            if (unit.IsDead()) {
-                continue;
-            }
-
-            if (eUnitPos != eUnitPosition.NONE) {
-                if (unit.GetUnitPosition() != eUnitPos) {
-                    continue;
-                }
-            }
-
-            arrUnit.Add(unit);
-        }
-        return arrUnit;
-    }
-
     public List<UnitObject> GetUnitByPredicate(Predicate<UnitObject> predicate) {
         return _vecUnit.FindAll(predicate);
     }
