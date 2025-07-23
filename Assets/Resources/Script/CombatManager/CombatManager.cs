@@ -196,7 +196,7 @@ public class CombatManager : MonoBehaviour {
                 }
 
                 if (cDefenderUnit == null || cDefenderUnit.IsDead()) {
-                    Global.DEBUG_PRINT("[ExecBattle] Defender deck is empty target=" + cDefenderUnit.index);
+                    Global.DEBUG_PRINT("[ExecBattle] Defender deck is empty");
                     continue;
                 }
 
@@ -217,6 +217,8 @@ public class CombatManager : MonoBehaviour {
                 break;
             }
         }
+
+        cAttackerUnit.PlayStateAnimation(PlayerState.ATTACK);
     }
 
     EffectTargetCondition _GetTargetConditionFromTempEffect(UnitObject cUnit, EffectType eType) {

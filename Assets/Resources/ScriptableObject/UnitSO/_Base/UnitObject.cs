@@ -79,6 +79,23 @@ public class UnitObject : MonoBehaviour {
 
     public Action onDeath { private get; set; } = null;
 
+    SPUM_Prefabs _prefabs = null;
+
+    public void Awake() {
+        _prefabs = GetComponent<SPUM_Prefabs>();
+        _prefabs.OverrideControllerInit();
+    }
+
+    public void Update() {
+        if (Input.GetKeyDown(KeyCode.Q)) {
+            PlayStateAnimation(PlayerState.ATTACK);
+        }
+
+        if (Input.GetKeyDown(KeyCode.W)) {
+            PlayStateAnimation(PlayerState.IDLE);
+        }
+    }
+
     public void Init() {
         _currentHealth.SetVal(unitSO.hp);
         _currentHealth.SetMax(unitSO.hp);
@@ -234,5 +251,13 @@ public class UnitObject : MonoBehaviour {
         }
 
         _bIsDead = true;
+    }
+
+    public void PlayStateAnimation(PlayerState state){
+        if (_prefabs == null) {
+            return;
+        }
+
+        _prefabs.PlayAnimation(state, 0);
     }
 }
