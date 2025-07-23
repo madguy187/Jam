@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: Moonveil_ZigZag_Stun
   m_EditorClassIdentifier: 
-  _eType: 15
+  _eType: 17
   _fEffectVal: 0
   _eTargetType: 2
   _eTargetCondition: 2
