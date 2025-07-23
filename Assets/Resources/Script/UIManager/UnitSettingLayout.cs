@@ -119,7 +119,9 @@ public class UnitSettingLayout : MonoBehaviour {
                 var unit = inventory.teamUnits[unitIndex];
 
                 GameObject unitGO = Instantiate(unitButtonPrefab, slot);
-                unitGO.GetComponent<UnitButton>().Init(unit, ShowDetails);
+                var unitItem = new MockInventoryItem(unit);
+                unitGO.GetComponent<UnitButton>().Init(unit, unitItem, ShowDetails);
+                unitGO.GetComponent<DragHandler>().Init(unitItem);
                 tracker.AddItem(TrackerType.UnitContainer, MockItemType.Unit);
 
                 // Optional but recommended: make it stretch to fill slot
@@ -168,10 +170,12 @@ public class UnitSettingLayout : MonoBehaviour {
                 var unitBtn = go.GetComponent<UnitButton>();
                 unitBtn.Init(item.unitData, item, ShowDetails);
                 unitBtn.boundItem = item;
+                unitBtn.GetComponent<DragHandler>().Init(item);
             } else // Relic
               {
                 go = Instantiate(itemButtonPrefab, slot);
                 go.GetComponent<RelicButton>().Init(item.relicData, item);
+                go.GetComponent<DragHandler>().Init(item);
             }
             ItemTracker.Instance.AddItem(TrackerType.BagContainer, item.itemType);
 
@@ -207,7 +211,9 @@ public class UnitSettingLayout : MonoBehaviour {
             if (i < unit.equippedRelics.Count) {
                 var relic = unit.equippedRelics[i];
                 GameObject go = Instantiate(relicButtonPrefab, slot);
-                go.GetComponent<RelicButton>().Init(relic, null);
+                var relicItem = new MockInventoryItem(relic);
+                go.GetComponent<RelicButton>().Init(relic, relicItem);
+                go.GetComponent<DragHandler>().Init(relicItem);
                 ItemTracker.Instance.AddItem(TrackerType.RelicContainer, MockItemType.Relic);
                 // Stretch to fit
                 RectTransform rt = go.GetComponent<RectTransform>();

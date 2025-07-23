@@ -19,9 +19,9 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         canvasGroup = GetComponent<CanvasGroup>();
     }
 
-    public void Init(MockInventoryItem item)
-    {
+    public void Init(MockInventoryItem item) {
         draggedItem = item;
+        Global.DEBUG_PRINT("[DragHandler::Init] THIS IS CALLED ");
     }
 
     public MockItemType GetItemType()
@@ -106,7 +106,7 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
 
                 if (activeUnit != null && draggedItem.itemType == MockItemType.Relic) {
                     activeUnit.UnequipRelic(draggedItem.relicData);
-                    layout.RefreshRelicUI();
+                    // layout.RefreshRelicUI();
                     // Destroy(gameObject);
                     Global.DEBUG_PRINT($"[DragHandler] Unequipped relic {draggedItem.relicData.relicName} from {activeUnit.unitName}");
                 }

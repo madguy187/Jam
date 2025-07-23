@@ -75,12 +75,6 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
             return;
         }
 
-        // Should not fail here but just in case...
-        if (!SnapToFirstAvailableSlot(eventData.pointerDrag/*, eventData*/)) {
-            dragHandler.OnDropRejected();
-            return;
-        }
-
         // If we reach here, we can accept the drop but this is specific for relic slots for a unit
         if (allowedType == AllowedItemType.RelicsOnly && draggedItemType == MockItemType.Relic) {
             // Get the current active unit from the layout
@@ -89,6 +83,12 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
                 layout.ActiveUnit.EquipRelic(dragHandler.GetDraggedItem().relicData);
                 Global.DEBUG_PRINT($"Equipped {dragHandler.GetDraggedItem().relicData.relicName} to {layout.ActiveUnit.unitName}");
             }
+        }
+
+        // Should not fail here but just in case...
+        if (!SnapToFirstAvailableSlot(eventData.pointerDrag/*, eventData*/)) {
+            dragHandler.OnDropRejected();
+            return;
         }
 
         // If passed all checks, accept drop

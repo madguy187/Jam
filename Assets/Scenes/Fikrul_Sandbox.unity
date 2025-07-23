@@ -722,8 +722,8 @@ MonoBehaviour:
   m_StartAxis: 0
   m_CellSize: {x: 80, y: 80}
   m_Spacing: {x: 0, y: 0}
-  m_Constraint: 2
-  m_ConstraintCount: 2
+  m_Constraint: 1
+  m_ConstraintCount: 3
 --- !u!114 &504451819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -783,8 +783,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxUnits: 5
-  maxRelics: 3
+  maxRelics: 15
   maxItems: 40
+  currentUnits: 0
+  currentRelics: 0
+  currentBagItems: 0
 --- !u!4 &504777300
 Transform:
   m_ObjectHideFlags: 0
