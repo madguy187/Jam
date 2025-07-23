@@ -22,6 +22,7 @@ public class UnitStat {
     }
 
     public float GetVal() { return val; }
+    public float GetMax() { return max; }
 
     public void AddVal(float _val) {
         if (max > 0 && val + _val > max) {

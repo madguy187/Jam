@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
-  m_Name: Moonveil_FullGrid_CritReduce
+  m_Name: BoneShaman_Diagonal_Res
   m_EditorClassIdentifier: 
-  _eType: 9
-  _fEffectVal: 25
+  _eType: 27
+  _fEffectVal: 50
   _eTargetType: 2
-  _eTargetCondition: 2
-  _eTargetParam: 0
-  _eExecType: 0
+  _eTargetCondition: 7
+  _eTargetParam: 1
+  _eExecType: 2
   _effectAffinityType: 0
   _effectResolveType: 1
-  _fEffectCount: 0
+  _fEffectCount: 3

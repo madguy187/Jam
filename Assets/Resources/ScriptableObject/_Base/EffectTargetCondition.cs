@@ -9,6 +9,7 @@ public enum EffectTargetCondition {
     ELF,
     DEAD,
     RANDOM,
+    RANDOM_UNDEAD,
     FRONTLINE,
     ALL_UNIT_BELOW_HP_PERCENT,
 }

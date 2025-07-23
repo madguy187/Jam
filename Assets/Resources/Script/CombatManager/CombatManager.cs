@@ -272,6 +272,10 @@ public class CombatManager : MonoBehaviour {
             fAttack = _GetDamageAfterShield(cDefenderUnit, fAttack);
         }
 
+        if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_HEX, out float fReducePercent)) {
+            fAttack *= fReducePercent * Global.PERCENTAGE_CONSTANT;
+        }
+
         fAttack = Mathf.Floor(fAttack);
 
         if (cDefenderUnit.GetEffectParam(EffectType.EFFECT_REFLECT, out float val)) {
@@ -441,6 +445,10 @@ public class CombatManager : MonoBehaviour {
                 unit.Revive();
                 unit._currentHealth.SetVal(cEffect.GetEffectVal());
             }
+            if (cEffect.IsEffectType(EffectType.EFFECT_REVIVE_FULL)) {
+                unit.Revive();
+                unit._currentHealth.SetVal(unit._currentHealth.GetMax());
+            }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_TRIGGER_ALL_SINGLE)) {
                 EffectList listEffect = unit.GetRollEffectList(MatchType.SINGLE);
@@ -539,6 +547,9 @@ public class CombatManager : MonoBehaviour {
                 break;
             case EffectTargetCondition.RANDOM:
                 arrTarget = DeckHelperFunc.GetRandomAliveUnit(cTargetDeck, (int)eTargetParam);
+                break;
+            case EffectTargetCondition.RANDOM_UNDEAD:
+                arrTarget = DeckHelperFunc.GetRandomAliveUnit(cTargetDeck, (int)eTargetParam, eUnitArchetype.UNDEAD);
                 break;
             case EffectTargetCondition.FRONTLINE:
                 arrTarget = DeckHelperFunc.GetAllUnitFrontLine(cTargetDeck);

@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Analytics;
 
 public static class DeckHelperFunc
 {
@@ -107,7 +108,7 @@ public static class DeckHelperFunc
         });
     }
 
-    public static List<UnitObject> GetRandomAliveUnit(Deck cDeck, int count) {
+    public static List<UnitObject> GetRandomAliveUnit(Deck cDeck, int count, eUnitArchetype eArchetype = eUnitArchetype.NONE) {
         int i = 0;
         return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
             if (unit == null) {
@@ -115,6 +116,10 @@ public static class DeckHelperFunc
             }
 
             if (!unit.IsDead()) {
+                return false;
+            }
+
+            if (eArchetype != eUnitArchetype.NONE && unit.unitSO.eUnitArchetype != eArchetype) {
                 return false;
             }
 
