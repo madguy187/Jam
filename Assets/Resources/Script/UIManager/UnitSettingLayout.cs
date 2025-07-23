@@ -67,6 +67,7 @@ public class UnitSettingLayout : MonoBehaviour {
     public void RefreshRelicUI()
     {
         ClearUnitRelicsOnly();
+        tracker.ResetCurrentRelicCount();
         if (activeUnit != null) {
             PopulateUnitRelics(activeUnit);
         }

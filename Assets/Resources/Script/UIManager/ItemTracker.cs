@@ -7,8 +7,7 @@ public enum TrackerType
     RelicContainer
 }
 
-public class ItemTracker : MonoBehaviour
-{
+public class ItemTracker : MonoBehaviour {
     public static ItemTracker Instance { get; private set; }
 
     [Header("Limits")]
@@ -30,10 +29,8 @@ public class ItemTracker : MonoBehaviour
         Debug.Log("[ItemTracker] Instance created.");
     }
 
-    public bool CanAccept(TrackerType trackerType, MockItemType itemType)
-    {
-        switch (trackerType)
-        {
+    public bool CanAccept(TrackerType trackerType, MockItemType itemType) {
+        switch (trackerType) {
             case TrackerType.UnitContainer:
                 return itemType == MockItemType.Unit && currentUnits < maxUnits;
             case TrackerType.RelicContainer:
@@ -45,15 +42,13 @@ public class ItemTracker : MonoBehaviour
         }
     }
 
-    public bool AddItem(TrackerType trackerType, MockItemType itemType)
-    {
+    public bool AddItem(TrackerType trackerType, MockItemType itemType) {
         if (!CanAccept(trackerType, itemType)) {
             Global.DEBUG_PRINT($"[ItemTracker::AddItem] Cannot add item of type {itemType} to {trackerType}. Limit reached.");
             return false;
         }
 
-        switch (trackerType)
-        {
+        switch (trackerType) {
             case TrackerType.UnitContainer:
                 currentUnits++;
                 return true;
@@ -68,46 +63,44 @@ public class ItemTracker : MonoBehaviour
         }
     }
 
-    public bool RemoveItem(TrackerType trackerType, MockItemType itemType)
-    {
-        switch (trackerType)
-        {
+    public bool RemoveItem(TrackerType trackerType, MockItemType itemType) {
+        switch (trackerType) {
             case TrackerType.UnitContainer:
-                if (currentUnits > 0)
-                {
+                if (currentUnits > 0) {
                     currentUnits--;
                     return true;
                 }
                 break;
 
             case TrackerType.RelicContainer:
-                if (currentRelics > 0)
-                {
+                if (currentRelics > 0) {
                     currentRelics--;
                     return true;
                 }
                 break;
 
             case TrackerType.BagContainer:
-                if (currentBagItems > 0)
-                {
+                if (currentBagItems > 0) {
                     currentBagItems--;
                 }
                 break;
         }
         return false;
     }
-    public int GetCurrentCount(MockItemType itemType)
-    {
+    public int GetCurrentCount(MockItemType itemType) {
         return itemType == MockItemType.Unit ? currentUnits : currentRelics;
     }
-    
+
     public int GetCurrentBagItemCount() => currentBagItems;
 
-    public void ClearItems()
-    {
+    public void ClearItems() {
         currentUnits = 0;
         currentRelics = 0;
         currentBagItems = 0;
+    }
+    
+    public void ResetCurrentRelicCount()
+    {
+        currentRelics = 0;
     }
 }
