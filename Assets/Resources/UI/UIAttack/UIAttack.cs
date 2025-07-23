@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Button))]
-public class UIEndTurnButton : MonoBehaviour
+public class UIAttack : MonoBehaviour
 {
     private Button button;
 
@@ -11,15 +11,15 @@ public class UIEndTurnButton : MonoBehaviour
         button = GetComponent<Button>();
         if (button != null)
         {
-            button.onClick.AddListener(OnEndTurnClicked);
+            button.onClick.AddListener(OnAttackClicked);
         }
         else
         {
-            Debug.LogError("[UIEndTurnButton] No Button component found!");
+            Debug.LogError("[UIAttack] No Button component found!");
         }
     }
 
-    void OnEndTurnClicked()
+    void OnAttackClicked()
     {
         SlotController.instance.EndPlayerTurn();
     }
@@ -36,7 +36,7 @@ public class UIEndTurnButton : MonoBehaviour
     {
         if (button != null)
         {
-            button.onClick.RemoveListener(OnEndTurnClicked);
+            button.onClick.RemoveListener(OnAttackClicked);
         }
     }
 } 

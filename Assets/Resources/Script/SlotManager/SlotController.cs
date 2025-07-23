@@ -6,29 +6,33 @@ using System.Linq;
 public class SlotController : MonoBehaviour
 {
     public static SlotController instance { get; private set; }
-    
+    public static System.Action OnTurnChanged;
+    public static System.Action OnMatchesProcessed;  
+
+    // - Configuration
     [Header("Configuration")]
     [SerializeField] private SlotConfig slotConfig;
 
     [Header("References")]
     [SerializeField] private SlotGridUI gridUI;
-    [SerializeField] private UIRollButton rollButton;
-    [SerializeField] private UIEndTurnButton endTurnButton;
+    [SerializeField] private UIRerollButton rerollButton;  
+    [SerializeField] private UIAttack attackButton;  
     
     private SlotGrid slotGrid;
     private MatchDetector matchDetector;
     private bool isSpinning;
     private SpinResult spinResult;
-    private int spinsThisTurn = 0;
-    private bool isEnemyTurn = false;
+    private int spinsThisTurn;
+    private bool isEnemyTurn;
+    private bool isFirstRoll = true;
     
-    public bool IsEnemyTurn() => isEnemyTurn;
-
+    // - Initialisation
     private void Awake()
     {
         if (instance == null)
         {
             instance = this;
+            transform.parent = null; 
             DontDestroyOnLoad(gameObject);
             InitializeSlotController();
         }
@@ -59,14 +63,14 @@ public class SlotController : MonoBehaviour
             return;
         }
 
-        if (rollButton == null)
+        if (rerollButton == null)
         {
-            Debug.LogError("[SlotController] Roll button reference is missing!");
+            Debug.LogError("[SlotController] Reroll button reference is missing!");
         }
 
-        if (endTurnButton == null)
+        if (attackButton == null)
         {
-            Debug.LogError("[SlotController] End turn button reference is missing!");
+            Debug.LogError("[SlotController] Attack button reference is missing!");
         }
     }
 
@@ -77,282 +81,116 @@ public class SlotController : MonoBehaviour
         spinResult = new SpinResult(new List<Match>(), 0);
     }
 
+    // - Public Functions
+    public bool IsEnemyTurn()
+    {
+        return isEnemyTurn;
+    }
+
+    public void InitializeProbabilitiesIfNeeded()
+    {
+        if (isFirstRoll)
+        {
+            SymbolGenerator.instance.UpdateProbabilities();
+            isFirstRoll = false;
+        }
+    }
+
     public void StartPlayerTurn()
     {
-        Global.DEBUG_PRINT("[SlotController] Starting player turn");
+        Debug.Log("[SlotController] Starting player turn");
         isEnemyTurn = false;
         spinsThisTurn = 0;
         spinResult.Clear();
         
-        // Add base income at start of turn
-        Global.DEBUG_PRINT("[SlotController] Adding base income for new turn");
+        Debug.Log("[SlotController] Adding base income for new turn");
         GoldManager.instance.OnRoundStart(false);
-        
-        // Enable buttons for player turn
-        if (rollButton != null) rollButton.SetInteractable(true);
-        if (endTurnButton != null) endTurnButton.SetInteractable(true);
+
+        OnTurnChanged?.Invoke();
     }
 
     public void EndPlayerTurn()
     {
-        Global.DEBUG_PRINT("[SlotController] EndPlayerTurn called - calculating interest before enemy turn");
-        // Calculate interest at end of player's turn
+        Debug.Log("=== PLAYER TURN COMBAT EXECUTION ===");
+
+        ProcessPlayerTurnCombat();
+        OnMatchesProcessed?.Invoke();
         GoldManager.instance.CalculateInterest();
-        StartEnemyTurn();
-    }
 
-    public void StartEnemyTurn()
-    {
+        if (CheckAllEnemiesDead())
+        {
+            Debug.Log("[SlotController] All enemies dead, player wins!");
+            GoldManager.instance.OnVictory();
+            return;
+        }
+
         isEnemyTurn = true;
-        spinsThisTurn = 0;
-        spinResult.Clear();
-
-        // Disable buttons during enemy turn
-        if (rollButton != null) rollButton.SetInteractable(false);
-        if (endTurnButton != null) endTurnButton.SetInteractable(false);
-
-        // Execute enemy's single spin
         StartCoroutine(ExecuteEnemyTurn());
     }
 
-    private IEnumerator ExecuteEnemyTurn()
+    public bool GetIsSpinning()
     {
-        // Small delay before enemy acts - will deal w this magic number later
-        yield return new WaitForSeconds(1f); 
-        
-        // Generate random symbols for enemy's single spin
-        SymbolType[] finalSymbols = new SymbolType[slotConfig.TotalGridSize];
-        for (int i = 0; i < slotConfig.TotalGridSize; i++)
-        {
-            finalSymbols[i] = SymbolGenerator.instance.GenerateRandomSymbol();
-        }
-        
-        isSpinning = true;
-        gridUI.StartSpinAnimation(finalSymbols);
-        FillGridWithSymbols(finalSymbols);
-        
-        // Wait for spin animation
-        while (gridUI.GetIsSpinning())
-        {
-            yield return null;
-        }
-
-        // Check for matches
-        List<Match> matches = CheckForMatches();
-        
-        // If we have matches, execute enemy attack
-        if (matches.Count > 0)
-        {
-            // Get enemy unit that will attack
-            Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
-            for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
-            {
-                var unit = enemyDeck.GetUnitObject(i);
-                if (unit != null && unit.unitSO != null)
-                {
-                    foreach (var match in matches)
-                    {
-                        match.SetUnitName(unit.unitSO.unitName);
-                    }
-
-                    // Execute enemy attack
-                    CombatManager.instance.ExecBattle(eDeckType.ENEMY, i);
-                    break;
-                }
-            }
-        }
-        // enemy dont earn gold, we only got gold for player
-        spinResult.SetMatches(matches, 0);
-        isSpinning = false;
-
-        yield return new WaitForSeconds(1f); 
-        StartPlayerTurn();
-    }
-    
-    public bool GetIsSpinning() {
         return isSpinning;
     }
 
-    public int GetSpinsThisTurn() {
+    public int GetSpinsThisTurn()
+    {
         return spinsThisTurn;
     }
 
-    public void ResetSpins() {
+    public void ResetSpins()
+    {
         spinsThisTurn = 0;
     }
 
-    public void IncrementSpins() {
+    public void IncrementSpins()
+    {
         spinsThisTurn++;
     }
 
-    public bool HasFreeSpinAvailable() {
+    public bool HasFreeSpinAvailable()
+    {
         return spinsThisTurn == 0;
     }
 
     public int GetCurrentSpinCost()
     {
-        if (HasFreeSpinAvailable()) {
+        if (HasFreeSpinAvailable())
+        {
             return 0;
         }
         return slotConfig.baseSpinCost + ((spinsThisTurn - 1) * 2);
     }
-    
+
     public void FillGridWithRandomSymbols()
     {
-        if (isSpinning) 
+        if (isSpinning || gridUI.GetIsSpinning())
         {
             return;
         }
 
-        if (gridUI.GetIsSpinning())
+        if (!TrySpendGoldForSpin())
         {
             return;
         }
-        
-        // Check if this is a free spin or if we need to spend gold
-        bool isFreeSpin = HasFreeSpinAvailable();
-        if (!isFreeSpin)
-        {
-            // Only try to spend gold if it's not a free spin
-            int spinCost = GetCurrentSpinCost();
-            if (!GoldManager.instance.SpendGold(spinCost))
-            {
-                Global.DEBUG_PRINT("Cannot afford spin, cost: " + spinCost);
-                return;
-            }
-        }
-        else
-        {
-            Global.DEBUG_PRINT("Using free spin!");
-        }
 
-        isSpinning = true;
-        // Disable roll button during spin
-        if (rollButton != null)
-        {
-            rollButton.SetInteractable(false);
-        }
-        
-        IncrementSpins();
-        
-        // Generate random symbols
-        SymbolType[] finalSymbols = new SymbolType[slotConfig.TotalGridSize];
-        for (int i = 0; i < slotConfig.TotalGridSize; i++)
-        {
-            finalSymbols[i] = SymbolGenerator.instance.GenerateRandomSymbol();
-        }
-        
-        if (finalSymbols == null || finalSymbols.Length != slotConfig.TotalGridSize)
-        {
-            Debug.LogError("Failed to generate symbols!");
-            isSpinning = false;
-            // Re-enable roll button if spin fails
-            if (rollButton != null)
-            {
-                rollButton.SetInteractable(true);
-            }
-            return;
-        }
-        
-        // Start the spin animation and fill the grid
-        gridUI.StartSpinAnimation(finalSymbols);
-        FillGridWithSymbols(finalSymbols);
-        
-        StartCoroutine(WaitForSpinComplete());
-    }
-
-    private IEnumerator WaitForSpinComplete()
-    {
-        // Wait for spin animation to complete
-        while (gridUI.GetIsSpinning())
-        {
-            yield return null;
-        }
-
-        // After grid is filled and animation is complete, check for matches
-        List<Match> matches = CheckForMatches();
-        
-        // Calculate total gold earned
-        int totalGold = 0;
-        foreach (Match match in matches)
-        {
-            if (match.GetMatchType() != MatchType.SINGLE)
-            {
-                int goldReward = GoldManager.instance.GetGoldRewardForMatch(match.GetMatchType());
-                totalGold += goldReward;
-                GoldManager.instance.AddGold(goldReward);
-            }
-        }
-
-        // If we have matches, execute combat immediately
-        if (matches.Count > 0)
-        {
-            // Get the player's unit that will attack
-            Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
-            for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
-            {
-                var unit = playerDeck.GetUnitObject(i);
-                if (unit != null && unit.unitSO != null)
-                {
-                    // Set unit name for each match
-                    string unitName = unit.unitSO.unitName;
-                    foreach (var match in matches)
-                    {
-                        match.SetUnitName(unitName);
-                    }
-
-                    // Execute the attack directly
-                    CombatManager.instance.ExecBattle(eDeckType.PLAYER, i);
-                    break;
-                }
-            }
-        }
-        
-        // Save matches to our SpinResult
-        spinResult.SetMatches(matches, totalGold);
-        isSpinning = false;
-
-        // Re-enable roll button after spin completes
-        if (rollButton != null)
-        {
-            rollButton.SetInteractable(true);
-        }
+        StartSpinSequence();
     }
 
     public bool CanSpin()
     {
-        if (isSpinning) 
+        if (isSpinning)
         {
+            return false;
+        }
+
+        if (!HasAlivePlayerUnits())
+        {
+            Debug.Log("[SlotController] Cannot spin - all player units are dead");
             return false;
         }
         
         return GoldManager.instance.HasEnoughGold(GetCurrentSpinCost());
-    }
-    
-    private void ClearGrid()
-    {
-        slotGrid.ClearGrid();
-    }
-    
-    private List<Match> CheckForMatches()
-    {
-        List<Match> matches = matchDetector.DetectMatches();
-        return matches;
-    }
-    
-    private void FillGridWithSymbols(SymbolType[] symbols)
-    {
-        if (symbols == null || symbols.Length != slotConfig.TotalGridSize) return;
-        
-        slotGrid.ClearGrid();
-        for (int row = 0; row < slotConfig.gridRows; row++)
-        {
-            for (int col = 0; col < slotConfig.gridColumns; col++)
-            {
-                int index = row * slotConfig.gridColumns + col;
-                slotGrid.SetSlot(row, col, symbols[index]);
-            }
-        }
     }
 
     public SpinResult GetSpinResult()
@@ -363,5 +201,324 @@ public class SlotController : MonoBehaviour
     public void ClearSpinResult()
     {
         spinResult.Clear();
+    }
+
+    // - Private Functions
+    private void Update()
+    {
+        if (isEnemyTurn)
+        {
+            return;
+        }
+
+        bool hasAlivePlayerUnits = HasAlivePlayerUnits();
+        bool hasAliveEnemyUnits = HasAliveEnemyUnits();
+
+        UpdateButtonStates(hasAlivePlayerUnits, hasAliveEnemyUnits);
+    }
+
+    private void UpdateButtonStates(bool hasAlivePlayerUnits, bool hasAliveEnemyUnits)
+    {
+        if (rerollButton != null)
+        {
+            rerollButton.SetInteractable(hasAlivePlayerUnits);
+        }
+
+        if (attackButton != null)
+        {
+            attackButton.SetInteractable(hasAlivePlayerUnits && hasAliveEnemyUnits);
+        }
+    }
+
+    private bool HasAlivePlayerUnits()
+    {
+        return HasAliveUnitsInDeck(eDeckType.PLAYER);
+    }
+
+    private bool HasAliveEnemyUnits()
+    {
+        return HasAliveUnitsInDeck(eDeckType.ENEMY);
+    }
+
+    private bool HasAliveUnitsInDeck(eDeckType deckType)
+    {
+        Deck deck = DeckManager.instance.GetDeckByType(deckType);
+        for (int i = 0; i < deck.GetDeckMaxSize(); i++)
+        {
+            UnitObject unit = deck.GetUnitObject(i);
+            if (unit != null && !unit.IsDead())
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private bool TrySpendGoldForSpin()
+    {
+        bool isFreeSpin = HasFreeSpinAvailable();
+        if (!isFreeSpin)
+        {
+            int spinCost = GetCurrentSpinCost();
+            if (!GoldManager.instance.SpendGold(spinCost))
+            {
+                Debug.Log("Cannot afford spin, cost: " + spinCost);
+                return false;
+            }
+        }
+        else
+        {
+            Debug.Log("Using free spin!");
+        }
+        return true;
+    }
+
+    private void StartSpinSequence()
+    {
+        isSpinning = true;
+        if (rerollButton != null)
+        {
+            rerollButton.SetInteractable(false);
+        }
+        
+        IncrementSpins();
+        
+        Deck currentDeck = DeckManager.instance.GetDeckByType(isEnemyTurn ? eDeckType.ENEMY : eDeckType.PLAYER);
+        SymbolType[] finalSymbols = SymbolGenerator.instance.GenerateSymbolsForDeck(currentDeck);
+        
+        if (!ValidateSymbols(finalSymbols))
+        {
+            return;
+        }
+        
+        gridUI.StartSpinAnimation(finalSymbols);
+        FillGridWithSymbols(finalSymbols);
+        
+        StartCoroutine(WaitForSpinComplete());
+    }
+
+    private bool ValidateSymbols(SymbolType[] symbols)
+    {
+        if (symbols == null || symbols.Length != slotConfig.TotalGridSize)
+        {
+            Debug.LogError("Failed to generate symbols!");
+            isSpinning = false;
+            if (rerollButton != null)
+            {
+                rerollButton.SetInteractable(true);
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private void ProcessPlayerTurnCombat()
+    {
+        List<Match> currentMatches = spinResult.GetAllMatches();
+        if (currentMatches.Count > 0)
+        {
+            foreach (Match match in currentMatches)
+            {
+                eUnitArchetype matchArchetype = match.GetArchetype();
+                MatchType matchType = match.GetMatchType();
+
+                Debug.Log($"[SlotController] Processing match: {matchType} for archetype: {matchArchetype}");
+                Debug.Log($"Processing match: Type={matchType}, Archetype={matchArchetype}");
+
+                ExecutePlayerCombat(match);
+            }
+        }
+        Debug.Log("=== END OF PLAYER COMBAT ===\n");
+    }
+
+    private void ExecutePlayerCombat(Match match)
+    {
+        Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
+        Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+
+        //Debug.Log($"[SlotController] Match archetype: {match.GetArchetype()}");
+
+        for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
+        {
+            UnitObject unit = playerDeck.GetUnitObject(i);
+            if (unit != null && unit.unitSO != null)
+            {
+                // Debug.Log($"[SlotController] Unit {i} archetype: {unit.unitSO.eUnitArchetype}");
+                
+                int targetIndex = CombatManager.instance.GetLowestHealth(enemyDeck);
+                UnitObject target = enemyDeck.GetUnitObject(targetIndex);
+                
+                if (target != null)
+                {
+                    // Only set match name (enabling skills) if archetype matches
+                    if (unit.unitSO.eUnitArchetype == match.GetArchetype())
+                    {
+                        // Debug.Log($"[SlotController] Unit {unit.unitSO.unitName} archetype matches {match.GetArchetype()}, will use skills");
+                        match.SetUnitName(unit.unitSO.unitName);
+                    }
+                    
+                    // Debug.Log($"Player unit {unit.unitSO.unitName} attacking target {target.unitSO.unitName}");
+                    CombatManager.instance.ExecBattle(eDeckType.PLAYER, i);
+                }
+            }
+        }
+    }
+
+    private bool CheckAllEnemiesDead()
+    {
+        var enemyDeckCheck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+        for (int i = 0; i < enemyDeckCheck.GetDeckMaxSize(); i++)
+        {
+            UnitObject unit = enemyDeckCheck.GetUnitObject(i);
+            if (unit != null && !unit.IsDead())
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private IEnumerator ExecuteEnemyTurn()
+    {
+        Debug.Log("=== ENEMY TURN COMBAT EXECUTION ===");
+        yield return new WaitForSeconds(1f);
+        
+        Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+        SymbolType[] finalSymbols = SymbolGenerator.instance.GenerateSymbolsForDeck(enemyDeck);
+        
+        isSpinning = true;
+        gridUI.StartSpinAnimation(finalSymbols);
+        FillGridWithSymbols(finalSymbols);
+        
+        while (gridUI.GetIsSpinning())
+        {
+            yield return null;
+        }
+
+        ProcessEnemyTurnCombat();
+
+        yield return new WaitForSeconds(1f);
+        StartPlayerTurn();
+    }
+
+    private void ProcessEnemyTurnCombat()
+    {
+        List<Match> matches = CheckForMatches();
+        
+        if (matches.Count > 0)
+        {
+            foreach (Match match in matches)
+            {
+                match.SetArchetype(SymbolGenerator.GetArchetypeForSymbol(match.GetSymbol()));
+                MatchType matchType = match.GetMatchType();
+
+                Debug.Log($"[SlotController] Enemy processing match: {matchType} for archetype: {match.GetArchetype()}");
+                Debug.Log($"Enemy processing match: Type={matchType}, Archetype={match.GetArchetype()}");
+
+                ExecuteEnemyCombat(match);
+            }
+        }
+        Debug.Log("=== END OF ENEMY COMBAT ===\n");
+
+        spinResult.SetMatches(matches, 0);
+        isSpinning = false;
+
+        OnMatchesProcessed?.Invoke();
+    }
+
+    private void ExecuteEnemyCombat(Match match)
+    {
+        Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+
+        // Debug.Log($"[SlotController] Enemy match archetype: {match.GetArchetype()}");
+
+        for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
+        {
+            UnitObject unit = enemyDeck.GetUnitObject(i);
+            if (unit != null && unit.unitSO != null)
+            {
+                // Debug.Log($"[SlotController] Enemy unit {i} archetype: {unit.unitSO.eUnitArchetype}");
+                
+                int targetIndex = CombatManager.instance.GetLowestHealth(DeckManager.instance.GetDeckByType(eDeckType.PLAYER));
+                UnitObject target = DeckManager.instance.GetDeckByType(eDeckType.PLAYER).GetUnitObject(targetIndex);
+                
+                if (target != null)
+                {
+                    // Only set match name (enabling skills) if archetype matches
+                    if (unit.unitSO.eUnitArchetype == match.GetArchetype())
+                    {
+                        // Debug.Log($"[SlotController] Enemy unit {unit.unitSO.unitName} archetype matches {match.GetArchetype()}, will use skills");
+                        match.SetUnitName(unit.unitSO.unitName);
+                    }
+                    
+                    //Debug.Log($"Enemy unit {unit.unitSO.unitName} attacking target {target.unitSO.unitName}");
+                    CombatManager.instance.ExecBattle(eDeckType.ENEMY, i);
+                }
+            }
+        }
+    }
+
+    private IEnumerator WaitForSpinComplete()
+    {
+        while (gridUI.GetIsSpinning())
+        {
+            yield return null;
+        }
+
+        ProcessSpinResults();
+    }
+
+    private void ProcessSpinResults()
+    {
+        List<Match> matches = CheckForMatches();
+        
+        int totalGold = 0;
+        foreach (Match match in matches)
+        {
+            match.SetArchetype(SymbolGenerator.GetArchetypeForSymbol(match.GetSymbol()));
+
+            if (match.GetMatchType() != MatchType.SINGLE)
+            {
+                int goldReward = GoldManager.instance.GetGoldRewardForMatch(match.GetMatchType());
+                totalGold += goldReward;
+                GoldManager.instance.AddGold(goldReward);
+            }
+        }
+
+        spinResult.SetMatches(matches, totalGold);
+        isSpinning = false;
+
+        if (rerollButton != null)
+        {
+            rerollButton.SetInteractable(true);
+        }
+    }
+
+    private void ClearGrid()
+    {
+        slotGrid.ClearGrid();
+    }
+    
+    private List<Match> CheckForMatches()
+    {
+        return matchDetector.DetectMatches();
+    }
+    
+    private void FillGridWithSymbols(SymbolType[] symbols)
+    {
+        if (symbols == null || symbols.Length != slotConfig.TotalGridSize)
+        {
+            return;
+        }
+        
+        slotGrid.ClearGrid();
+        for (int row = 0; row < slotConfig.gridRows; row++)
+        {
+            for (int col = 0; col < slotConfig.gridColumns; col++)
+            {
+                int index = row * slotConfig.gridColumns + col;
+                slotGrid.SetSlot(row, col, symbols[index]);
+            }
+        }
     }
 } 

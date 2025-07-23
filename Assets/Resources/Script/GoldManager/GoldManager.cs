@@ -10,11 +10,12 @@ public class GoldManager : MonoBehaviour
     [Header("Gold Settings")]
     [SerializeField] private int currentGold = 40;
 
-    void Awake()
+    private void Awake()
     {
         if (instance == null)
         {
             instance = this;
+            transform.parent = null; 
             DontDestroyOnLoad(gameObject);
             
             if (config == null)
