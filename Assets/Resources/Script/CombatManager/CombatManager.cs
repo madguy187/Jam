@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class CombatManager : MonoBehaviour {
@@ -35,6 +37,17 @@ public class CombatManager : MonoBehaviour {
 
     public void InitRound() {
         DeckManager.instance.InitDeckEffect();
+    }
+
+    public void StartBattleLoop(List<Match> matches) {
+        if (!_CanBattle()) {
+            return;
+        }
+
+        _listMatch = matches;
+        _state = eCombatState.ATTACK;
+        _eAttackerDeck = eDeckType.PLAYER;
+        _nAttackerIndex = 0;
     }
 
     void Update() {
@@ -80,16 +93,11 @@ public class CombatManager : MonoBehaviour {
     }
 
     void _UpdateAttackOrder() {
-        switch (_eAttackerDeck) {
-            case eDeckType.NONE:
-                _eAttackerDeck = eDeckType.PLAYER;
-                break;
-            case eDeckType.PLAYER:
-                _eAttackerDeck = eDeckType.ENEMY;
-                break;
-            case eDeckType.ENEMY:
-                _eAttackerDeck = eDeckType.NONE;
-                break;
+        eDeckType[] arrType = (eDeckType[])Enum.GetValues(typeof(eDeckType));
+        int nTypeCount = arrType.Count();
+        _eAttackerDeck++;
+        if ((int)_eAttackerDeck >= nTypeCount) {
+            _eAttackerDeck = eDeckType.NONE;
         }
         _nAttackerIndex = 0;
     }
@@ -110,17 +118,6 @@ public class CombatManager : MonoBehaviour {
         }
 
         return false;
-    }
-
-    public void StartBattleLoop(List<Match> matches) {
-        if (!_CanBattle()) {
-            return;
-        }
-
-        _listMatch = matches;
-        _state = eCombatState.ATTACK;
-        _eAttackerDeck = eDeckType.PLAYER;
-        _nAttackerIndex = 0;
     }
 
     void _UnPause() {
@@ -221,14 +218,6 @@ public class CombatManager : MonoBehaviour {
         cAttackerUnit.PlayStateAnimation(PlayerState.ATTACK);
     }
 
-    EffectTargetCondition _GetTargetConditionFromTempEffect(UnitObject cUnit, EffectType eType) {
-        EffectTargetCondition eTargetCondition = EffectTargetCondition.LOWEST_HP;
-        if (cUnit.GetEffectSO(eType, out EffectScriptableObject effectSO)) {
-            eTargetCondition = effectSO.GetTargetCondition();
-        }
-        return eTargetCondition;
-    }
-
     List<MatchType> _GetRollType(string unitName) {
         List<MatchType> listResult = new List<MatchType>();
         if (_listMatch == null) {
@@ -289,7 +278,7 @@ public class CombatManager : MonoBehaviour {
         _ActivatePostEffect(cAttackerUnit, fAttack);
 
         ResourceManager.instance.GenerateDynamicText(cDefenderUnit.transform.position, fAttack.ToString());
-        
+
         Global.DEBUG_PRINT("Final Damage=" + fAttack);
     }
 
@@ -350,12 +339,12 @@ public class CombatManager : MonoBehaviour {
         if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_STAT_INCREASE_CRIT_RATE_TURN, out float val)) {
             nCritRate += (int)val;
         }
-        
+
         if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_DAMAGE_CRIT_HIT)) {
             return true;
         }
-        
-        int nRand = Random.Range(0, Global.PERCENTAGE_CONSTANT + 1); // +1 coz exclusive
+
+        int nRand = UnityEngine.Random.Range(0, Global.PERCENTAGE_CONSTANT + 1); // +1 coz exclusive
         if (nRand < nCritRate) {
             return true;
         }
@@ -382,6 +371,15 @@ public class CombatManager : MonoBehaviour {
         foreach (UnitObject unit in arrTargetUnit) {
             if (unit == null) {
                 continue;
+            }
+
+            if (cEffect.GetExecType() == EffectExecType.COUNT_SPECIFIED) {
+                unit.AddTempEffect(cEffect);
+                return;
+            }
+
+            if (cEffect.GetExecType() != EffectExecType.TRIGGER_ONCE) {
+                return;
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_ATK)) {
@@ -427,10 +425,6 @@ public class CombatManager : MonoBehaviour {
 
                     return false;
                 });
-            }
-
-            if (cEffect.GetExecType() == EffectExecType.COUNT_SPECIFIED) {
-                unit.AddTempEffect(cEffect);
             }
 
             Global.DEBUG_PRINT("[Effect] Triggered " + cEffect.GetTypeName() +
@@ -497,121 +491,40 @@ public class CombatManager : MonoBehaviour {
                     break;
                 }
             case EffectTargetCondition.HOLY:
-                arrTarget = _GetUnitByArchetype(cTargetDeck, eUnitArchetype.HOLY);
+                arrTarget = DeckHelperFunc.GetUnitByArchetype(cTargetDeck, eUnitArchetype.HOLY);
                 break;
             case EffectTargetCondition.UNDEAD:
-                arrTarget = _GetUnitByArchetype(cTargetDeck, eUnitArchetype.UNDEAD);
+                arrTarget = DeckHelperFunc.GetUnitByArchetype(cTargetDeck, eUnitArchetype.UNDEAD);
                 break;
             case EffectTargetCondition.ELF:
-                arrTarget = _GetUnitByArchetype(cTargetDeck, eUnitArchetype.ELF);
+                arrTarget = DeckHelperFunc.GetUnitByArchetype(cTargetDeck, eUnitArchetype.ELF);
                 break;
             case EffectTargetCondition.DECK:
                 arrTarget = cTargetDeck.GetAllAliveUnit();
                 break;
             case EffectTargetCondition.DEAD:
-                arrTarget = _GetAllDeadUnit(cTargetDeck);
+                arrTarget = DeckHelperFunc.GetAllDeadUnit(cTargetDeck);
                 break;
             case EffectTargetCondition.RANDOM:
-                arrTarget = _GetRandomAliveUnit(cTargetDeck, (int)eTargetParam);
+                arrTarget = DeckHelperFunc.GetRandomAliveUnit(cTargetDeck, (int)eTargetParam);
                 break;
             case EffectTargetCondition.FRONTLINE:
-                arrTarget = _GetAllUnitFrontLine(cTargetDeck);
+                arrTarget = DeckHelperFunc.GetAllUnitFrontLine(cTargetDeck);
                 break;
             case EffectTargetCondition.ALL_UNIT_BELOW_HP_PERCENT:
-                arrTarget = _GetAllUnitBelowHpPercent(cTargetDeck, eTargetParam);
+                arrTarget = DeckHelperFunc.GetAllUnitBelowHpPercent(cTargetDeck, eTargetParam);
                 break;
 
         }
 
         return arrTarget;
     }
-
-    List<UnitObject> _GetUnitByArchetype(Deck cDeck, eUnitArchetype eUnitArchetype) {
-        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
-            if (unit == null) {
-                return false;
-            }
-
-            if (unit.IsDead()) {
-                return false;
-            }
-
-            if (unit.unitSO.eUnitArchetype != eUnitArchetype) {
-                return false;
-            }
-
-            return true;
-        });
-    }
-
-    List<UnitObject> _GetAllDeadUnit(Deck cDeck) {
-        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
-            if (unit == null) {
-                return false;
-            }
-
-            if (!unit.IsDead()) {
-                return false;
-            }
-
-            return true;
-        });
-    }
-
-    List<UnitObject> _GetAllUnitFrontLine(Deck cDeck) {
-        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
-            if (unit == null) {
-                return false;
-            }
-
-            if (!unit.IsDead()) {
-                return false;
-            }
-
-            if (!unit.IsFrontPosition()) {
-                return false;
-            }
-
-            return true;
-        });
-    }
-
-    List<UnitObject> _GetAllUnitBelowHpPercent(Deck cDeck, float percent) {
-        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
-            if (unit == null) {
-                return false;
-            }
-
-            if (!unit.IsDead()) {
-                return false;
-            }
-
-            if (unit.GetHealthPercentage() > percent) {
-                return false;
-            }
-
-            return true;
-        });
-    }
-
-    List<UnitObject> _GetRandomAliveUnit(Deck cDeck, int count) {
-        int i = 0;
-        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
-            if (unit == null) {
-                return false;
-            }
-
-            if (!unit.IsDead()) {
-                return false;
-            }
-
-            if (i == count) {
-                return false;
-            }
-
-            i++;
-
-            return true;
-        });
+    
+    EffectTargetCondition _GetTargetConditionFromTempEffect(UnitObject cUnit, EffectType eType) {
+        EffectTargetCondition eTargetCondition = EffectTargetCondition.LOWEST_HP;
+        if (cUnit.GetEffectSO(eType, out EffectScriptableObject effectSO)) {
+            eTargetCondition = effectSO.GetTargetCondition();
+        }
+        return eTargetCondition;
     }
 }
