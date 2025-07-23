@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: Windstalker_Horizontal_Damage
   m_EditorClassIdentifier: 
   _eType: 1
+  _fEffectVal: 9
   _eTargetType: 0
+  _eTargetCondition: 0
+  _eTargetParam: 0
   _eExecType: 2
   _effectAffinityType: 0
-  _effectResolveType: 2
-  _fEffectVal: 9
-  _fEffectTurn: 1
+  _effectResolveType: 3
+  _fEffectCount: 1

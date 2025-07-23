@@ -172,7 +172,7 @@ public class CombatManager : MonoBehaviour {
             // using EffectTargetType coz i lazy change already
             int nAttackCount_SameTarget = 1;
             int nTargetCount = 1;
-            
+
             EffectTargetCondition eTargetCondition = EffectTargetCondition.LOWEST_HP;
             if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_ATTACK_MULTIPLE)) {
                 eTargetCondition = _GetTargetConditionFromTempEffect(cAttackerUnit, EffectType.EFFECT_ATTACK_MULTIPLE);
@@ -285,6 +285,8 @@ public class CombatManager : MonoBehaviour {
         cDefenderUnit.ReceiveDamage(fAttack);
 
         _ActivatePostEffect(cAttackerUnit, fAttack);
+
+        ResourceManager.instance.GenerateDynamicText(cDefenderUnit.transform.position, fAttack.ToString());
         
         Global.DEBUG_PRINT("Final Damage=" + fAttack);
     }

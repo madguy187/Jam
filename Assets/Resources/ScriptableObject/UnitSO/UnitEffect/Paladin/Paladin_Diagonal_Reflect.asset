@@ -12,8 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: Paladin_Diagonal_Reflect
   m_EditorClassIdentifier: 
-  _eType: 3
-  _eTargetType: 0
-  _eExecType: 2
+  _eType: 16
   _fEffectVal: 20
-  _fEffectTurn: 1
+  _eTargetType: 0
+  _eTargetCondition: 0
+  _eTargetParam: 0
+  _eExecType: 2
+  _effectAffinityType: 0
+  _effectResolveType: 1
+  _fEffectCount: 1
