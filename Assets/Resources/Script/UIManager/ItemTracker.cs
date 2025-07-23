@@ -20,15 +20,14 @@ public class ItemTracker : MonoBehaviour
     public int currentUnits = 0;
     public int currentRelics = 0;
     public int currentBagItems = 0;
-    
-    private void Awake()
-    {
-        if (Instance != null && Instance != this)
-        {
+
+    private void Awake() {
+        if (Instance != null && Instance != this) {
             Destroy(gameObject); // Prevent duplicates
             return;
         }
         Instance = this;
+        Debug.Log("[ItemTracker] Instance created.");
     }
 
     public bool CanAccept(TrackerType trackerType, MockItemType itemType)

@@ -19,9 +19,9 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         canvasGroup = GetComponent<CanvasGroup>();
     }
 
-    public void Init(MockInventoryItem item) {
+    public void Init(MockInventoryItem item)
+    {
         draggedItem = item;
-        Global.DEBUG_PRINT("[DragHandler::Init] THIS IS CALLED ");
     }
 
     public MockItemType GetItemType()

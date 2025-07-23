@@ -20,7 +20,7 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
     private Image image;
     private ItemTracker itemTracker;
 
-    private void Awake()
+    private void Start()
     {
         image = GetComponent<Image>();
         if (image != null) { image.color = normalColor; }
@@ -68,7 +68,11 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
             dragHandler.OnDropRejected();
             return;
         }
-
+        if (itemTracker == null) {
+            Global.DEBUG_PRINT("[DropZone::OnDrop] ItemTracker is null.");
+            dragHandler.OnDropRejected();
+            return;
+        }
         if (!itemTracker.CanAccept(trackerType, draggedItemType)) {
             Global.DEBUG_PRINT("[DropZone::OnDrop] Cannot drop more items, max limit reached.");
             dragHandler.OnDropRejected();
