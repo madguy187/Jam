@@ -1,17 +1,18 @@
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
 public class UnitSettingLayout : MonoBehaviour {
-
     [Header("UI References")]
     public TMP_Text goldText;
     public Transform teamUnitContainer;
+    public Transform relicContainer;
     public Transform bagContainer;
 
     [Header("Prefabs")]
     public GameObject unitSlotPrefab;
     public GameObject unitButtonPrefab;
+    public GameObject relicSlotPrefab;
+    public GameObject relicButtonPrefab;
     public GameObject itemSlotPrefab;
     public GameObject itemButtonPrefab;
 
@@ -19,66 +20,82 @@ public class UnitSettingLayout : MonoBehaviour {
     public UnitDetailsPanel unitDetailsPanel;
 
     private MockPlayerInventory inventory;
+    private MockUnit activeUnit;
+    private ItemTracker tracker;
 
-    public void Init(MockPlayerInventory playerInventory)
-    {
+    public void Init(MockPlayerInventory playerInventory) {
+        tracker = ItemTracker.Instance;
+        if (tracker == null) {
+            Global.DEBUG_PRINT("[UnitSettingsLayout::Init] ItemTracker is null.");
+        }
         inventory = playerInventory;
         gameObject.SetActive(true);
         SetupDropZones();
         GenerateFixedTeamSlots();
+        GenerateFixedUnitRelicSlots();
         GenerateFixedBagSlots();
         RefreshUI();
+        relicContainer.gameObject.SetActive(false);
         Debug.Log("[UnitSettingsLayout::Init] UnitSettingLayout initialized with player inventory.");
     }
 
-    void RefreshUI()
-    {
+    void RefreshUI() {
         goldText.text = $"Gold: {inventory.gold}";
         ClearTeamUnitButtonsOnly();
         PopulateTeamUnits();
         ClearBagItemsOnly();
         PopulateBagItems();
+        ClearUnitRelicsOnly();
+        if (activeUnit != null) {
+            PopulateUnitRelics(activeUnit);
+        } else {
+            relicContainer.gameObject.SetActive(false);
+        }
     }
 
-    void ShowDetails(MockUnit unit)
-    {
+    public void RefreshRelicUI() {
+        ClearUnitRelicsOnly();
+        if (activeUnit != null) {
+            PopulateUnitRelics(activeUnit);
+        }
+    }
+
+
+    void ShowDetails(MockUnit unit) {
         unitDetailsPanel.Show(unit);
+        activeUnit = unit;
+        relicContainer.gameObject.SetActive(true);
+        RefreshRelicUI();
     }
 
-    public void CloseLayout()
-    {
+    public void CloseLayout() {
         gameObject.SetActive(false);
     }
 
-    public void SetupDropZones()
-    {
+    public void SetupDropZones() {
         // TeamUnitContainer only accepts units
         DropZoneSetup.AddDropZone(teamUnitContainer.gameObject, DropZone.AllowedItemType.UnitsOnly);
+
+        // RelicContainer only accepts relics
+        DropZoneSetup.AddDropZone(relicContainer.gameObject, DropZone.AllowedItemType.RelicsOnly);
 
         // BagContainer accepts both units and relics
         DropZoneSetup.AddDropZone(bagContainer.gameObject, DropZone.AllowedItemType.UnitsAndRelics);
     }
 
-    private void GenerateFixedTeamSlots()
-    {
+    private void GenerateFixedTeamSlots() {
         // Clear old slots
         foreach (Transform child in teamUnitContainer) {
             Destroy(child.gameObject);
         }
 
         // Get ItemTracker from teamUnitContainer or its children
-        var tracker = teamUnitContainer.GetComponentInChildren<ItemTracker>();
-        if (tracker == null) {
-            Debug.LogWarning("[UnitSettingsLayout::GenerateFixedTeamSlots] ItemTracker component not found in teamUnitContainer or its children.");
-            return;
-        }
         for (int i = 0; i < tracker.maxUnits; i++) {
             Instantiate(unitSlotPrefab, teamUnitContainer);
         }
     }
 
-    void ClearTeamUnitButtonsOnly()
-    {
+    void ClearTeamUnitButtonsOnly() {
         foreach (Transform slot in teamUnitContainer) {
             if (slot.childCount > 0) {
                 // Destroy any UnitButton children inside the slot
@@ -89,8 +106,7 @@ public class UnitSettingLayout : MonoBehaviour {
         }
     }
 
-    void PopulateTeamUnits()
-    {
+    void PopulateTeamUnits() {
         int unitIndex = 0;
 
         foreach (Transform slot in teamUnitContainer) {
@@ -104,13 +120,7 @@ public class UnitSettingLayout : MonoBehaviour {
 
                 GameObject unitGO = Instantiate(unitButtonPrefab, slot);
                 unitGO.GetComponent<UnitButton>().Init(unit, ShowDetails);
-                // Get ItemTracker from teamUnitContainer or its children
-                var tracker = teamUnitContainer.GetComponentInChildren<ItemTracker>();
-                if (tracker == null) {
-                    Debug.LogWarning("[UnitSettingsLayout::GenerateFixedTeamSlots] ItemTracker component not found in teamUnitContainer or its children.");
-                    return;
-                }
-                tracker.AddItem(MockItemType.Unit);
+                tracker.AddItem(TrackerType.UnitContainer, MockItemType.Unit);
 
                 // Optional but recommended: make it stretch to fill slot
                 RectTransform rt = unitGO.GetComponent<RectTransform>();
@@ -124,40 +134,26 @@ public class UnitSettingLayout : MonoBehaviour {
         }
     }
 
-    void ClearBagItemsOnly()
-    {
-        foreach (Transform slot in bagContainer)
-        {
-            foreach (Transform child in slot)
-            {
+    void ClearBagItemsOnly() {
+        foreach (Transform slot in bagContainer) {
+            foreach (Transform child in slot) {
                 Destroy(child.gameObject); // Remove the item inside the slot
             }
         }
     }
 
     private void GenerateFixedBagSlots() {
-        // Get ItemTracker from bagContainer
-        var tracker = bagContainer.GetComponentInChildren<ItemTracker>();
-        if (tracker == null) {
-            Debug.LogWarning("[UnitSettingsLayout::GenerateFixedBagSlots] ItemTracker component not found in bagContainer or its children.");
-            return;
-        }
-
-        int totalSlots = tracker.maxUnits + tracker.maxRelics;
-
-        for (int i = 0; i < totalSlots; i++) {
+        for (int i = 0; i < tracker.maxItems; i++) {
             Instantiate(itemSlotPrefab, bagContainer);
         }
-        
-        Debug.Log($"[UnitSettingsLayout::GenerateFixedBagSlots] BagContainer has {totalSlots} slots");
+
+        Global.DEBUG_PRINT($"[UnitSettingsLayout::GenerateFixedBagSlots] BagContainer has {tracker.maxItems} slots");
     }
-    
-    private void PopulateBagItems()
-    {
+
+    private void PopulateBagItems() {
         int bagItemIndex = 0;
 
-        foreach (Transform slot in bagContainer)
-        {
+        foreach (Transform slot in bagContainer) {
             if (bagItemIndex >= inventory.bagItems.Count)
                 break;
 
@@ -167,26 +163,17 @@ public class UnitSettingLayout : MonoBehaviour {
             var item = inventory.bagItems[bagItemIndex];
             GameObject go;
 
-            if (item.itemType == MockItemType.Unit)
-            {
+            if (item.itemType == MockItemType.Unit) {
                 go = Instantiate(unitButtonPrefab, slot);
                 var unitBtn = go.GetComponent<UnitButton>();
                 unitBtn.Init(item.unitData, item, ShowDetails);
                 unitBtn.boundItem = item;
-            }
-            else // Relic
-            {
+            } else // Relic
+              {
                 go = Instantiate(itemButtonPrefab, slot);
-                go.GetComponent<MockRelicSlot>().Init(item.relicData, item);
+                go.GetComponent<RelicButton>().Init(item.relicData, item);
             }
-
-            // Get ItemTracker from bag container or its children
-            var tracker = bagContainer.GetComponentInChildren<ItemTracker>();
-            if (tracker == null) {
-                Debug.LogWarning("[UnitSettingsLayout::PopulateBagItems] ItemTracker component not found in bagContainer or its children.");
-                return;
-            }
-            tracker.AddItem(item.itemType);
+            ItemTracker.Instance.AddItem(TrackerType.BagContainer, item.itemType);
 
             // Stretch to fit slot
             RectTransform rt = go.GetComponent<RectTransform>();
@@ -198,4 +185,39 @@ public class UnitSettingLayout : MonoBehaviour {
             bagItemIndex++;
         }
     }
+
+    void ClearUnitRelicsOnly() {
+        foreach (Transform slot in relicContainer) {
+            foreach (Transform child in slot) {
+                Destroy(child.gameObject);
+            }
+        }
+    }
+
+    private void GenerateFixedUnitRelicSlots() {
+        for (int i = 0; i < tracker.maxRelics / tracker.maxUnits; i++) {
+            Instantiate(relicSlotPrefab, relicContainer);
+        }
+    }
+
+    void PopulateUnitRelics(MockUnit unit)
+    {
+        for (int i = 0; i < relicContainer.childCount; i++) {
+            var slot = relicContainer.GetChild(i);
+            if (i < unit.equippedRelics.Count) {
+                var relic = unit.equippedRelics[i];
+                GameObject go = Instantiate(relicButtonPrefab, slot);
+                go.GetComponent<RelicButton>().Init(relic, null);
+                ItemTracker.Instance.AddItem(TrackerType.RelicContainer, MockItemType.Relic);
+                // Stretch to fit
+                RectTransform rt = go.GetComponent<RectTransform>();
+                rt.anchorMin = Vector2.zero;
+                rt.anchorMax = Vector2.one;
+                rt.offsetMin = Vector2.zero;
+                rt.offsetMax = Vector2.zero;
+            }
+        }
+    }
+
+    public MockUnit ActiveUnit => activeUnit;
 }

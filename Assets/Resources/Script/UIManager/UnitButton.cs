@@ -20,6 +20,7 @@ public class UnitButton : MonoBehaviour, IDragHandlerInterface
         unitData = unit;
         boundItem = inventoryItem;
         onClickCallback = onClick;
+        GetComponent<Button>().onClick.AddListener(() => onClick?.Invoke(unit));
 
         nameText.text = unit.unitName;
         if (unit.icon != null)

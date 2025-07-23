@@ -3,6 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler {
+    [SerializeField] public TrackerType trackerType; // Default to BagContainer
     public enum AllowedItemType {
         UnitsOnly,
         RelicsOnly,
@@ -16,32 +17,31 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
     // Optional visual feedback on pointer enter/exit
     public Color normalColor = Color.white;
     public Color highlightColor = Color.yellow;
-    private UnityEngine.UI.Image image;
+    private Image image;
     private ItemTracker itemTracker;
 
-    private void Awake() {
-        image = GetComponent<UnityEngine.UI.Image>();
-        if (image != null)
-            image.color = normalColor;
+    private void Awake()
+    {
+        image = GetComponent<Image>();
+        if (image != null) { image.color = normalColor; }
 
-        if (contentParent == null)
-            contentParent = this.transform;
+        if (contentParent == null) { contentParent = this.transform; }
 
-        if (itemTracker == null)
-            itemTracker = GetComponent<ItemTracker>();
+        if (itemTracker == null) { itemTracker = ItemTracker.Instance; }
     }
 
-    public void OnPointerEnter(PointerEventData eventData) {
-        if (image != null)
-            image.color = highlightColor;
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (image != null) { image.color = highlightColor; }
     }
 
-    public void OnPointerExit(PointerEventData eventData) {
-        if (image != null)
-            image.color = normalColor;
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (image != null) { image.color = normalColor; }
     }
 
-    public void OnDrop(PointerEventData eventData) {
+    public void OnDrop(PointerEventData eventData)
+    {
         var dragHandler = eventData.pointerDrag?.GetComponent<IDragHandlerInterface>();
         if (dragHandler == null)
             return;
@@ -69,7 +69,7 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
             return;
         }
 
-        if (!itemTracker.CanAccept(draggedItemType)) {
+        if (!itemTracker.CanAccept(trackerType, draggedItemType)) {
             Global.DEBUG_PRINT("[DropZone::OnDrop] Cannot drop more items, max limit reached.");
             dragHandler.OnDropRejected();
             return;
@@ -81,10 +81,20 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
             return;
         }
 
+        // If we reach here, we can accept the drop but this is specific for relic slots for a unit
+        if (allowedType == AllowedItemType.RelicsOnly && draggedItemType == MockItemType.Relic) {
+            // Get the current active unit from the layout
+            UnitSettingLayout layout = GetComponentInParent<UnitSettingLayout>();
+            if (layout.ActiveUnit != null) {
+                layout.ActiveUnit.EquipRelic(dragHandler.GetDraggedItem().relicData);
+                Global.DEBUG_PRINT($"Equipped {dragHandler.GetDraggedItem().relicData.relicName} to {layout.ActiveUnit.unitName}");
+            }
+        }
+
         // If passed all checks, accept drop
         // eventData.pointerDrag.transform.SetParent(contentParent, false);
         LayoutRebuilder.MarkLayoutForRebuild(contentParent.GetComponent<RectTransform>());
-        itemTracker.AddItem(draggedItemType);
+        itemTracker.AddItem(trackerType, draggedItemType);
         dragHandler.OnDropAccepted();
     }
 

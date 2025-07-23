@@ -12,11 +12,11 @@ GameObject:
   - component: {fileID: 2290234699908253902}
   - component: {fileID: 3374763702783722327}
   - component: {fileID: 4773813655064778440}
-  - component: {fileID: 7760515512275174007}
   - component: {fileID: 9172477431140849815}
   - component: {fileID: 7391384902507873785}
+  - component: {fileID: 5016021234994268605}
   m_Layer: 5
-  m_Name: UnitButton
+  m_Name: RelicButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -125,39 +125,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &7760515512275174007
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3509845748852257446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b45518af05aa61b41a9f01483aa1e7f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  unitIcon: {fileID: 1153766199557287263}
-  nameText: {fileID: 6476979424244670308}
-  boundItem:
-    itemType: 0
-    unitData:
-      unitName: 
-      level: 0
-      maxHP: 0
-      currentHP: 0
-      attack: 0
-      defense: 0
-      equippedRelics: []
-      icon: {fileID: 0}
-    relicData:
-      relicName: 
-      description: 
-      icon: {fileID: 0}
-      rarity: 0
-      bonusHP: 0
-      bonusAttack: 0
-      bonusDefense: 0
 --- !u!225 &9172477431140849815
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -183,7 +150,39 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   draggedItem:
-    itemType: 0
+    itemType: 1
+    unitData:
+      unitName: 
+      level: 0
+      maxHP: 0
+      currentHP: 0
+      attack: 0
+      defense: 0
+      equippedRelics: []
+      icon: {fileID: 0}
+    relicData:
+      relicName: 
+      description: 
+      icon: {fileID: 0}
+      rarity: 0
+      bonusHP: 0
+      bonusAttack: 0
+      bonusDefense: 0
+--- !u!114 &5016021234994268605
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3509845748852257446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc5554c79dd31c141a1ad272091f1a2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  iconImage: {fileID: 1153766199557287263}
+  boundItem:
+    itemType: 1
     unitData:
       unitName: 
       level: 0
@@ -213,7 +212,7 @@ GameObject:
   - component: {fileID: 4704440405519019140}
   - component: {fileID: 1153766199557287263}
   m_Layer: 5
-  m_Name: UnitIcon
+  m_Name: RelicIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -288,7 +287,7 @@ GameObject:
   - component: {fileID: 8891399072870231126}
   - component: {fileID: 6476979424244670308}
   m_Layer: 5
-  m_Name: UnitNameText
+  m_Name: RelicNameText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -1,72 +1,114 @@
 using UnityEngine;
 
+public enum TrackerType
+{
+    BagContainer,
+    UnitContainer,
+    RelicContainer
+}
+
 public class ItemTracker : MonoBehaviour
 {
-    [Header("Limits")]
-    [SerializeField] public int maxUnits = 5;
-    [SerializeField] public int maxRelics = 10;
+    public static ItemTracker Instance { get; private set; }
 
+    [Header("Limits")]
+    [SerializeField] public int maxUnits = 5; // For UnitContainer
+    [SerializeField] public int maxRelics = 15; // For RelicContainer
+    [SerializeField] public int maxItems = 40; // For BagContainer (combined units + relics)
+
+    [Header("Debug Info")]
     public int currentUnits = 0;
     public int currentRelics = 0;
-
-    // Call this to check if the container can accept another item of the given type
-    public bool CanAccept(MockItemType itemType)
+    public int currentBagItems = 0;
+    
+    private void Awake()
     {
-        switch (itemType)
+        if (Instance != null && Instance != this)
         {
-            case MockItemType.Unit:
-                return currentUnits < maxUnits;
-            case MockItemType.Relic:
-                return currentRelics < maxRelics;
+            Destroy(gameObject); // Prevent duplicates
+            return;
+        }
+        Instance = this;
+    }
+
+    public bool CanAccept(TrackerType trackerType, MockItemType itemType)
+    {
+        switch (trackerType)
+        {
+            case TrackerType.UnitContainer:
+                return itemType == MockItemType.Unit && currentUnits < maxUnits;
+            case TrackerType.RelicContainer:
+                return itemType == MockItemType.Relic && currentRelics < maxRelics;
+            case TrackerType.BagContainer:
+                return currentBagItems < maxItems;
             default:
                 return false;
         }
     }
 
-    // Call this to add an item count of the given type
-    public bool AddItem(MockItemType itemType)
+    public bool AddItem(TrackerType trackerType, MockItemType itemType)
     {
-        if (!CanAccept(itemType))
+        if (!CanAccept(trackerType, itemType)) {
+            Global.DEBUG_PRINT($"[ItemTracker::AddItem] Cannot add item of type {itemType} to {trackerType}. Limit reached.");
             return false;
+        }
 
-        switch (itemType)
+        switch (trackerType)
         {
-            case MockItemType.Unit:
+            case TrackerType.UnitContainer:
                 currentUnits++;
                 return true;
-            case MockItemType.Relic:
+            case TrackerType.RelicContainer:
                 currentRelics++;
                 return true;
+            case TrackerType.BagContainer:
+                currentBagItems++;
+                return true;
+            default:
+                return false;
         }
-        return false;
     }
 
-    // Call this to remove an item count of the given type
-    public bool RemoveItem(MockItemType itemType)
+    public bool RemoveItem(TrackerType trackerType, MockItemType itemType)
     {
-        switch (itemType)
+        switch (trackerType)
         {
-            case MockItemType.Unit:
+            case TrackerType.UnitContainer:
                 if (currentUnits > 0)
                 {
                     currentUnits--;
                     return true;
                 }
                 break;
-            case MockItemType.Relic:
+
+            case TrackerType.RelicContainer:
                 if (currentRelics > 0)
                 {
                     currentRelics--;
                     return true;
                 }
                 break;
+
+            case TrackerType.BagContainer:
+                if (currentBagItems > 0)
+                {
+                    currentBagItems--;
+                }
+                break;
         }
         return false;
     }
-
-    // Optional: get current counts
     public int GetCurrentCount(MockItemType itemType)
     {
         return itemType == MockItemType.Unit ? currentUnits : currentRelics;
+    }
+    
+    public int GetCurrentBagItemCount() => currentBagItems;
+
+    public void ClearItems()
+    {
+        currentUnits = 0;
+        currentRelics = 0;
+        currentBagItems = 0;
     }
 }

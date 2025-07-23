@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class MockRelicSlot : MonoBehaviour, IDragHandlerInterface
+public class RelicButton : MonoBehaviour, IDragHandlerInterface
 {
     public Image iconImage;
 

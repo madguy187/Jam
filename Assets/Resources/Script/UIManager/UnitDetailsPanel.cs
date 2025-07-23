@@ -37,7 +37,7 @@ public class UnitDetailsPanel : MonoBehaviour
         levelText.text = $"Lv {currentUnit.level}";
         hpText.text = $"HP: {currentUnit.currentHP} / {currentUnit.maxHP}";
         atkText.text = $"ATK: {currentUnit.attack}";
-        defText.text = $"DEF: {currentUnit.defense}";
+        defText.text = $"NOR: {currentUnit.equippedRelics.Count}"; // Placeholder to check relic count
 
         UpdateEquippedRelics();
     }
@@ -49,7 +49,7 @@ public class UnitDetailsPanel : MonoBehaviour
         // }
         // foreach (MockRelic relic in currentUnit.equippedRelics) {
         //     var go = Instantiate(relicSlotPrefab, equippedRelicContainer);
-        //     var slot = go.GetComponent<MockRelicSlot>();
+        //     var slot = go.GetComponent<RelicButton>();
         //     slot.Init(relic);
         // }
     }

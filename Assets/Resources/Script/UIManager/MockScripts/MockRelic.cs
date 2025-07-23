@@ -20,9 +20,9 @@ public class MockRelic
         icon = Resources.Load<Sprite>("Sprites/Axe_1");
         if (icon == null)
             Debug.LogWarning("Relic icon not found!");
-        bonusHP = UnityEngine.Random.Range(5, 15);
-        bonusAttack = UnityEngine.Random.Range(1, 5);
-        bonusDefense = UnityEngine.Random.Range(0, 3);
+        bonusHP = Random.Range(5, 15);
+        bonusAttack = Random.Range(1, 5);
+        bonusDefense = Random.Range(0, 3);
     }
 }
 

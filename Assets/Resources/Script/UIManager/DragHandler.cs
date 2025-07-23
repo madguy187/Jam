@@ -54,11 +54,15 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         originalParent = transform.parent;
 
         if (originalParent != null) {
-            var tracker = originalParent.GetComponentInParent<ItemTracker>();
-            if (tracker != null) {
-                tracker.RemoveItem(draggedItem.GetItemType());
+            if (ItemTracker.Instance != null) {
+                var dropZone = originalParent.gameObject.GetComponentInParent<DropZone>();
+                if (dropZone != null) {
+                    ItemTracker.Instance.RemoveItem(dropZone.trackerType, draggedItem.GetItemType());
+                } else {
+                    Global.DEBUG_PRINT("[DragHandler::OnBeginDrag] DropZone is null for originalParent: " + originalParent.gameObject.name);
+                }
             } else {
-                Global.DEBUG_PRINT("[DragHandler::OnBeginDrag] ItemTracker cannot be found in parent.");
+                Global.DEBUG_PRINT("[DragHandler::OnBeginDrag] ItemTracker is null.");
             }
         }
 
@@ -81,17 +85,32 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         rectTransform.localPosition = localPoint;
     }
 
-    public void OnEndDrag(PointerEventData eventData)
-    {
+    public void OnEndDrag(PointerEventData eventData) {
         canvasGroup.alpha = 1f;
         canvasGroup.blocksRaycasts = true;
 
         // If dropped over a valid drop zone, the drop zone script should handle reparenting.
         // If not, revert to original position and parent.
-        if (transform.parent == canvas.transform)
-        {
+        if (transform.parent == canvas.transform) {
             transform.SetParent(originalParent);
             rectTransform.position = originalPosition;
+        }
+        
+        var dropZone = originalParent.GetComponentInParent<DropZone>();
+
+        if (dropZone != null && dropZone.allowedType == DropZone.AllowedItemType.RelicsOnly) {
+            // And the relic is no longer in the same container (i.e., dragged out)
+            if (!(transform.parent == originalParent)) {
+                var layout = originalParent.GetComponentInParent<UnitSettingLayout>();
+                var activeUnit = layout?.ActiveUnit;
+
+                if (activeUnit != null && draggedItem.itemType == MockItemType.Relic) {
+                    activeUnit.UnequipRelic(draggedItem.relicData);
+                    layout.RefreshRelicUI();
+                    // Destroy(gameObject);
+                    Global.DEBUG_PRINT($"[DragHandler] Unequipped relic {draggedItem.relicData.relicName} from {activeUnit.unitName}");
+                }
+            }
         }
     }
 }
