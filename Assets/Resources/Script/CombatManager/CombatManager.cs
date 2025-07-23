@@ -175,21 +175,22 @@ public class CombatManager : MonoBehaviour {
         cDefenderUnit.Resolve(EffectResolveType.RESOLVE_ATTACK);
     }
 
-    MatchType _GetRollType(string unitName) {
+    List<MatchType> _GetRollType(string unitName) {
+        List<MatchType> listResult = new List<MatchType>();
         if (_listMatch == null) {
-            return MatchType.NONE;
+            return listResult;
         }
 
         foreach (Match match in _listMatch) {
             if (match.GetUnitName() == unitName) {
-                return match.GetMatchType();
+                listResult.Add(match.GetMatchType());
             }
         }
 
-        return MatchType.NONE;
+        return listResult;
     }
 
-    void _ExecBattleOne(UnitObject cAttackerUnit, UnitObject cDefenderUnit, MatchType eRoll) {
+    void _ExecBattleOne(UnitObject cAttackerUnit, UnitObject cDefenderUnit, List<MatchType> listRoll) {
         if (cAttackerUnit == null || cAttackerUnit.IsDead()) {
             return;
         }
@@ -198,10 +199,12 @@ public class CombatManager : MonoBehaviour {
             return;
         }
 
-        EffectList effects = cAttackerUnit.GetRollEffectList(eRoll);
-        if (effects != null) {
-            foreach (EffectScriptableObject effect in effects) {
-                _ActivateRollEffect(effect);
+        foreach (MatchType eRoll in listRoll) {
+            EffectList effects = cAttackerUnit.GetRollEffectList(eRoll);
+            if (effects != null) {
+                foreach (EffectScriptableObject effect in effects) {
+                    _ActivateRollEffect(effect);
+                }
             }
         }
 

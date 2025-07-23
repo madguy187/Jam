@@ -6,6 +6,10 @@ public class UIHealthBar : MonoBehaviour
     [SerializeField] UnitObject _unit = null;
     [SerializeField] Slider _slider = null;
 
+    public void SetUnit(UnitObject unit) {
+        _unit = unit;
+    }
+
     // Update is called once per frame
     void Update()
     {
