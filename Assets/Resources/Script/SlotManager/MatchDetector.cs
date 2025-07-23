@@ -5,22 +5,37 @@ using System.Linq;
 public class MatchDetector
 {
     private SlotGrid grid;
-    
-    // Load all the complex shapes first
     private List<Vector2Int>[] horizontalPatterns;
     private List<Vector2Int>[] verticalPatterns;
     private List<Vector2Int>[] diagonalPatterns;
     private List<List<Vector2Int>> zigzagPatterns;
     private List<Vector2Int> xShapePattern;
     private List<Vector2Int> fullGridPattern;
+    private bool excludeSinglesInLargerPatterns = true; 
 
+    // - Initialisation
     public MatchDetector(SlotGrid grid)
     {
         this.grid = grid;
         InitializePatterns();
     }
 
+    public void SetExcludeSinglesInLargerPatterns(bool exclude)
+    {
+        excludeSinglesInLargerPatterns = exclude;
+    }
+
     private void InitializePatterns()
+    {
+        InitializeHorizontalPatterns();
+        InitializeVerticalPatterns();
+        InitializeDiagonalPatterns();
+        InitializeZigzagPatterns();
+        InitializeXShapePattern();
+        InitializeFullGridPattern();
+    }
+
+    private void InitializeHorizontalPatterns()
     {
         horizontalPatterns = new List<Vector2Int>[3];
         for (int row = 0; row < 3; row++)
@@ -32,7 +47,10 @@ public class MatchDetector
                 new Vector2Int(row, 2)
             };
         }
+    }
 
+    private void InitializeVerticalPatterns()
+    {
         verticalPatterns = new List<Vector2Int>[3];
         for (int col = 0; col < 3; col++)
         {
@@ -43,7 +61,10 @@ public class MatchDetector
                 new Vector2Int(2, col)
             };
         }
-        
+    }
+
+    private void InitializeDiagonalPatterns()
+    {
         diagonalPatterns = new List<Vector2Int>[2];
         diagonalPatterns[0] = new List<Vector2Int>
         {
@@ -57,8 +78,10 @@ public class MatchDetector
             new Vector2Int(1, 1),
             new Vector2Int(2, 0)
         };
-        
-        // Initialize zigzag patterns
+    }
+
+    private void InitializeZigzagPatterns()
+    {
         zigzagPatterns = new List<List<Vector2Int>>
         {
             new List<Vector2Int> { // Left zigzag
@@ -72,7 +95,10 @@ public class MatchDetector
                 new Vector2Int(2, 1), new Vector2Int(2, 0)
             }
         };
-        
+    }
+
+    private void InitializeXShapePattern()
+    {
         xShapePattern = new List<Vector2Int>
         {
             new Vector2Int(0, 0), 
@@ -81,7 +107,10 @@ public class MatchDetector
             new Vector2Int(2, 0), 
             new Vector2Int(2, 2)  
         };
-        
+    }
+
+    private void InitializeFullGridPattern()
+    {
         fullGridPattern = new List<Vector2Int>();
         for (int row = 0; row < 3; row++)
         {
@@ -92,21 +121,16 @@ public class MatchDetector
         }
     }
 
+    // - Public Functions
     public List<Match> DetectMatches()
     {
         List<Match> allMatches = new List<Match>();
         HashSet<Vector2Int> positionsInComplexPatterns = new HashSet<Vector2Int>();
 
-        // First detect all complex patterns
-        var complexMatches = new List<Match>();
-        complexMatches.AddRange(DetectFullGridMatches());
-        complexMatches.AddRange(DetectXShapeMatches());
-        complexMatches.AddRange(DetectDiagonalMatches());
-        complexMatches.AddRange(DetectZigzagMatches());
-        complexMatches.AddRange(DetectHorizontalMatches());
-        complexMatches.AddRange(DetectVerticalMatches());
+        // Detect all complex patterns first
+        var complexMatches = DetectComplexPatterns();
 
-        // Track all positions that are part of complex patterns
+        // Track positions in complex patterns
         foreach (var match in complexMatches)
         {
             foreach (var pos in match.GetPositions())
@@ -115,26 +139,39 @@ public class MatchDetector
             }
         }
 
-        // Add complex matches
-        if (Global.EXCLUDE_SINGLES_IN_LARGER_PATTERNS)
+        // Handle singles detection
+        var potentialSingles = DetectSingleMatches();
+        var singlesBySymbol = GroupSinglesBySymbol(potentialSingles);
+
+        // Add singles that aren't part of complex patterns (one per symbol type)
+        AddUniqueSingles(allMatches, singlesBySymbol, positionsInComplexPatterns);
+
+        // Then add complex matches if configured
+        if (excludeSinglesInLargerPatterns)
         {
             allMatches.AddRange(complexMatches);
         }
-        /*else
-        {
-            // Group matches by symbol and type to get unique matches
-            var uniqueMatches = complexMatches
-                .GroupBy(m => new { Symbol = m.GetSymbol(), Type = m.GetMatchType() })
-                .Select(g => g.First());
-            allMatches.AddRange(uniqueMatches);
-        }*/
 
-        // Handle singles detection
-        var potentialSingles = DetectSingleMatches();
-        var singlesBySymbol = new Dictionary<SymbolType, List<Match>>();    
+        return allMatches;
+    }
 
-        // Group singles by symbol type
-        foreach (var single in potentialSingles)
+    // - Private Methods
+    private List<Match> DetectComplexPatterns()
+    {
+        var complexMatches = new List<Match>();
+        complexMatches.AddRange(DetectHorizontalMatches());
+        complexMatches.AddRange(DetectVerticalMatches());
+        complexMatches.AddRange(DetectDiagonalMatches());
+        complexMatches.AddRange(DetectZigzagMatches());
+        complexMatches.AddRange(DetectXShapeMatches());
+        complexMatches.AddRange(DetectFullGridMatches());
+        return complexMatches;
+    }
+
+    private Dictionary<SymbolType, List<Match>> GroupSinglesBySymbol(List<Match> singles)
+    {
+        var singlesBySymbol = new Dictionary<SymbolType, List<Match>>();
+        foreach (var single in singles)
         {
             var symbol = single.GetSymbol();
             if (!singlesBySymbol.ContainsKey(symbol))
@@ -143,8 +180,11 @@ public class MatchDetector
             }
             singlesBySymbol[symbol].Add(single);
         }
+        return singlesBySymbol;
+    }
 
-        // Add singles that aren't part of complex patterns
+    private void AddUniqueSingles(List<Match> allMatches, Dictionary<SymbolType, List<Match>> singlesBySymbol, HashSet<Vector2Int> positionsInComplexPatterns)
+    {
         foreach (var symbolSingles in singlesBySymbol)
         {
             foreach (var single in symbolSingles.Value)
@@ -156,20 +196,22 @@ public class MatchDetector
                 }
             }
         }
-
-        return allMatches;
     }
 
     private bool IsMatchingPattern(List<Vector2Int> pattern, out SymbolType symbol)
     {
         symbol = grid.GetSlot(pattern[0].x, pattern[0].y);
         if (symbol == SymbolType.EMPTY)
+        {
             return false;
+        }
 
         foreach (var pos in pattern)
         {
             if (grid.GetSlot(pos.x, pos.y) != symbol)
+            {
                 return false;
+            }
         }
 
         return true;

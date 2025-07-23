@@ -1,30 +1,26 @@
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
 
 public enum SymbolType
 {
     EMPTY = 0,
-    ATTACK = 1,
-    DEFENSE = 2,
-    SPECIAL = 3
+    HOLY = 1,
+    UNDEAD = 2,
+    ELF = 3
 }
 
 public class SymbolGenerator : MonoBehaviour
 {
     public static SymbolGenerator instance { get; private set; }
-    
-    [Header("Symbol Probabilities")]
-    [SerializeField] [Range(0f, 1f)] private float emptyProbability = 0.2f;    
-    [SerializeField] [Range(0f, 1f)] private float attackProbability = 0.3f;   
-    [SerializeField] [Range(0f, 1f)] private float defenseProbability = 0.25f; 
-    [SerializeField] [Range(0f, 1f)] private float specialProbability = 0.25f; 
 
-    void Awake()
+    private void Awake()
     {
         if (instance == null)
         {
             instance = this;
+            transform.parent = null;
             DontDestroyOnLoad(gameObject);
-            ValidateProbabilities();
         }
         else
         {
@@ -32,110 +28,142 @@ public class SymbolGenerator : MonoBehaviour
         }
     }
 
-    private void OnValidate()
+    private void Start()
     {
-        ValidateProbabilities();
+        UpdateProbabilities();
     }
 
-    private void ValidateProbabilities()
+    public void UpdateProbabilities()
     {
-        float total = emptyProbability + attackProbability + defenseProbability + specialProbability;
-        if (Mathf.Abs(total - 1f) > 0.01f)
-        {
-            Debug.LogWarning("Symbol probabilities sum != 1.0!");
-        }
-    }
-
-    private SymbolType GenerateSymbolFromProbabilities(float emptyProb, float attackProb, float defenseProb)
-    {
-        float roll = Random.value;
-        float currentThreshold = 0f;
-
-        currentThreshold += emptyProb;
-        if (roll <= currentThreshold)
-        {
-            return SymbolType.EMPTY;
-        }
-
-        currentThreshold += attackProb;
-        if (roll <= currentThreshold)
-        {
-            return SymbolType.ATTACK;
-        }
-
-        currentThreshold += defenseProb;
-        if (roll <= currentThreshold)
-        {
-            return SymbolType.DEFENSE;
-        }
-
-        return SymbolType.SPECIAL;
+        Deck currentDeck = DeckManager.instance.GetDeckByType(
+            SlotController.instance.IsEnemyTurn() ? eDeckType.ENEMY : eDeckType.PLAYER
+        );
+        ProbabilityCalculator.instance.CalculateProbabilities(currentDeck);
     }
 
     public SymbolType GenerateRandomSymbol()
     {
-        return GenerateSymbolFromProbabilities(emptyProbability, attackProbability, defenseProbability);
+        UpdateProbabilities(); 
+        return ProbabilityCalculator.instance.GenerateRandomSymbol();
+    }
+
+    public static eUnitArchetype GetArchetypeForSymbol(SymbolType symbolType)
+    {
+        switch (symbolType)
+        {
+            case SymbolType.HOLY:
+                return eUnitArchetype.HOLY;
+            case SymbolType.UNDEAD:
+                return eUnitArchetype.UNDEAD;
+            case SymbolType.ELF:
+                return eUnitArchetype.ELF;
+            default:
+                return eUnitArchetype.NONE;
+        }
     }
     
     public void FillGridWithRandomSymbols(SlotGrid grid)
     {
         if (grid == null) return;
         
-        // Clear existing symbols to prevent any leftover state
+        Debug.Log("[SymbolGenerator] Starting to fill grid with random symbols");
+        
+        UpdateProbabilities();
+        
         grid.ClearGrid();
         
-        // Fill each position with a new random symbol
         for (int row = 0; row < 3; row++) 
         {
             for (int col = 0; col < 3; col++) 
             {
-                grid.SetSlot(row, col, GenerateRandomSymbol());
+                SymbolType symbol = GenerateRandomSymbol();
+                Debug.Log($"[SymbolGenerator] Setting position ({row}, {col}) to {symbol}");
+                grid.SetSlot(row, col, symbol);
             }
         }
+
+        Debug.Log("[SymbolGenerator] Finished filling grid");
     }
 
-    // Generate symbols based on unit type and stats
-    public SymbolType[] GenerateSymbolsForUnit(UnitObject unit)
+    public SymbolType[] GenerateSymbolsForDeck(Deck deck)
     {
-        if (unit == null) return null;
+        if (deck == null) return null;
 
-        float tempEmptyProb = emptyProbability;
-        float tempAttackProb = attackProbability;
-        float tempDefenseProb = defenseProbability;
-        float tempSpecialProb = specialProbability;
-
-        // TODO: Adjust probabilities based on unit stats
-        
-        SymbolType[] symbols = new SymbolType[9];
-        for (int i = 0; i < 9; i++)
+        HashSet<UnitObject> uniqueUnits = new HashSet<UnitObject>();
+        foreach (UnitObject unit in deck)
         {
-            symbols[i] = GenerateSymbolFromProbabilities(tempEmptyProb, tempAttackProb, tempDefenseProb);
+            if (unit != null && unit.unitSO != null)
+            {
+                uniqueUnits.Add(unit);
+            }
+        }
+
+        SymbolType[] symbols = new SymbolType[9];
+        
+        int currentSlot = 0;
+        foreach (UnitObject unit in uniqueUnits)
+        {
+            if (currentSlot >= 9) break; 
+
+            switch (unit.unitSO.eUnitArchetype)
+            {
+                case eUnitArchetype.HOLY:
+                    symbols[currentSlot] = SymbolType.HOLY;
+                    break;
+                case eUnitArchetype.UNDEAD:
+                    symbols[currentSlot] = SymbolType.UNDEAD;
+                    break;
+                case eUnitArchetype.ELF:
+                    symbols[currentSlot] = SymbolType.ELF;
+                    break;
+                default:
+                    symbols[currentSlot] = SymbolType.EMPTY;
+                    break;
+            }
+            currentSlot++;
+        }
+
+        for (int i = currentSlot; i < 9; i++)
+        {
+            if (Random.value < ProbabilityCalculator.instance.GetProbabilityForSymbol(SymbolType.EMPTY))
+            {
+                symbols[i] = SymbolType.EMPTY;
+                continue;
+            }
+
+            if (uniqueUnits.Count > 0)
+            {
+                UnitObject randomUnit = uniqueUnits.ElementAt(Random.Range(0, uniqueUnits.Count));
+                switch (randomUnit.unitSO.eUnitArchetype)
+                {
+                    case eUnitArchetype.HOLY:
+                        symbols[i] = SymbolType.HOLY;
+                        break;
+                    case eUnitArchetype.UNDEAD:
+                        symbols[i] = SymbolType.UNDEAD;
+                        break;
+                    case eUnitArchetype.ELF:
+                        symbols[i] = SymbolType.ELF;
+                        break;
+                    default:
+                        symbols[i] = SymbolType.EMPTY;
+                        break;
+                }
+            }
+            else
+            {
+                symbols[i] = SymbolType.EMPTY;
+            }
+        }
+
+        for (int i = symbols.Length - 1; i > 0; i--)
+        {
+            int randomIndex = Random.Range(0, i + 1);
+            SymbolType temp = symbols[i];
+            symbols[i] = symbols[randomIndex];
+            symbols[randomIndex] = temp;
         }
 
         return symbols;
-    }
-    
-    public void SetEmptyProbability(float probability)
-    {
-        emptyProbability = Mathf.Clamp01(probability);
-        ValidateProbabilities();
-    }
-    
-    public void SetAttackProbability(float probability) 
-    {
-        attackProbability = Mathf.Clamp01(probability);
-        ValidateProbabilities();
-    }
-    
-    public void SetDefenseProbability(float probability) 
-    {
-        defenseProbability = Mathf.Clamp01(probability);
-        ValidateProbabilities();
-    }
-    
-    public void SetSpecialProbability(float probability) 
-    {
-        specialProbability = Mathf.Clamp01(probability);
-        ValidateProbabilities();
     }
 } 

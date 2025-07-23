@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 
 [RequireComponent(typeof(Button))]
-public class UIRollButton : MonoBehaviour
+public class UIRerollButton : MonoBehaviour
 {
     private Button button;
     
@@ -35,7 +35,10 @@ public class UIRollButton : MonoBehaviour
     
     private void OnClick()
     {
-        Global.DEBUG_PRINT("[UIRollButton] Button clicked!");
+        // Init probabilities if this is the first reroll
+        SlotController.instance.InitializeProbabilitiesIfNeeded();
+        
+        // Then do the normal reroll
         SlotController.instance.FillGridWithRandomSymbols();
     }
     
