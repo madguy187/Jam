@@ -53,18 +53,7 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
         originalPosition = rectTransform.position;
         originalParent = transform.parent;
 
-        if (originalParent != null) {
-            if (ItemTracker.Instance != null) {
-                var dropZone = originalParent.gameObject.GetComponentInParent<DropZone>();
-                if (dropZone != null) {
-                    ItemTracker.Instance.RemoveItem(dropZone.trackerType, draggedItem.GetItemType());
-                } else {
-                    Global.DEBUG_PRINT("[DragHandler::OnBeginDrag] DropZone is null for originalParent: " + originalParent.gameObject.name);
-                }
-            } else {
-                Global.DEBUG_PRINT("[DragHandler::OnBeginDrag] ItemTracker is null.");
-            }
-        }
+        // Do NOT update tracker here. Only update after drop is successful in a different container.
 
         canvasGroup.alpha = 0.6f;  // make transparent while dragging
         canvasGroup.blocksRaycasts = false; // so drop targets can receive events
@@ -95,12 +84,21 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             transform.SetParent(originalParent);
             rectTransform.position = originalPosition;
         }
-        
-        var dropZone = originalParent.GetComponentInParent<DropZone>();
 
-        if (dropZone != null && dropZone.allowedType == DropZone.AllowedItemType.RelicsOnly) {
+        // Only update tracker if dropped into a different container
+        var originalDropZone = originalParent.GetComponentInParent<DropZone>();
+        var newDropZone = transform.parent.GetComponentInParent<DropZone>();
+
+        if (originalDropZone != null && newDropZone != null && originalDropZone != newDropZone) {
+            // Remove from original, add to new
+            ItemTracker.Instance.RemoveItem(originalDropZone.trackerType, draggedItem.GetItemType());
+            ItemTracker.Instance.AddItem(newDropZone.trackerType, draggedItem.GetItemType());
+        }
+
+        // Relic unequip logic (only if dragged out of relic container)
+        if (originalDropZone != null && originalDropZone.allowedType == DropZone.AllowedItemType.RelicsOnly) {
             // And the relic is no longer in the same container (i.e., dragged out)
-            if (!(transform.parent == originalParent)) {
+            if (transform.parent != originalParent) {
                 var layout = originalParent.GetComponentInParent<UnitSettingLayout>();
                 var activeUnit = layout?.ActiveUnit;
 

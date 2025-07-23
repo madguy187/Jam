@@ -22,25 +22,36 @@ public class UnitSettingLayout : MonoBehaviour {
     private MockPlayerInventory inventory;
     private MockUnit activeUnit;
     private ItemTracker tracker;
+    private bool hasInitialized = false;
 
-    public void Init(MockPlayerInventory playerInventory) {
+    public void Init(MockPlayerInventory playerInventory)
+    {
         tracker = ItemTracker.Instance;
         if (tracker == null) {
             Global.DEBUG_PRINT("[UnitSettingsLayout::Init] ItemTracker is null.");
         }
+
         inventory = playerInventory;
         gameObject.SetActive(true);
-        SetupDropZones();
-        GenerateFixedTeamSlots();
-        GenerateFixedUnitRelicSlots();
-        GenerateFixedBagSlots();
+
+        if (!hasInitialized) {
+            SetupDropZones();
+            GenerateFixedTeamSlots();
+            GenerateFixedUnitRelicSlots();
+            GenerateFixedBagSlots();
+            hasInitialized = true;
+        }
+        
         RefreshUI();
         relicContainer.gameObject.SetActive(false);
         Debug.Log("[UnitSettingsLayout::Init] UnitSettingLayout initialized with player inventory.");
     }
 
-    void RefreshUI() {
+    void RefreshUI()
+    {
         goldText.text = $"Gold: {inventory.gold}";
+        // Always clear tracker counts before repopulating
+        tracker.ClearItems();
         ClearTeamUnitButtonsOnly();
         PopulateTeamUnits();
         ClearBagItemsOnly();
@@ -53,7 +64,8 @@ public class UnitSettingLayout : MonoBehaviour {
         }
     }
 
-    public void RefreshRelicUI() {
+    public void RefreshRelicUI()
+    {
         ClearUnitRelicsOnly();
         if (activeUnit != null) {
             PopulateUnitRelics(activeUnit);
@@ -61,14 +73,21 @@ public class UnitSettingLayout : MonoBehaviour {
     }
 
 
-    void ShowDetails(MockUnit unit) {
+    void ShowDetails(MockUnit unit)
+    {
         unitDetailsPanel.Show(unit);
         activeUnit = unit;
         relicContainer.gameObject.SetActive(true);
         RefreshRelicUI();
     }
 
-    public void CloseLayout() {
+    public void CloseLayout()
+    {
+        ClearUnitRelicsOnly();
+        ClearTeamUnitButtonsOnly();
+        ClearBagItemsOnly();
+        activeUnit = null;
+        relicContainer.gameObject.SetActive(false);
         gameObject.SetActive(false);
     }
 
