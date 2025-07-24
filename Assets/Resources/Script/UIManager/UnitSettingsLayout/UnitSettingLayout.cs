@@ -74,8 +74,8 @@ public class UnitSettingLayout : MonoBehaviour
         }
     }
 
-
-    void ShowDetails(MockUnit unit) {
+    void ShowDetails(MockUnit unit)
+    {
         unitDetailsPanel.Show(unit);
         activeUnit = unit;
         relicContainer.gameObject.SetActive(true);
@@ -125,7 +125,8 @@ public class UnitSettingLayout : MonoBehaviour
         }
     }
 
-    private void GenerateFixedTeamSlots() {
+    private void GenerateFixedTeamSlots()
+    {
         // Clear old slots
         foreach (Transform child in teamUnitContainer) {
             Destroy(child.gameObject);
@@ -164,8 +165,10 @@ public class UnitSettingLayout : MonoBehaviour
 
                 GameObject unitGO = Instantiate(unitButtonPrefab, slot);
                 var unitItem = new MockInventoryItem(unit);
+                unit.uiGameObject = unitGO;
                 unitGO.GetComponent<UnitButton>().Init(unit, unitItem, ShowDetails);
                 unitGO.GetComponent<DragHandler>().Init(unitItem);
+                unitGO.GetComponent<ToolTipDetails>().Init(unitDetailsPanel.GetAnyUnitName(unit), unitDetailsPanel.GetAnyUnitDetails(unit));
                 tracker.AddItem(TrackerType.UnitContainer, MockItemType.Unit);
 
                 // Optional but recommended: make it stretch to fill slot

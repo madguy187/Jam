@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 7760515512275174007}
   - component: {fileID: 9172477431140849815}
   - component: {fileID: 7391384902507873785}
+  - component: {fileID: 1521225764846984686}
   m_Layer: 5
   m_Name: UnitButton
   m_TagString: Untagged
@@ -139,8 +140,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitIcon: {fileID: 1153766199557287263}
   nameText: {fileID: 6476979424244670308}
-  selectedHighlight: {fileID: 0}
-  visualTransform: {fileID: 5725677782776046403}
   boundItem:
     itemType: 0
     unitData:
@@ -203,6 +202,22 @@ MonoBehaviour:
       bonusHP: 0
       bonusAttack: 0
       bonusDefense: 0
+--- !u!114 &1521225764846984686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3509845748852257446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afdd738693039df49ad6761bc9254813, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  titleText: 
+  detailsText: 
+  ToolTipDelaySeconds: 0.3
+  ToolTipFrameIncrease: 3
 --- !u!1 &7878664586210785864
 GameObject:
   m_ObjectHideFlags: 0

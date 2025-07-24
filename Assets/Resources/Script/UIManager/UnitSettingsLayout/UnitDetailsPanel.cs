@@ -33,17 +33,28 @@ public class UnitDetailsPanel : MonoBehaviour
     {
         if (currentUnit == null) { return; }
 
+        //string title = currentUnit.unitName;
+        //string details = 
+        //    $"Lv {currentUnit.level}\n" +
+        //    $"HP: {currentUnit.currentHP} / {currentUnit.maxHP}\n" +
+        //    $"ATK: {currentUnit.attack}\n" +
+        //    $"NOR: {currentUnit.equippedRelics.Count}";
+
         nameText.text = currentUnit.unitName;
         levelText.text = $"Lv {currentUnit.level}";
         hpText.text = $"HP: {currentUnit.currentHP} / {currentUnit.maxHP}";
         atkText.text = $"ATK: {currentUnit.attack}";
         defText.text = $"NOR: {currentUnit.equippedRelics.Count}"; // Placeholder to check relic count
 
+        // var tooltip = currentUnit.uiGameObject.GetComponent<ToolTipDetails>();
+        // if (tooltip != null) {
+        //     tooltip.Init(title, details);
+        // }
+
         UpdateEquippedRelics();
     }
 
-    private void UpdateEquippedRelics() 
-    {
+    private void UpdateEquippedRelics() {
         // foreach (Transform child in equippedRelicContainer) {
         //     Destroy(child.gameObject);
         // }
@@ -52,6 +63,18 @@ public class UnitDetailsPanel : MonoBehaviour
         //     var slot = go.GetComponent<RelicButton>();
         //     slot.Init(relic);
         // }
+    }
+
+    public string GetAnyUnitName(MockUnit unit) => unit?.unitName ?? "NULL";
+
+    public string GetAnyUnitDetails(MockUnit unit) 
+    {
+        if (unit == null) return "NULL";
+        return $"Lv {unit.level}\n" +
+               $"HP: {unit.currentHP} / {unit.maxHP}\n" +
+               $"ATK: {unit.attack}\n" +
+               $"DEF: {unit.defense}\n" +
+               $"Relics: {unit.equippedRelics.Count}";
     }
 
     public MockUnit GetCurrentUnit() => currentUnit;

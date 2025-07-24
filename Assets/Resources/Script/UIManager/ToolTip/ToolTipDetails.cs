@@ -2,7 +2,8 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class ToolTipDetails : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
+public class ToolTipDetails : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler 
+{
     public string titleText;
     public string detailsText;
 
@@ -17,6 +18,12 @@ public class ToolTipDetails : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     void Start()
     {
         hasMouseOver = false;
+    }
+
+    public void Init(string title, string details)
+    {
+        titleText = title;
+        detailsText = details;
     }
 
     // Update is called once per frame

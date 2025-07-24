@@ -4,6 +4,8 @@ using System.Collections.Generic;
 [System.Serializable]
 public class MockUnit 
 {
+    // Reference to the associated GameObject (e.g., the UI or scene object representing this unit)
+    public GameObject uiGameObject;
     public string unitName;
     public int level;
     public int maxHP;

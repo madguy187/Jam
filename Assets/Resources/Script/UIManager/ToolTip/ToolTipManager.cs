@@ -11,7 +11,8 @@ public class ToolTipManager : MonoBehaviour {
     private bool isShowing;
     private float _frameIncrease;
     
-    private void Awake() {
+    private void Awake()
+    {
         if (Instance != null && Instance != this) {
             Destroy(gameObject); // Prevent duplicates
             return;
