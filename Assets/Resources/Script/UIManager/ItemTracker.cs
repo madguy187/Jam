@@ -20,7 +20,8 @@ public class ItemTracker : MonoBehaviour {
     public int currentRelics = 0;
     public int currentBagItems = 0;
 
-    private void Awake() {
+    private void Awake()
+    {
         if (Instance != null && Instance != this) {
             Destroy(gameObject); // Prevent duplicates
             return;
@@ -29,7 +30,8 @@ public class ItemTracker : MonoBehaviour {
         Debug.Log("[ItemTracker] Instance created.");
     }
 
-    public bool CanAccept(TrackerType trackerType, MockItemType itemType) {
+    public bool CanAccept(TrackerType trackerType, MockItemType itemType)
+    {
         switch (trackerType) {
             case TrackerType.UnitContainer:
                 return itemType == MockItemType.Unit && currentUnits < maxUnits;
@@ -42,7 +44,8 @@ public class ItemTracker : MonoBehaviour {
         }
     }
 
-    public bool AddItem(TrackerType trackerType, MockItemType itemType) {
+    public bool AddItem(TrackerType trackerType, MockItemType itemType)
+    {
         if (!CanAccept(trackerType, itemType)) {
             Global.DEBUG_PRINT($"[ItemTracker::AddItem] Cannot add item of type {itemType} to {trackerType}. Limit reached.");
             return false;
@@ -63,7 +66,8 @@ public class ItemTracker : MonoBehaviour {
         }
     }
 
-    public bool RemoveItem(TrackerType trackerType, MockItemType itemType) {
+    public bool RemoveItem(TrackerType trackerType, MockItemType itemType)
+    {
         switch (trackerType) {
             case TrackerType.UnitContainer:
                 if (currentUnits > 0) {
@@ -87,13 +91,15 @@ public class ItemTracker : MonoBehaviour {
         }
         return false;
     }
-    public int GetCurrentCount(MockItemType itemType) {
+    public int GetCurrentCount(MockItemType itemType)
+    {
         return itemType == MockItemType.Unit ? currentUnits : currentRelics;
     }
 
     public int GetCurrentBagItemCount() => currentBagItems;
 
-    public void ClearItems() {
+    public void ClearItems()
+    {
         currentUnits = 0;
         currentRelics = 0;
         currentBagItems = 0;

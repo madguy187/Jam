@@ -107,7 +107,7 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
                 // Unequip relic
                 bool success = activeUnit.UnequipRelic(draggedItem.relicData);
                 if (success) {
-                    layout.RefreshRelicUI();
+                    // layout.RefreshRelicUI();
                     Global.DEBUG_PRINT($"[DropZone] Unequipped relic {draggedItem.relicData.relicName} from {activeUnit.unitName} to bag.");
                 } else {
                     Global.DEBUG_PRINT($"[DropZone] Relic {draggedItem.relicData.relicName} not found on {activeUnit.unitName}.");
@@ -118,7 +118,7 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
             else if (allowedType == AllowedItemType.RelicsOnly) {
                 // Equip relic
                 activeUnit.EquipRelic(draggedItem.relicData);
-                layout.RefreshRelicUI();
+                //layout.RefreshRelicUI();
                 Global.DEBUG_PRINT($"Equipped {draggedItem.relicData.relicName} to {activeUnit.unitName}");
             }
         }
