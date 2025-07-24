@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: HolyBlade_Single_Atk
   m_EditorClassIdentifier: 
-  _eType: 16
-  _fEffectVal: 0
+  _eType: 2
+  _fEffectVal: 4
   _eTargetType: 0
   _eTargetCondition: 0
   _eTargetParam: 0

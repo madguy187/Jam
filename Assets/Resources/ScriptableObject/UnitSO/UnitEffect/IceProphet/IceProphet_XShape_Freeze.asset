@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: IceProphet_XShape_Freeze
   m_EditorClassIdentifier: 
-  _eType: 19
+  _eType: 28
   _fEffectVal: 0
   _eTargetType: 2
-  _eTargetCondition: 9
+  _eTargetCondition: 10
   _eTargetParam: 40
   _eExecType: 2
   _effectAffinityType: 2
   _effectResolveType: 1
   _fEffectCount: 1
+  IsLocked: 1

@@ -72,6 +72,7 @@ public class UnitObject : MonoBehaviour {
     EffectMap _listTempEffect = new EffectMap();
 
     public int index { get; set; }
+    public int death_count { get; set; } = 0;
 
     public UnitStat _currentHealth = new UnitStat(0.0f);
     public UnitStat _currentAttack = new UnitStat(0.0f);
@@ -250,6 +251,7 @@ public class UnitObject : MonoBehaviour {
 
     public void Revive() {
         _bIsDead = false;
+        PlayStateAnimation(PlayerState.IDLE);
     }
 
     void _TriggerDeath() {
@@ -261,6 +263,7 @@ public class UnitObject : MonoBehaviour {
             onDeath();
         }
 
+        PlayStateAnimation(PlayerState.DEATH);
         _bIsDead = true;
     }
 

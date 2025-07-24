@@ -299,6 +299,16 @@ public class CombatManager : MonoBehaviour {
             fAttack *= damageMulti;
         }
 
+        if (cDefenderUnit.HasEffectParam(EffectType.EFFECT_ZERO_DAMAGE)) {
+            fAttack = 0.0f;
+        }
+
+        if (cDefenderUnit.HasEffectParam(EffectType.EFFECT_CANNOT_DIE)) {
+            if (cDefenderUnit._currentHealth.GetVal() <= fAttack) {
+                fAttack = cDefenderUnit._currentHealth.GetVal() - 1;
+            }
+        }
+
         cDefenderUnit.ReceiveDamage(fAttack);
 
         _ActivatePostEffect(cAttackerUnit, fAttack);
@@ -462,6 +472,10 @@ public class CombatManager : MonoBehaviour {
                 unit.Revive();
                 unit._currentHealth.SetVal(unit._currentHealth.GetMax());
             }
+            if (cEffect.IsEffectType(EffectType.EFFECT_DIE_REVIVE)) {
+                unit.death_count++;
+                unit._currentHealth.SetVal(unit._currentHealth.GetMax());
+            }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_TRIGGER_ALL_SINGLE)) {
                 EffectList listEffect = unit.GetRollEffectList(MatchType.SINGLE);
@@ -494,6 +508,10 @@ public class CombatManager : MonoBehaviour {
         foreach (UnitObject unit in arrTargetUnit) {
             if (eType == EffectType.EFFECT_HEAL_TURN) {
                 unit._currentHealth.AddVal(val);
+            }
+
+            if (eType == EffectType.EFFECT_STAT_INCREASE_RES_TURN) {
+                unit._currentRes.AddVal(val);
             }
         }
     }

@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: IceProphet_Diagonal_CritRate
   m_EditorClassIdentifier: 
-  _eType: 9
+  _eType: 10
   _fEffectVal: 10
   _eTargetType: 2
   _eTargetCondition: 9
@@ -21,3 +21,4 @@ MonoBehaviour:
   _effectAffinityType: 0
   _effectResolveType: 0
   _fEffectCount: 0
+  IsLocked: 1

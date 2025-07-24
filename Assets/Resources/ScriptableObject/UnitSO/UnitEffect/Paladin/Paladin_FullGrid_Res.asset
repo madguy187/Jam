@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: Paladin_FullGrid_Res
   m_EditorClassIdentifier: 
-  _eType: 4
+  _eType: 5
   _fEffectVal: 2
   _eTargetType: 1
   _eTargetCondition: 3
@@ -21,3 +21,4 @@ MonoBehaviour:
   _effectAffinityType: 0
   _effectResolveType: 1
   _fEffectCount: 0
+  IsLocked: 1

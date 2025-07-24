@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: HolyBlade_XShape_CritRate
   m_EditorClassIdentifier: 
-  _eType: 6
+  _eType: 9
   _fEffectVal: 50
   _eTargetType: 0
   _eTargetCondition: 0
@@ -21,3 +21,4 @@ MonoBehaviour:
   _effectAffinityType: 0
   _effectResolveType: 3
   _fEffectCount: 1
+  IsLocked: 1
