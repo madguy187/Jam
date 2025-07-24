@@ -7,7 +7,6 @@ public class EditTeamButton : MonoBehaviour
     public Button myButton;
     public TMP_Text buttonText;
     public UnitSettingLayout unitSettingLayout;
-    public MockPlayerInventoryHolder playerInventoryHolder;
 
     private bool isOpen = false;
 
@@ -27,7 +26,7 @@ public class EditTeamButton : MonoBehaviour
 
         if (isOpen)
         {
-            unitSettingLayout.Init(playerInventoryHolder.playerInventory);
+            unitSettingLayout.OpenLayout();
             buttonText.text = "Close";
         }
         else

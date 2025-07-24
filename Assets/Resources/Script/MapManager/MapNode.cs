@@ -20,8 +20,7 @@ namespace Map
     /// Visual and interactive representation of a node in the map.
     /// Handles state changes, user interactions (hover, click), and visual 
     /// feedback such as scaling, color transitions, and animations.
-    public class MapNode : MonoBehaviour, IPointerEnterHandler, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler 
-    {
+    public class MapNode : MonoBehaviour, IPointerEnterHandler, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler {
         /// The SpriteRenderer for the node's main visual
         public SpriteRenderer sr;
         /// The UI Image for the node's main visual (for UI-based nodes)
@@ -52,8 +51,10 @@ namespace Map
         private Coroutine pulseCoroutineImg;
         private Coroutine fillCoroutine;
 
+        private bool lockInteractions = false;
+
         /// Initializes the node's visuals and state based on the provided node data and blueprint
-        public void SetUp(Node node, NodeBlueprint blueprint) 
+        public void SetUp(Node node, NodeBlueprint blueprint)
         {
             Node = node;
             Blueprint = blueprint;
@@ -79,10 +80,11 @@ namespace Map
         }
 
         /// Sets the visual state of the node (Locked, Visited, Attainable) and triggers corresponding animations
-        public void SetState(NodeStates state) 
+        public void SetState(NodeStates state)
         {
             if (visitedCircle != null) { visitedCircle.gameObject.SetActive(false); }
-            if (circleImage != null) { circleImage.gameObject.SetActive(false); };
+            if (circleImage != null) { circleImage.gameObject.SetActive(false); }
+            ;
 
             // Stop any running color/pulse coroutines
             if (colorCoroutineSr != null) { StopCoroutine(colorCoroutineSr); }
@@ -124,8 +126,9 @@ namespace Map
         }
 
         /// Triggers a scale-up animation
-        public void OnPointerEnter(PointerEventData data) 
+        public void OnPointerEnter(PointerEventData data)
         {
+            if (lockInteractions) { return; } // Ignore if interactions are locked
             if (sr != null) {
                 if (scaleCoroutineSr != null) { StopCoroutine(scaleCoroutineSr); }
                 scaleCoroutineSr = StartCoroutine(ScaleTo(sr.transform, initialScale * HoverScaleFactor, 0.3f));
@@ -137,8 +140,9 @@ namespace Map
         }
 
         /// Returning the node to its original scale
-        public void OnPointerExit(PointerEventData data) 
+        public void OnPointerExit(PointerEventData data)
         {
+            if (lockInteractions) { return; } // Ignore if interactions are locked
             if (sr != null) {
                 if (scaleCoroutineSr != null) { StopCoroutine(scaleCoroutineSr); }
                 scaleCoroutineSr = StartCoroutine(ScaleTo(sr.transform, initialScale, 0.3f));
@@ -150,21 +154,23 @@ namespace Map
         }
 
         /// Recording the time for click duration detection
-        public void OnPointerDown(PointerEventData data) 
+        public void OnPointerDown(PointerEventData data)
         {
+            if (lockInteractions) { return; } // Ignore if interactions are locked
             mouseDownTime = Time.time;
         }
 
         /// Triggering node selection if the click was short
-        public void OnPointerUp(PointerEventData data) 
+        public void OnPointerUp(PointerEventData data)
         {
+            if (lockInteractions) { return; } // Ignore if interactions are locked
             if (Time.time - mouseDownTime < MaxClickDuration) {
                 MapPlayerTracker.Instance.SelectNode(this);
             }
         }
 
         /// Plays a swirl fill animation on the visited circle image
-        public void ShowSwirlAnimation() 
+        public void ShowSwirlAnimation()
         {
             if (visitedCircleImage == null) return;
 
@@ -177,7 +183,7 @@ namespace Map
         }
 
         /// Cleans up any running coroutines when the node is destroyed
-        private void OnDestroy() 
+        private void OnDestroy()
         {
             if (scaleCoroutineSr != null) { StopCoroutine(scaleCoroutineSr); }
             if (scaleCoroutineImg != null) { StopCoroutine(scaleCoroutineImg); }
@@ -191,7 +197,7 @@ namespace Map
         // --- Animation Coroutines ---
 
         /// Smoothly scales a transform to the target scale over the given duration
-        private IEnumerator ScaleTo(Transform target, float targetScale, float duration) 
+        private IEnumerator ScaleTo(Transform target, float targetScale, float duration)
         {
             float startScale = target.localScale.x;
             float time = 0f;
@@ -206,7 +212,7 @@ namespace Map
         }
 
         /// Smoothly transitions a SpriteRenderer's color to the target color over the given duration
-        private IEnumerator ColorTo(SpriteRenderer renderer, Color targetColor, float duration) 
+        private IEnumerator ColorTo(SpriteRenderer renderer, Color targetColor, float duration)
         {
             Color startColor = renderer.color;
             float time = 0f;
@@ -219,7 +225,7 @@ namespace Map
         }
 
         /// Smoothly transitions an Image's color to the target color over the given duration
-        private IEnumerator ColorTo(Image img, Color targetColor, float duration) 
+        private IEnumerator ColorTo(Image img, Color targetColor, float duration)
         {
             Color startColor = img.color;
             float time = 0f;
@@ -232,7 +238,7 @@ namespace Map
         }
 
         /// Continuously pulses a SpriteRenderer's color between two colors
-        private IEnumerator PulseColor(SpriteRenderer renderer, Color colorA, Color colorB, float duration) 
+        private IEnumerator PulseColor(SpriteRenderer renderer, Color colorA, Color colorB, float duration)
         {
             while (true) {
                 // Lerp to colorB
@@ -253,7 +259,7 @@ namespace Map
         }
 
         /// Continuously pulses an Image's color between two colors
-        private IEnumerator PulseColor(Image img, Color colorA, Color colorB, float duration) 
+        private IEnumerator PulseColor(Image img, Color colorA, Color colorB, float duration)
         {
             while (true) {
                 float time = 0f;
@@ -272,7 +278,7 @@ namespace Map
         }
 
         /// Smoothly fills an Image's fillAmount to the target value over the given duration
-        private IEnumerator FillTo(Image img, float targetFill, float duration) 
+        private IEnumerator FillTo(Image img, float targetFill, float duration)
         {
             float startFill = img.fillAmount;
             float time = 0f;
@@ -282,6 +288,11 @@ namespace Map
                 yield return null;
             }
             img.fillAmount = targetFill;
+        }
+
+        public void LockInteractions(bool lockInteractions)
+        {
+            this.lockInteractions = lockInteractions;
         }
     }
 }

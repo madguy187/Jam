@@ -3,10 +3,19 @@ using System.Collections.Generic;
 
 public class MockPlayerInventoryHolder : MonoBehaviour
 {
+    public static MockPlayerInventoryHolder Instance { get; private set; }
     public MockPlayerInventory playerInventory = new MockPlayerInventory();
 
     private void Awake()
     {
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject); // Prevent duplicates
+            return;
+        }
+        Instance = this;
+    }
+    
+    private void Start() {
         // Initialize with some test data here
         playerInventory.gold = 100;
 

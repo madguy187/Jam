@@ -18,8 +18,9 @@ public class MockRelic
         relicName = name;
         this.rarity = rarity;
         icon = Resources.Load<Sprite>("Sprites/Axe_1");
-        if (icon == null)
-            Debug.LogWarning("Relic icon not found!");
+        if (icon == null) {
+            Global.DEBUG_PRINT("[MockRelic] Relic icon not found!");
+        }
         bonusHP = Random.Range(5, 15);
         bonusAttack = Random.Range(1, 5);
         bonusDefense = Random.Range(0, 3);

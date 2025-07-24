@@ -27,7 +27,7 @@ public class ItemTracker : MonoBehaviour {
             return;
         }
         Instance = this;
-        Debug.Log("[ItemTracker] Instance created.");
+        Global.DEBUG_PRINT("[ItemTracker::Awake] Instance created.");
     }
 
     public bool CanAccept(TrackerType trackerType, MockItemType itemType)

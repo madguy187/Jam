@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using Map;
 
 public class UnitSettingLayout : MonoBehaviour 
 {
@@ -16,23 +17,23 @@ public class UnitSettingLayout : MonoBehaviour
     public GameObject relicButtonPrefab;
     public GameObject itemSlotPrefab;
 
-    [Header("Detail Panel")]
+    [Header("Game Information")]
     public UnitDetailsPanel unitDetailsPanel;
+    public MockPlayerInventory inventory;
 
-    private MockPlayerInventory inventory;
     private MockUnit activeUnit;
     public UnitButton currentSelectedUnitButton;
     private ItemTracker tracker;
     private bool hasInitialized = false;
 
-    public void Init(MockPlayerInventory playerInventory)
+    public void Init()
     {
         tracker = ItemTracker.Instance;
         if (tracker == null) {
             Global.DEBUG_PRINT("[UnitSettingsLayout::Init] ItemTracker is null.");
         }
 
-        inventory = playerInventory;
+        inventory = MockPlayerInventoryHolder.Instance.playerInventory;
         gameObject.SetActive(true);
 
         if (!hasInitialized) {
@@ -45,7 +46,7 @@ public class UnitSettingLayout : MonoBehaviour
 
         RefreshUI();
         relicContainer.gameObject.SetActive(false);
-        Debug.Log("[UnitSettingsLayout::Init] UnitSettingLayout initialized with player inventory.");
+        Global.DEBUG_PRINT("[UnitSettingsLayout::Init] UnitSettingLayout initialized with player inventory.");
     }
 
     void RefreshUI()
@@ -83,6 +84,17 @@ public class UnitSettingLayout : MonoBehaviour
         HighlightSelectedUnit(unit);
     }
 
+    public void OpenLayout()
+    {
+        Init();
+        if (MapView.Instance != null) {
+            MapView.Instance.LockMapInteractions(true);
+        } else {
+            Global.DEBUG_PRINT("[UnitSettingsLayout::OpenLayout] MapView is null, cannot unlock map interactions.");
+        }
+        gameObject.SetActive(true);
+    }
+
     public void CloseLayout()
     {
         ClearUnitRelicsOnly();
@@ -91,6 +103,11 @@ public class UnitSettingLayout : MonoBehaviour
         activeUnit = null;
         currentSelectedUnitButton = null;
         relicContainer.gameObject.SetActive(false);
+        if (MapView.Instance != null) {
+            MapView.Instance.LockMapInteractions(false);
+        } else {
+            Global.DEBUG_PRINT("[UnitSettingsLayout::OpenLayout] MapView is null, cannot unlock map interactions.");
+        }
         gameObject.SetActive(false);
     }
 
