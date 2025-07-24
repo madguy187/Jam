@@ -21,4 +21,4 @@ MonoBehaviour:
   _effectAffinityType: 0
   _effectResolveType: 1
   _fEffectCount: 0
-  IsLocked: 0
+  IsLocked: 1

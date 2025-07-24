@@ -127,6 +127,12 @@ public class UnitObject : MonoBehaviour {
         _listTempEffect.AddEffect(effectSO.GetEffectType(), effect);
     }
 
+    public void AddTempEffect(EffectType effectType, EffectTargetType eTarget, EffectTargetCondition eCondition, float eParam, EffectAffinityType eAffinity, EffectResolveType eResolve, int nCount) {
+        EffectScriptableObject effectSO = ScriptableObject.CreateInstance<EffectScriptableObject>();
+        effectSO.InitScriptableInstance(effectType, eTarget, eCondition, eParam, EffectExecType.COUNT_SPECIFIED, eAffinity, eResolve, nCount);
+        AddTempEffect(effectSO);
+    }
+
     public void RemoveEffect(EffectType eType) {
         _listTempEffect.RemoveEffect(eType);
     }

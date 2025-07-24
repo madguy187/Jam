@@ -269,11 +269,28 @@ public class CombatManager : MonoBehaviour {
             fAttack += fBonus;
         }
 
+        bool bIsCrit = false;
         if (_IsCrit(cAttackerUnit)) {
             fAttack *= _GetCritRatio(cAttackerUnit);
+            bIsCrit = true;
         }
 
-        fAttack *= _GetResRatio(cDefenderUnit);
+        if (bIsCrit) {
+            if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_DAMAGE_CRIT_FLAT_HEAL)) {
+                if (cDefenderUnit.GetEffectParam(EffectType.EFFECT_DAMAGE_CRIT_FLAT_HEAL, out float val)) {
+                    cAttackerUnit._currentHealth.AddVal(val);
+                }   
+            }
+        }
+
+        bool bIsIgnoreRes = false;
+        if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_IGNORE_RES)) {
+            bIsIgnoreRes = true;
+        }
+
+        if (!bIsIgnoreRes) {
+            fAttack *= _GetResRatio(cDefenderUnit);
+        }
 
         bool bIgnoreShield = false;
         if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_IGNORE_SHIELD)) {
@@ -288,19 +305,37 @@ public class CombatManager : MonoBehaviour {
             fAttack *= fReducePercent * Global.PERCENTAGE_CONSTANT;
         }
 
-        fAttack = Mathf.Floor(fAttack);
-
-        if (cDefenderUnit.GetEffectParam(EffectType.EFFECT_REFLECT, out float val)) {
-            float fReflect = _GetDamageAfterShield(cAttackerUnit, fAttack);
-            cAttackerUnit.ReceiveDamage(fReflect * val / Global.PERCENTAGE_CONSTANT);
+        if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_SHADOW_BLADE_BLEED, out float fApplyCount)) {
+            if (cDefenderUnit.HasEffectParam(EffectType.EFFECT_BLEED)) {
+                fAttack += 5;
+                cDefenderUnit.AddTempEffect(EffectType.EFFECT_BLEED, EffectTargetType.SELF, EffectTargetCondition.NONE, 0.0f, EffectAffinityType.NONE, EffectResolveType.RESOLVE_TURN, 2);
+            } else {
+                fAttack += 2;
+                cDefenderUnit.AddTempEffect(EffectType.EFFECT_BLEED, EffectTargetType.SELF, EffectTargetCondition.NONE, 0.0f, EffectAffinityType.NONE, EffectResolveType.RESOLVE_TURN, 3);
+            }
         }
 
+        fAttack = Mathf.Floor(fAttack);
+
+        if (cDefenderUnit.HasEffectParam(EffectType.EFFECT_REFLECT)) {
+            if (cDefenderUnit.GetEffectParam(EffectType.EFFECT_REFLECT, out float val)) {
+                float fReflect = _GetDamageAfterShield(cAttackerUnit, fAttack);
+                cAttackerUnit.ReceiveDamage(fReflect * val / Global.PERCENTAGE_CONSTANT);
+            }
+        }
+        
         if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_DAMAGE_MULTIPLY, out float damageMulti)) {
             fAttack *= damageMulti;
         }
 
         if (cDefenderUnit.HasEffectParam(EffectType.EFFECT_ZERO_DAMAGE)) {
             fAttack = 0.0f;
+        }
+
+        if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_DAMAGE_LIFESTEAL)) {
+            if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_DAMAGE_LIFESTEAL, out float val)) {
+                cAttackerUnit._currentHealth.AddVal(fAttack * val / Global.PERCENTAGE_CONSTANT);
+            }
         }
 
         if (cDefenderUnit.HasEffectParam(EffectType.EFFECT_CANNOT_DIE)) {
@@ -477,11 +512,19 @@ public class CombatManager : MonoBehaviour {
                 unit._currentHealth.SetVal(unit._currentHealth.GetMax());
             }
 
+            if (cEffect.IsEffectType(EffectType.EFFECT_INSTANT_KILL)) {
+                unit.ReceiveDamage(unit._currentHealth.GetVal());
+            }
+
             if (cEffect.IsEffectType(EffectType.EFFECT_TRIGGER_ALL_SINGLE)) {
                 EffectList listEffect = unit.GetRollEffectList(MatchType.SINGLE);
                 foreach (EffectScriptableObject singleEffect in listEffect) {
                     _ActivateEffect(cDeck, singleEffect);
                 }
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_DAMAGE_FLAT_DAMAGE)) {
+                unit.ReceiveDamage(cEffect.GetEffectVal());
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_CLEANSE)) {
@@ -512,6 +555,10 @@ public class CombatManager : MonoBehaviour {
 
             if (eType == EffectType.EFFECT_STAT_INCREASE_RES_TURN) {
                 unit._currentRes.AddVal(val);
+            }
+
+            if (eType == EffectType.EFFECT_BLEED) {
+                unit._currentHealth.MinusVal(val);
             }
         }
     }
@@ -593,6 +640,10 @@ public class CombatManager : MonoBehaviour {
                 break;
             case EffectTargetCondition.RANDOM_UNDEAD:
                 arrTarget = DeckHelperFunc.GetRandomAliveUnit(cTargetDeck, (int)eTargetParam, eUnitArchetype.UNDEAD);
+                break;
+            case EffectTargetCondition.RANDOM_BELOW_HP_PERCENT_1:
+                arrTarget = DeckHelperFunc.GetAllUnitBelowHpPercent(cTargetDeck, eTargetParam);
+                arrTarget = DeckHelperFunc.PickRandomFromList(arrTarget, 1);
                 break;
             case EffectTargetCondition.FRONTLINE:
                 arrTarget = DeckHelperFunc.GetAllUnitFrontLine(cTargetDeck);

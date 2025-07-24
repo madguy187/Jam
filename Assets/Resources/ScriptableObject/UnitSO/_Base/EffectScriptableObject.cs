@@ -34,6 +34,24 @@ public class EffectScriptableObject : ScriptableObject, ISerializationCallbackRe
     [SerializeField] EffectResolveType _effectResolveType = EffectResolveType.RESOLVE_TURN;
     [SerializeField] int _fEffectCount = 0;
 
+    public void InitScriptableInstance(EffectType effectType,
+                                        EffectTargetType targetType,
+                                        EffectTargetCondition targetCondition,
+                                        float targetParam,
+                                        EffectExecType execType,
+                                        EffectAffinityType affinityType,
+                                        EffectResolveType resolveType,
+                                        int resolveCount) {
+        _eType = effectType;
+        _eTargetType = targetType;
+        _eTargetCondition = targetCondition;
+        _eTargetParam = targetParam;
+        _eExecType = execType;
+        _effectAffinityType = affinityType;
+        _effectResolveType = resolveType;
+        _fEffectCount = resolveCount;
+    }
+
     public EffectResolveType GetEffectResolveType() { return _effectResolveType; }
     public int GetEffectCount() { return _fEffectCount; }
 

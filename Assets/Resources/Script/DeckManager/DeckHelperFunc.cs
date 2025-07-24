@@ -1,9 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.Analytics;
+using Map;
 
-public static class DeckHelperFunc
-{
+public static class DeckHelperFunc {
     public static bool IsDeckEmptyOrDead(Deck cDeck) {
         foreach (UnitObject unit in cDeck) {
             if (unit == null) {
@@ -109,27 +109,26 @@ public static class DeckHelperFunc
     }
 
     public static List<UnitObject> GetRandomAliveUnit(Deck cDeck, int count, eUnitArchetype eArchetype = eUnitArchetype.NONE) {
-        int i = 0;
-        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
-            if (unit == null) {
-                return false;
+        List<UnitObject> listUnit = GetUnitByArchetype(cDeck, eArchetype);
+        if (listUnit.Count == count) {
+            return listUnit;
+        }
+
+        return PickRandomFromList(listUnit, count);
+    }
+
+    public static List<UnitObject> PickRandomFromList(List<UnitObject> list, int count) {
+        list.Shuffle();
+
+        List<UnitObject> listResult = new List<UnitObject>();
+        for (int i = 0; i < count; i++) {
+            if (i >= list.Count) {
+                break;
             }
 
-            if (!unit.IsDead()) {
-                return false;
-            }
+            listResult.Add(list[i]);
+        }
 
-            if (eArchetype != eUnitArchetype.NONE && unit.unitSO.eUnitArchetype != eArchetype) {
-                return false;
-            }
-
-            if (i == count) {
-                return false;
-            }
-
-            i++;
-
-            return true;
-        });
+        return listResult;
     }
 }
