@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: HolyBlade_Single_IgnoreShield
   m_EditorClassIdentifier: 
-  _eType: 10
-  _fEffectVal: 4
+  _eType: 16
+  _fEffectVal: 0
   _eTargetType: 0
   _eTargetCondition: 0
   _eTargetParam: 0
@@ -21,3 +21,4 @@ MonoBehaviour:
   _effectAffinityType: 0
   _effectResolveType: 3
   _fEffectCount: 1
+  IsLocked: 1

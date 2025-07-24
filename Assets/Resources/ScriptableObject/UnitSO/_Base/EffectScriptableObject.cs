@@ -1,7 +1,11 @@
+using System;
 using UnityEngine;
 
+using UnityEditor;
+using System.Collections.Generic;
+
 [CreateAssetMenu(menuName = "Scriptable Object/Unit/EffectScriptableObject")]
-public class EffectScriptableObject : ScriptableObject {
+public class EffectScriptableObject : ScriptableObject, ISerializationCallbackReceiver {
 
     [SerializeField] EffectType _eType;
     public EffectType GetEffectType() { return _eType; }
@@ -44,4 +48,40 @@ public class EffectScriptableObject : ScriptableObject {
     public string GetTypeName() {
         return _eType.ToString();
     }
+
+#if UNITY_EDITOR
+    [Header("Do not allow changes, this is done to fix the enum from changing")]
+    [SerializeField] bool IsLocked = false;
+
+    string _strEditorOriginal_EffectType;
+    string _strEditorOriginal_EffectTargetType;
+    string _strEditorOriginal_EffectTargetCondition;
+    string _strEditorOriginal_EffectExecType;
+    string _strEditorOriginal_EffectAffinityType;
+    string _strEditorOriginal_EffectResolveType;
+
+    public void OnBeforeSerialize() {
+        _strEditorOriginal_EffectType = _eType.ToString();
+        _strEditorOriginal_EffectTargetType = _eTargetType.ToString();
+        _strEditorOriginal_EffectTargetCondition = _eTargetCondition.ToString();
+        _strEditorOriginal_EffectExecType = _eExecType.ToString();
+        _strEditorOriginal_EffectAffinityType = _effectAffinityType.ToString();
+        _strEditorOriginal_EffectResolveType = _effectResolveType.ToString();
+    }
+
+    public void OnAfterDeserialize() {
+        if (IsLocked) {
+            _eType = (EffectType)Enum.Parse(typeof(EffectType), _strEditorOriginal_EffectType, true);
+            _eTargetType = (EffectTargetType)Enum.Parse(typeof(EffectTargetType), _strEditorOriginal_EffectTargetType, true);
+            _eTargetCondition = (EffectTargetCondition)Enum.Parse(typeof(EffectTargetCondition), _strEditorOriginal_EffectTargetCondition, true);
+            _eExecType = (EffectExecType)Enum.Parse(typeof(EffectExecType), _strEditorOriginal_EffectExecType, true);
+            _effectAffinityType = (EffectAffinityType)Enum.Parse(typeof(EffectAffinityType), _strEditorOriginal_EffectAffinityType, true);
+            _effectResolveType = (EffectResolveType)Enum.Parse(typeof(EffectResolveType), _strEditorOriginal_EffectResolveType, true);
+        }
+    }
+
+    public bool GetLock() {
+        return IsLocked;
+    }
+#endif
 }

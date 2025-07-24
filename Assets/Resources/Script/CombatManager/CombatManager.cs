@@ -155,6 +155,7 @@ public class CombatManager : MonoBehaviour {
         }
 
         _ExecRoll(cDeck, cAttackerUnit, _GetRollType(cAttackerUnit.unitSO.unitName));
+        _ExecTempEffect(cDeck, cAttackerUnit);
 
         int nAttackCount = 1;
         if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_ATTACK_TIMES, out float fAttackCount)) {
@@ -245,9 +246,20 @@ public class CombatManager : MonoBehaviour {
             EffectList effects = cAttackerUnit.GetRollEffectList(eRoll);
             if (effects != null) {
                 foreach (EffectScriptableObject effect in effects) {
-                    _ActivateRollEffect(cAttackerDeck, effect);
+                    _ActivateEffect(cAttackerDeck, effect);
                 }
             }
+        }
+    }
+
+    void _ExecTempEffect(Deck cDeck, UnitObject cUnit) {
+        if (cUnit == null || cUnit.IsDead()) {
+            return;
+        }
+
+        EffectMap effects = cUnit.GetAllTempEffect();
+        foreach (EffectObject effectObj in effects) {
+            _ActivateTempEffect(cDeck, effectObj);
         }
     }
 
@@ -379,7 +391,7 @@ public class CombatManager : MonoBehaviour {
         return Global.PERCENTAGE_CONSTANT / (Global.PERCENTAGE_CONSTANT + cDefenderUnit.GetRes() * Global.RESISTANCE_PERCENTAGE_CONSTANT);
     }
 
-    void _ActivateRollEffect(Deck cDeck, EffectScriptableObject cEffect) {
+    void _ActivateEffect(Deck cDeck, EffectScriptableObject cEffect) {
         List<UnitObject> arrTargetUnit = _GetTargetUnitBasedOnTargetType(cDeck, cEffect);
 
         foreach (UnitObject unit in arrTargetUnit) {
@@ -392,8 +404,9 @@ public class CombatManager : MonoBehaviour {
                 return;
             }
 
-            if (cEffect.GetExecType() != EffectExecType.TRIGGER_ONCE) {
-                return;
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_BASE_HP)) {
+                unit._currentHealth.AddTempMax(cEffect.GetEffectVal());
+                unit._currentHealth.AddVal(cEffect.GetEffectVal());
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_ATK)) {
@@ -453,7 +466,7 @@ public class CombatManager : MonoBehaviour {
             if (cEffect.IsEffectType(EffectType.EFFECT_TRIGGER_ALL_SINGLE)) {
                 EffectList listEffect = unit.GetRollEffectList(MatchType.SINGLE);
                 foreach (EffectScriptableObject singleEffect in listEffect) {
-                    _ActivateRollEffect(cDeck, singleEffect);
+                    _ActivateEffect(cDeck, singleEffect);
                 }
             }
 
@@ -470,6 +483,18 @@ public class CombatManager : MonoBehaviour {
             Global.DEBUG_PRINT("[Effect] Triggered " + cEffect.GetTypeName() +
                                 " val=" + cEffect.GetEffectVal() +
                                 " unit_index=" + unit.index);
+        }
+    }
+
+    void _ActivateTempEffect(Deck cDeck, EffectObject cEffect) {
+        List<UnitObject> arrTargetUnit = _GetTargetUnitBasedOnTargetType(cDeck, cEffect.effectSO);
+
+        float val = cEffect.GetEffectVal();
+        EffectType eType = cEffect.effectSO.GetEffectType();
+        foreach (UnitObject unit in arrTargetUnit) {
+            if (eType == EffectType.EFFECT_HEAL_TURN) {
+                unit._currentHealth.AddVal(val);
+            }
         }
     }
 
@@ -495,7 +520,7 @@ public class CombatManager : MonoBehaviour {
 
                 if (unitObj.HasEffectParam(EffectType.EFFECT_DAMAGE_MULTIPLY_POST)) {
                     if (unitObj.GetEffectParam(EffectType.EFFECT_DAMAGE_MULTIPLY_POST, out float val)) {
-                        target._currentHealth.AddVal(fAttack * val);
+                        target._currentHealth.MinusVal(fAttack * val);
                     }
                 }
             }

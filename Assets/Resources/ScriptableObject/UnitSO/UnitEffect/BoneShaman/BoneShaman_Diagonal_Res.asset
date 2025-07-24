@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: BoneShaman_Diagonal_Res
   m_EditorClassIdentifier: 
-  _eType: 27
+  _eType: 6
   _fEffectVal: 50
   _eTargetType: 2
   _eTargetCondition: 7
   _eTargetParam: 1
-  _eExecType: 2
+  _eExecType: 0
   _effectAffinityType: 0
-  _effectResolveType: 1
-  _fEffectCount: 3
+  _effectResolveType: 0
+  _fEffectCount: 0
+  IsLocked: 1

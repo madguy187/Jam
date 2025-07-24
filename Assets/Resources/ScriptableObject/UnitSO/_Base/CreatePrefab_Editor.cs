@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -15,11 +16,17 @@ public class CreatePrefabFromMenu {
     const string UNIT_PREFAB_PATH = "ScriptableObject/UnitSO/Unit";
     const string UNIT_PREFAB_FULL_PATH = "Assets/Resources/" + UNIT_PREFAB_PATH;
 
-    const string UNIT_PREFAB_DATA_PATH = "/Resources/" + UNIT_PREFAB_PATH;
-
     const string HEALTH_BAR_PATH = "UI/UIHealthBar/UIHealthBar";
 
     const string FOLDER_SEPARATOR = "/";
+
+    [MenuItem("Assets/Create/Scriptable Object/EditEnum", priority = 11)]
+    public static void EditEnumVal() {
+        string path = Application.dataPath + "/Resources/ScriptableObject/_Base";
+        using (StreamReader outputFile = new StreamReader(Path.Combine(path, "EffectType.cs"), true)) {
+            Debug.Log(outputFile.ReadLine());
+        }
+    }
 
     [MenuItem("Assets/Create/Scriptable Object/LoadAll", priority = 11)]
     public static void LoadAllSO() {
@@ -113,6 +120,10 @@ public class CreatePrefabFromMenu {
         EffectList zigzag = new EffectList();
         EffectList fullgrid = new EffectList();
         foreach (EffectScriptableObject effect in effects) {
+            if (!effect.GetLock()) {
+                Debug.Log(effect.name + " is not locked");
+            }
+
             if (effect.name.Contains("Single")) {
                 single.AddEffect(effect);
             }

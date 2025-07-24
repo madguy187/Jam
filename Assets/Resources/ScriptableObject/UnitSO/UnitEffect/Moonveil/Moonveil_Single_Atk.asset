@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: Moonveil_Single_Atk
   m_EditorClassIdentifier: 
-  _eType: 1
+  _eType: 2
   _fEffectVal: 6
   _eTargetType: 0
-  _eTargetCondition: 0
+  _eTargetCondition: 1
   _eTargetParam: 0
   _eExecType: 0
   _effectAffinityType: 0
   _effectResolveType: 3
   _fEffectCount: 1
+  IsLocked: 1

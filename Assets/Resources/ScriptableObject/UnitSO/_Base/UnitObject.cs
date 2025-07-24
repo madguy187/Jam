@@ -1,17 +1,26 @@
 using System;
-using System.Collections.Generic;
+using TMPro.EditorUtilities;
 using UnityEngine;
 
 public class UnitStat {
     float val = 0.0f;
     float max = 0.0f;
+    float tempMax = 0.0f;
 
     public UnitStat(float _val) { val = _val; }
 
     public void SetMax(float _max) { max = _max; }
+    public void AddTempMax(float _tempMax) { tempMax = _tempMax; }
+
+    public void Reset() {
+        val = max;
+        tempMax = 0.0f;
+    }
+
     public void SetVal(float _val) {
-        if (max > 0 && _val > max) {
-            _val = max;
+        float _max = GetMax();
+        if (_max > 0 && _val > _max) {
+            _val = _max;
         }
 
         if (_val < 0) {
@@ -22,11 +31,12 @@ public class UnitStat {
     }
 
     public float GetVal() { return val; }
-    public float GetMax() { return max; }
+    public float GetMax() { return max + tempMax; }
 
     public void AddVal(float _val) {
-        if (max > 0 && val + _val > max) {
-            _val = max - val;
+        float _max = GetMax();
+        if (_max > 0 && val + _val > _max) {
+            _val = _max - val;
         }
         val += _val;
     }

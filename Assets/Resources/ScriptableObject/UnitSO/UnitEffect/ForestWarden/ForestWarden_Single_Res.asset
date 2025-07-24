@@ -12,12 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: ForestWarden_Single_Res
   m_EditorClassIdentifier: 
-  _eType: 4
+  _eType: 5
   _fEffectVal: 2
   _eTargetType: 1
-  _eTargetCondition: 5
+  _eTargetCondition: 7
   _eTargetParam: 0
   _eExecType: 0
   _effectAffinityType: 0
   _effectResolveType: 0
   _fEffectCount: 0
+  IsLocked: 1
