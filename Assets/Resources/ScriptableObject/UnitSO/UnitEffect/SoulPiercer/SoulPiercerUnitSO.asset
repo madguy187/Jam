@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Soul Piercer
   eUnitArchetype: 2
-  hp: 0
-  attack: 0
-  shield: 0
-  res: 0
-  critRate: 0
-  critMulti: 0
+  hp: 17
+  attack: 7
+  shield: 2
+  res: 1
+  critRate: 20
+  critMulti: 160
   singleMatchDescription: 
   horizontalMatchDescription: 
   diagonalMatchDescription: 
