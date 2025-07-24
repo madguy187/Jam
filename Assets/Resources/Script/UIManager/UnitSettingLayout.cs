@@ -21,6 +21,7 @@ public class UnitSettingLayout : MonoBehaviour
 
     private MockPlayerInventory inventory;
     private MockUnit activeUnit;
+    public UnitButton currentSelectedUnitButton;
     private ItemTracker tracker;
     private bool hasInitialized = false;
 
@@ -74,12 +75,12 @@ public class UnitSettingLayout : MonoBehaviour
     }
 
 
-    void ShowDetails(MockUnit unit)
-    {
+    void ShowDetails(MockUnit unit) {
         unitDetailsPanel.Show(unit);
         activeUnit = unit;
         relicContainer.gameObject.SetActive(true);
         RefreshRelicUI();
+        HighlightSelectedUnit(unit);
     }
 
     public void CloseLayout()
@@ -88,6 +89,7 @@ public class UnitSettingLayout : MonoBehaviour
         ClearTeamUnitButtonsOnly();
         ClearBagItemsOnly();
         activeUnit = null;
+        currentSelectedUnitButton = null;
         relicContainer.gameObject.SetActive(false);
         gameObject.SetActive(false);
     }
@@ -103,9 +105,27 @@ public class UnitSettingLayout : MonoBehaviour
         // BagContainer accepts both units and relics
         DropZoneSetup.AddDropZone(bagContainer.gameObject, DropZone.AllowedItemType.UnitsAndRelics);
     }
-
-    private void GenerateFixedTeamSlots()
+    
+    void HighlightSelectedUnit(MockUnit unit)
     {
+        if (currentSelectedUnitButton != null) {
+            // Deselect the previously selected unit button
+            currentSelectedUnitButton.SetSelected(false);
+        }
+
+        foreach (Transform child in teamUnitContainer) {
+            var unitButton = child.GetComponentInChildren<UnitButton>();
+            if (unitButton != null && unitButton.GetUnit() == unit) {
+                unitButton.SetSelected(true);
+                currentSelectedUnitButton = unitButton;
+                break;
+            } else {
+                Global.DEBUG_PRINT($"[UnitSettingLayout::HighlightSelectedUnit] No matching unit button found for {unitButton.GetUnit().unitName}");
+            }
+        }
+    }
+
+    private void GenerateFixedTeamSlots() {
         // Clear old slots
         foreach (Transform child in teamUnitContainer) {
             Destroy(child.gameObject);
@@ -117,7 +137,7 @@ public class UnitSettingLayout : MonoBehaviour
         }
     }
 
-    void ClearTeamUnitButtonsOnly()
+    private void ClearTeamUnitButtonsOnly()
     {
         foreach (Transform slot in teamUnitContainer) {
             if (slot.childCount > 0) {
@@ -129,7 +149,7 @@ public class UnitSettingLayout : MonoBehaviour
         }
     }
 
-    void PopulateTeamUnits()
+    private void PopulateTeamUnits()
     {
         int unitIndex = 0;
 
@@ -160,7 +180,7 @@ public class UnitSettingLayout : MonoBehaviour
         }
     }
 
-    void ClearBagItemsOnly()
+    private void ClearBagItemsOnly()
     {
         foreach (Transform slot in bagContainer) {
             foreach (Transform child in slot) {
@@ -217,7 +237,7 @@ public class UnitSettingLayout : MonoBehaviour
         }
     }
 
-    void ClearUnitRelicsOnly()
+    private void ClearUnitRelicsOnly()
     {
         foreach (Transform slot in relicContainer) {
             foreach (Transform child in slot) {
@@ -233,7 +253,7 @@ public class UnitSettingLayout : MonoBehaviour
         }
     }
 
-    void PopulateUnitRelics(MockUnit unit)
+    private void PopulateUnitRelics(MockUnit unit)
     {
         for (int i = 0; i < relicContainer.childCount; i++) {
             var slot = relicContainer.GetChild(i);

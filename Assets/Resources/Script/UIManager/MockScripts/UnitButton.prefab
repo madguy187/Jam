@@ -139,6 +139,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitIcon: {fileID: 1153766199557287263}
   nameText: {fileID: 6476979424244670308}
+  selectedHighlight: {fileID: 0}
+  visualTransform: {fileID: 5725677782776046403}
   boundItem:
     itemType: 0
     unitData:
