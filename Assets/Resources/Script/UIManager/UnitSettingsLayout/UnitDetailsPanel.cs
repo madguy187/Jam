@@ -19,7 +19,8 @@ public class UnitDetailsPanel : MonoBehaviour
 
     public void Show(MockUnit unit) 
     {
-        gameObject.SetActive(true);
+        // for debug
+        // gameObject.SetActive(true);
         currentUnit = unit;
         UpdateUI();
     }
@@ -33,23 +34,11 @@ public class UnitDetailsPanel : MonoBehaviour
     {
         if (currentUnit == null) { return; }
 
-        //string title = currentUnit.unitName;
-        //string details = 
-        //    $"Lv {currentUnit.level}\n" +
-        //    $"HP: {currentUnit.currentHP} / {currentUnit.maxHP}\n" +
-        //    $"ATK: {currentUnit.attack}\n" +
-        //    $"NOR: {currentUnit.equippedRelics.Count}";
-
         nameText.text = currentUnit.unitName;
         levelText.text = $"Lv {currentUnit.level}";
         hpText.text = $"HP: {currentUnit.currentHP} / {currentUnit.maxHP}";
         atkText.text = $"ATK: {currentUnit.attack}";
         defText.text = $"NOR: {currentUnit.equippedRelics.Count}"; // Placeholder to check relic count
-
-        // var tooltip = currentUnit.uiGameObject.GetComponent<ToolTipDetails>();
-        // if (tooltip != null) {
-        //     tooltip.Init(title, details);
-        // }
 
         UpdateEquippedRelics();
     }
