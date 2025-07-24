@@ -1,7 +1,8 @@
 using UnityEngine;
 using TMPro;
 
-public class UnitSettingLayout : MonoBehaviour {
+public class UnitSettingLayout : MonoBehaviour 
+{
     [Header("UI References")]
     public TMP_Text goldText;
     public Transform teamUnitContainer;
@@ -14,7 +15,6 @@ public class UnitSettingLayout : MonoBehaviour {
     public GameObject relicSlotPrefab;
     public GameObject relicButtonPrefab;
     public GameObject itemSlotPrefab;
-    public GameObject itemButtonPrefab;
 
     [Header("Detail Panel")]
     public UnitDetailsPanel unitDetailsPanel;
@@ -200,7 +200,7 @@ public class UnitSettingLayout : MonoBehaviour {
                 unitBtn.GetComponent<DragHandler>().Init(item);
             } else // Relic
               {
-                go = Instantiate(itemButtonPrefab, slot);
+                go = Instantiate(relicButtonPrefab, slot);
                 go.GetComponent<RelicButton>().Init(item.relicData, item);
                 go.GetComponent<DragHandler>().Init(item);
             }
