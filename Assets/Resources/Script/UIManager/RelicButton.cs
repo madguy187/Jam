@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RelicButton : MonoBehaviour, IDragHandlerInterface
+public class RelicButton : MonoBehaviour
 {
     public Image iconImage;
 
@@ -20,26 +20,5 @@ public class RelicButton : MonoBehaviour, IDragHandlerInterface
             iconImage.sprite = relic.icon;
             iconImage.enabled = relic.icon != null;
         }
-    }
-
-    // IDragHandlerInterface implementations
-    public MockItemType GetItemType()
-    {
-        return MockItemType.Relic;
-    }
-
-    public MockInventoryItem GetDraggedItem()
-    {
-        return boundItem;
-    }
-
-    public void OnDropAccepted()
-    {
-        // Optional: Add visual or state changes here on drop accepted
-    }
-
-    public void OnDropRejected()
-    {
-        // Optional: Reset position or provide feedback on drop rejection
     }
 }

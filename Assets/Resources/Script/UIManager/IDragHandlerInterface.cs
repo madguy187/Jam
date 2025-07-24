@@ -1,7 +1,6 @@
-using UnityEngine.EventSystems;
+using UnityEngine;
 
-public interface IDragHandlerInterface
-{
+public interface IDragHandlerInterface {
     MockItemType GetItemType();
     MockInventoryItem GetDraggedItem();
     void OnDropAccepted();

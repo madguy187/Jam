@@ -24,9 +24,7 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
     {
         image = GetComponent<Image>();
         if (image != null) { image.color = normalColor; }
-
         if (contentParent == null) { contentParent = this.transform; }
-
         if (itemTracker == null) { itemTracker = ItemTracker.Instance; }
     }
 
@@ -43,8 +41,10 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
     public void OnDrop(PointerEventData eventData)
     {
         var dragHandler = eventData.pointerDrag?.GetComponent<IDragHandlerInterface>();
-        if (dragHandler == null)
+        if (dragHandler == null) {
             return;
+        }
+        Global.DEBUG_PRINT("[DropZone::OnDrop] DragHandler found: " + dragHandler.GetType().Name);
 
         var draggedItemType = dragHandler.GetItemType();
 
@@ -93,8 +93,7 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
         var draggedItem = dragHandler.GetDraggedItem();
 
         // === Handle relics ===
-        if (draggedItemType == MockItemType.Relic)
-        {
+        if (draggedItemType == MockItemType.Relic) {
             MockUnit activeUnit = layout?.ActiveUnit;
 
             if (activeUnit == null) {
@@ -107,30 +106,27 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
                 // Unequip relic
                 bool success = activeUnit.UnequipRelic(draggedItem.relicData);
                 if (success) {
-                    // layout.RefreshRelicUI();
-                    Global.DEBUG_PRINT($"[DropZone] Unequipped relic {draggedItem.relicData.relicName} from {activeUnit.unitName} to bag.");
+                    inventory.bagItems.Remove(draggedItem);
                 } else {
-                    Global.DEBUG_PRINT($"[DropZone] Relic {draggedItem.relicData.relicName} not found on {activeUnit.unitName}.");
+                    Global.DEBUG_PRINT($"[DropZone::OnDrop] Relic {draggedItem.relicData.relicName} not found on {activeUnit.unitName}.");
                     dragHandler.OnDropRejected();
                     return;
                 }
-            }
-            else if (allowedType == AllowedItemType.RelicsOnly) {
+            } else if (allowedType == AllowedItemType.RelicsOnly) {
                 // Equip relic
                 activeUnit.EquipRelic(draggedItem.relicData);
-                //layout.RefreshRelicUI();
-                Global.DEBUG_PRINT($"Equipped {draggedItem.relicData.relicName} to {activeUnit.unitName}");
+                inventory.bagItems.Remove(draggedItem);
             }
         }
 
-        // === Handle units ===
+        // Handle units
         if (draggedItemType == MockItemType.Unit) {
             if (trackerType == TrackerType.BagContainer) {
                 inventory.MoveUnitToBag(draggedItem.unitData);
-                Global.DEBUG_PRINT($"Moved {draggedItem.unitData.unitName} to Bag");
+                Global.DEBUG_PRINT($"[DropZone::OnDrop] Moved {draggedItem.unitData.unitName} to Bag");
             } else if (trackerType == TrackerType.UnitContainer) {
                 inventory.MoveUnitToTeam(draggedItem);
-                Global.DEBUG_PRINT($"Moved {draggedItem.unitData.unitName} to Team");
+                Global.DEBUG_PRINT($"[DropZone::OnDrop] Moved {draggedItem.unitData.unitName} to Team");
             }
         }
 

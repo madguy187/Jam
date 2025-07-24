@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 
-public class UnitButton : MonoBehaviour, IDragHandlerInterface
+public class UnitButton : MonoBehaviour
 {
     public Image unitIcon;
     public TMP_Text nameText;
@@ -35,26 +35,5 @@ public class UnitButton : MonoBehaviour, IDragHandlerInterface
     public void OnClick()
     {
         onClickCallback?.Invoke(unitData);
-    }
-
-    // IDragHandlerInterface implementations
-    public MockItemType GetItemType()
-    {
-        return MockItemType.Unit;
-    }
-
-    public MockInventoryItem GetDraggedItem()
-    {
-        return boundItem;
-    }
-
-    public void OnDropAccepted()
-    {
-        // Optional: Add visual or state changes here on drop accepted
-    }
-
-    public void OnDropRejected()
-    {
-        // Optional: Reset position or provide feedback on drop rejection
     }
 }
