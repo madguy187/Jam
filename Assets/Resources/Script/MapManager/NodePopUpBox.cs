@@ -6,15 +6,26 @@ public class NodePopUpBox : MonoBehaviour
     public string messsage;
     private Coroutine popupCoroutine;
 
+    private Map.MapView mapView;
+    
+    void Start()
+    {
+        mapView = Map.MapView.Instance;
+        if (mapView == null) {
+            Global.DEBUG_PRINT("[NodePopUpBox::Start] MapView instance is null, cannot show popups.");
+        }
+    }
+    
     private void OnMouseEnter()
     {
+        if (mapView.AreInteractionsLocked()) { return; }
         popupCoroutine = StartCoroutine(ShowPopupWithDelay());
     }
 
     private void OnMouseExit()
     {
-        if (popupCoroutine != null)
-        {
+        if (mapView.AreInteractionsLocked()) { return; }
+        if (popupCoroutine != null) {
             StopCoroutine(popupCoroutine);
             popupCoroutine = null;
         }

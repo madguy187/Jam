@@ -8,11 +8,9 @@ namespace Map
     /// Handles the visual representation and interaction logic for the node-based map.
     /// Responsible for instantiating nodes and lines, setting up map orientation,
     /// coloring, and background, and updating node and line states based on player progress.
-    public class MapView : MonoBehaviour 
-    {
+    public class MapView : MonoBehaviour {
         /// Defines the orientation in which the map is displayed and scrolled
-        public enum MapOrientation 
-        {
+        public enum MapOrientation {
             BottomToTop,
             TopToBottom,
             RightToLeft,
@@ -63,6 +61,7 @@ namespace Map
         protected GameObject mapParent;
         private List<List<Vector2Int>> paths;
         private Camera cam;
+        private bool isInteractionLocked = false;
 
         /// All instantiated MapNode components for the current map
         public readonly List<MapNode> MapNodes = new List<MapNode>();
@@ -75,7 +74,7 @@ namespace Map
         /// The currently displayed map
         public Map Map { get; protected set; }
 
-        private void Awake() 
+        private void Awake()
         {
             /// Sets the singleton instance and initializes the camera reference
             if (Instance != null) {
@@ -86,7 +85,7 @@ namespace Map
         }
 
         /// Destroys the current map's parent objects and clears all node and line references
-        protected virtual void ClearMap() 
+        protected virtual void ClearMap()
         {
             if (firstParent != null) { Destroy(firstParent); }
 
@@ -96,7 +95,7 @@ namespace Map
 
         /// Displays the given map by instantiating nodes, lines, background, and setting up 
         /// orientation and states
-        public virtual void ShowMap(Map m) 
+        public virtual void ShowMap(Map m)
         {
             if (m == null) {
                 Global.DEBUG_PRINT("[MapView::ShowMap] Map was null in MapView.ShowMap()");
@@ -117,7 +116,7 @@ namespace Map
         }
 
         /// Instantiates and positions the background sprite for the map, if set
-        protected virtual void CreateMapBackground(Map m) 
+        protected virtual void CreateMapBackground(Map m)
         {
             if (background == null) { return; }
 
@@ -136,7 +135,7 @@ namespace Map
         }
 
         /// Creates the parent GameObjects for the map and sets up scrolling and collision
-        protected virtual void CreateMapParent() 
+        protected virtual void CreateMapParent()
         {
             firstParent = new GameObject("OuterMapParent");
             mapParent = new GameObject("MapParentWithAScroll");
@@ -149,7 +148,7 @@ namespace Map
         }
 
         /// Instantiates all nodes for the map and adds them to MapNodes
-        protected void CreateNodes(IEnumerable<Node> nodes) 
+        protected void CreateNodes(IEnumerable<Node> nodes)
         {
             foreach (Node node in nodes) {
                 MapNode mapNode = CreateMapNode(node);
@@ -158,7 +157,7 @@ namespace Map
         }
 
         /// Instantiates a single MapNode and sets it up with its blueprint and position
-        protected virtual MapNode CreateMapNode(Node node) 
+        protected virtual MapNode CreateMapNode(Node node)
         {
             GameObject mapNodeObject = Instantiate(nodePrefab, mapParent.transform);
             MapNode mapNode = mapNodeObject.GetComponent<MapNode>();
@@ -168,8 +167,19 @@ namespace Map
             return mapNode;
         }
 
+        public void LockMapInteractions(bool lockInteractions)
+        {
+            mapParent.GetComponent<ScrollNonUI>().enabled = !lockInteractions;
+            mapParent.GetComponent<BoxCollider>().enabled = !lockInteractions;
+
+            foreach (MapNode node in MapNodes) {
+                node.LockInteractions(lockInteractions);
+            }
+            isInteractionLocked = lockInteractions;
+        }
+
         /// Updates the state of all nodes to reflect which are locked, attainable, or visited based on the current path
-        public void SetAttainableNodes() 
+        public void SetAttainableNodes()
         {
             // first set all the nodes as unattainable/locked:
             foreach (MapNode node in MapNodes)
@@ -200,7 +210,7 @@ namespace Map
         }
 
         /// Updates the color of all lines to reflect which are available, visited, or locked
-        public virtual void SetLineColors() 
+        public virtual void SetLineColors()
         {
             Global.DEBUG_PRINT("[MapView::SetLineColors] Setting line colors for map: " + mapManager.CurrentMap.configName);
             foreach (LineConnection connection in lineConnections)
@@ -233,7 +243,7 @@ namespace Map
         }
 
         /// Sets the orientation and scrolling constraints of the map based on the selected orientation
-        protected virtual void SetOrientation() 
+        protected virtual void SetOrientation()
         {
             ScrollNonUI scrollNonUi = mapParent.GetComponent<ScrollNonUI>();
             float span = mapManager.CurrentMap.DistanceBetweenFirstAndLastLayers();
@@ -285,7 +295,7 @@ namespace Map
         }
 
         /// Instantiates and connects lines between all nodes based on their outgoing connections
-        private void DrawLines() 
+        private void DrawLines()
         {
             foreach (MapNode node in MapNodes) {
                 foreach (Vector2Int connection in node.Node.outgoing)
@@ -294,16 +304,17 @@ namespace Map
         }
 
         /// Resets the rotation of all nodes to ensure they are upright after orientation changes
-        private void ResetNodesRotation() 
+        private void ResetNodesRotation()
         {
-            foreach (MapNode node in MapNodes)
+            foreach (MapNode node in MapNodes) {
                 node.transform.rotation = Quaternion.identity;
+            }
         }
 
         /// Instantiates a line between two nodes and configures its appearance and connection data
-        protected virtual void AddLineConnection(MapNode from, MapNode to) 
+        protected virtual void AddLineConnection(MapNode from, MapNode to)
         {
-            if (linePrefab == null) return;
+            if (linePrefab == null) { return; }
 
             GameObject lineObject = Instantiate(linePrefab, mapParent.transform);
             LineRenderer lineRenderer = lineObject.GetComponent<LineRenderer>();
@@ -332,29 +343,31 @@ namespace Map
         }
 
         /// Finds the MapNode corresponding to a given grid point
-        protected MapNode GetNode(Vector2Int p) 
+        protected MapNode GetNode(Vector2Int p)
         {
             return MapNodes.FirstOrDefault(n => n.Node.point.Equals(p));
         }
 
         /// Finds a MapConfig by its name from the list of all configs
-        protected MapConfig GetConfig(string configName) 
+        protected MapConfig GetConfig(string configName)
         {
             return allMapConfigs.FirstOrDefault(c => c.name == configName);
         }
 
         /// Finds a NodeBlueprint by node type from the current map's config
-        protected NodeBlueprint GetBlueprint(NodeType type) 
+        protected NodeBlueprint GetBlueprint(NodeType type)
         {
             MapConfig config = GetConfig(mapManager.CurrentMap.configName);
             return config.nodeBlueprints.FirstOrDefault(n => n.nodeType == type);
         }
 
         /// Finds a NodeBlueprint by blueprint name from the current map's config
-        protected NodeBlueprint GetBlueprint(string blueprintName) 
+        protected NodeBlueprint GetBlueprint(string blueprintName)
         {
             MapConfig config = GetConfig(mapManager.CurrentMap.configName);
             return config.nodeBlueprints.FirstOrDefault(n => n.name == blueprintName);
         }
+        
+        public bool AreInteractionsLocked() => isInteractionLocked;
     }
 }
