@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class CombatManager : MonoBehaviour {
@@ -35,6 +37,17 @@ public class CombatManager : MonoBehaviour {
 
     public void InitRound() {
         DeckManager.instance.InitDeckEffect();
+    }
+
+    public void StartBattleLoop(List<Match> matches) {
+        if (!_CanBattle()) {
+            return;
+        }
+
+        _listMatch = matches;
+        _state = eCombatState.ATTACK;
+        _eAttackerDeck = eDeckType.PLAYER;
+        _nAttackerIndex = 0;
     }
 
     void Update() {
@@ -80,16 +93,11 @@ public class CombatManager : MonoBehaviour {
     }
 
     void _UpdateAttackOrder() {
-        switch (_eAttackerDeck) {
-            case eDeckType.NONE:
-                _eAttackerDeck = eDeckType.PLAYER;
-                break;
-            case eDeckType.PLAYER:
-                _eAttackerDeck = eDeckType.ENEMY;
-                break;
-            case eDeckType.ENEMY:
-                _eAttackerDeck = eDeckType.NONE;
-                break;
+        eDeckType[] arrType = (eDeckType[])Enum.GetValues(typeof(eDeckType));
+        int nTypeCount = arrType.Count();
+        _eAttackerDeck++;
+        if ((int)_eAttackerDeck >= nTypeCount) {
+            _eAttackerDeck = eDeckType.NONE;
         }
         _nAttackerIndex = 0;
     }
@@ -112,17 +120,6 @@ public class CombatManager : MonoBehaviour {
         return false;
     }
 
-    public void StartBattleLoop(List<Match> matches) {
-        if (!_CanBattle()) {
-            return;
-        }
-
-        _listMatch = matches;
-        _state = eCombatState.ATTACK;
-        _eAttackerDeck = eDeckType.PLAYER;
-        _nAttackerIndex = 0;
-    }
-
     void _UnPause() {
         if (_eAttackerDeck == eDeckType.NONE) {
             _state = eCombatState.FINISH;
@@ -136,21 +133,7 @@ public class CombatManager : MonoBehaviour {
     }
 
     public void ExecBattle(eDeckType eType, int nAttackerIndex) {
-        eDeckType eOtherType = eType == eDeckType.PLAYER ? eDeckType.ENEMY : eDeckType.PLAYER;
         Deck cDeck = DeckManager.instance.GetDeckByType(eType);
-        Deck cOtherDeck = DeckManager.instance.GetDeckByType(eOtherType);
-
-        int nTarget = GetLowestHealth(cOtherDeck);
-        if (nTarget <= Global.INVALID_INDEX) {
-            Global.DEBUG_PRINT("[ExecBattle] Cannot find target");
-            return;
-        }
-
-        UnitObject cDefenderUnit = cOtherDeck.GetUnitObject(nTarget);
-        if (cDefenderUnit == null || cDefenderUnit.IsDead()) {
-            Global.DEBUG_PRINT("[ExecBattle] Defender deck is empty target=" + nTarget);
-            return;
-        }
 
         UnitObject cAttackerUnit = cDeck.GetUnitObject(nAttackerIndex);
         if (cAttackerUnit == null || cAttackerUnit.IsDead()) {
@@ -162,68 +145,211 @@ public class CombatManager : MonoBehaviour {
         if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_FREEZE)) {
             bCanAttack = false;
         }
+        if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_STUN)) {
+            bCanAttack = false;
+        }
 
         cAttackerUnit.Resolve(EffectResolveType.RESOLVE_PRE_ATTACK);
         if (!bCanAttack) {
             return;
         }
 
-        Global.DEBUG_PRINT("attacker_deck=" + eType + " attacker_index=" + nAttackerIndex + " defender_index=" + nTarget);
-        _ExecBattleOne(cAttackerUnit, cDefenderUnit, _GetRollType(cAttackerUnit.unitSO.unitName));
+        _ExecRoll(cDeck, cAttackerUnit, _GetRollType(cAttackerUnit.unitSO.unitName));
+        _ExecTempEffect(cDeck, cAttackerUnit);
 
-        cAttackerUnit.Resolve(EffectResolveType.RESOLVE_ATTACK);
-        cDefenderUnit.Resolve(EffectResolveType.RESOLVE_ATTACK);
+        int nAttackCount = 1;
+        if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_ATTACK_TIMES, out float fAttackCount)) {
+            nAttackCount = (int)fAttackCount;
+        }
+
+        bool bBreak = false;
+        if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_ATTACK_MULTIPLE_IF_DEAD, out float fAttackCountIfDead)) {
+            nAttackCount = (int)fAttackCountIfDead;
+            bBreak = true;
+        }
+
+        for (int i = 0; i < nAttackCount; i++) {
+            // Normal attack target type
+            // using EffectTargetType coz i lazy change already
+            int nAttackCount_SameTarget = 1;
+            int nTargetCount = 1;
+
+            EffectTargetCondition eTargetCondition = EffectTargetCondition.LOWEST_HP;
+            if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_ATTACK_MULTIPLE)) {
+                eTargetCondition = _GetTargetConditionFromTempEffect(cAttackerUnit, EffectType.EFFECT_ATTACK_MULTIPLE);
+                if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_ATTACK_MULTIPLE, out float nAttackTargetNum)) {
+                    nTargetCount = (int)nAttackTargetNum;
+                }
+            }
+            if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_ATTACK_MULTIPLE_IF_DEAD)) {
+                eTargetCondition = _GetTargetConditionFromTempEffect(cAttackerUnit, EffectType.EFFECT_ATTACK_MULTIPLE_IF_DEAD);
+                if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_ATTACK_MULTIPLE_IF_DEAD, out float nAttackCount_SameTargetEffect)) {
+                    nAttackCount_SameTarget = (int)nAttackCount_SameTargetEffect;
+                }
+            }
+
+            List<UnitObject> listTarget = _GetTargetUnitBasedOnTargetType(cDeck, EffectTargetType.ENEMY, eTargetCondition);
+
+            bool bDefenderDied = false;
+            foreach (UnitObject cDefenderUnit in listTarget) {
+                if (nTargetCount <= 0) {
+                    break;
+                }
+
+                if (cDefenderUnit == null || cDefenderUnit.IsDead()) {
+                    Global.DEBUG_PRINT("[ExecBattle] Defender deck is empty");
+                    continue;
+                }
+
+                Global.DEBUG_PRINT("attacker_deck=" + eType + " attacker_index=" + nAttackerIndex + " defender_index=" + cDefenderUnit.index);
+                for (int j = 0; j < nAttackCount_SameTarget; j++) {
+                    _ExecBattleOne(cAttackerUnit, cDefenderUnit);
+                }
+
+                if (cDefenderUnit.IsDead()) {
+                    bDefenderDied = true;
+                }
+
+                cAttackerUnit.Resolve(EffectResolveType.RESOLVE_ATTACK);
+                nTargetCount--;
+            }
+
+            if (bBreak && !bDefenderDied) {
+                break;
+            }
+        }
+
+        cAttackerUnit.PlayStateAnimation(PlayerState.ATTACK);
     }
 
-    MatchType _GetRollType(string unitName) {
+    List<MatchType> _GetRollType(string unitName) {
+        List<MatchType> listResult = new List<MatchType>();
         if (_listMatch == null) {
-            return MatchType.NONE;
+            return listResult;
         }
 
         foreach (Match match in _listMatch) {
             if (match.GetUnitName() == unitName) {
-                return match.GetMatchType();
+                listResult.Add(match.GetMatchType());
             }
         }
 
-        return MatchType.NONE;
+        return listResult;
     }
 
-    void _ExecBattleOne(UnitObject cAttackerUnit, UnitObject cDefenderUnit, MatchType eRoll) {
+    void _ExecRoll(Deck cAttackerDeck, UnitObject cAttackerUnit, List<MatchType> listRoll) {
         if (cAttackerUnit == null || cAttackerUnit.IsDead()) {
             return;
         }
 
-        if (cDefenderUnit == null || cDefenderUnit.IsDead()) {
+        foreach (MatchType eRoll in listRoll) {
+            EffectList effects = cAttackerUnit.GetRollEffectList(eRoll);
+            if (effects != null) {
+                foreach (EffectScriptableObject effect in effects) {
+                    _ActivateEffect(cAttackerDeck, effect);
+                }
+            }
+        }
+    }
+
+    void _ExecTempEffect(Deck cDeck, UnitObject cUnit) {
+        if (cUnit == null || cUnit.IsDead()) {
             return;
         }
 
-        EffectList effects = cAttackerUnit.GetRollEffectList(eRoll);
-        if (effects != null) {
-            foreach (EffectScriptableObject effect in effects) {
-                _ActivateRollEffect(effect);
+        EffectMap effects = cUnit.GetAllTempEffect();
+        foreach (EffectObject effectObj in effects) {
+            _ActivateTempEffect(cDeck, effectObj);
+        }
+    }
+
+    void _ExecBattleOne(UnitObject cAttackerUnit, UnitObject cDefenderUnit) {
+        float fAttack = cAttackerUnit.GetAttack();
+        if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_STAT_INCREASE_ATK_TURN, out float fBonus)) {
+            fAttack += fBonus;
+        }
+
+        bool bIsCrit = false;
+        if (_IsCrit(cAttackerUnit)) {
+            fAttack *= _GetCritRatio(cAttackerUnit);
+            bIsCrit = true;
+        }
+
+        if (bIsCrit) {
+            if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_DAMAGE_CRIT_FLAT_HEAL)) {
+                if (cDefenderUnit.GetEffectParam(EffectType.EFFECT_DAMAGE_CRIT_FLAT_HEAL, out float val)) {
+                    cAttackerUnit._currentHealth.AddVal(val);
+                }   
             }
         }
 
-        float fAttack = cAttackerUnit.GetAttack();
-        if (_IsCrit(cAttackerUnit)) {
-            fAttack *= _GetCritRatio(cAttackerUnit);
+        bool bIsIgnoreRes = false;
+        if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_IGNORE_RES)) {
+            bIsIgnoreRes = true;
         }
 
-        fAttack *= _GetResRatio(cDefenderUnit);
+        if (!bIsIgnoreRes) {
+            fAttack *= _GetResRatio(cDefenderUnit);
+        }
 
-        fAttack = _GetDamageAfterShield(cDefenderUnit, fAttack);
+        bool bIgnoreShield = false;
+        if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_IGNORE_SHIELD)) {
+            bIgnoreShield = true;
+        }
 
-        if (cDefenderUnit.GetEffectParam(EffectType.EFFECT_REFLECT, out float val)) {
-            float fReflect = _GetDamageAfterShield(cAttackerUnit, fAttack);
-            cAttackerUnit.ReceiveDamage(fReflect * val / Global.PERCENTAGE_CONSTANT);
+        if (!bIgnoreShield) {
+            fAttack = _GetDamageAfterShield(cDefenderUnit, fAttack);
+        }
+
+        if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_HEX, out float fReducePercent)) {
+            fAttack *= fReducePercent * Global.PERCENTAGE_CONSTANT;
+        }
+
+        if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_SHADOW_BLADE_BLEED, out float fApplyCount)) {
+            if (cDefenderUnit.HasEffectParam(EffectType.EFFECT_BLEED)) {
+                fAttack += 5;
+                cDefenderUnit.AddTempEffect(EffectType.EFFECT_BLEED, EffectTargetType.SELF, EffectTargetCondition.NONE, 0.0f, EffectAffinityType.NONE, EffectResolveType.RESOLVE_TURN, 2);
+            } else {
+                fAttack += 2;
+                cDefenderUnit.AddTempEffect(EffectType.EFFECT_BLEED, EffectTargetType.SELF, EffectTargetCondition.NONE, 0.0f, EffectAffinityType.NONE, EffectResolveType.RESOLVE_TURN, 3);
+            }
         }
 
         fAttack = Mathf.Floor(fAttack);
+
+        if (cDefenderUnit.HasEffectParam(EffectType.EFFECT_REFLECT)) {
+            if (cDefenderUnit.GetEffectParam(EffectType.EFFECT_REFLECT, out float val)) {
+                float fReflect = _GetDamageAfterShield(cAttackerUnit, fAttack);
+                cAttackerUnit.ReceiveDamage(fReflect * val / Global.PERCENTAGE_CONSTANT);
+            }
+        }
+        
+        if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_DAMAGE_MULTIPLY, out float damageMulti)) {
+            fAttack *= damageMulti;
+        }
+
+        if (cDefenderUnit.HasEffectParam(EffectType.EFFECT_ZERO_DAMAGE)) {
+            fAttack = 0.0f;
+        }
+
+        if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_DAMAGE_LIFESTEAL)) {
+            if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_DAMAGE_LIFESTEAL, out float val)) {
+                cAttackerUnit._currentHealth.AddVal(fAttack * val / Global.PERCENTAGE_CONSTANT);
+            }
+        }
+
+        if (cDefenderUnit.HasEffectParam(EffectType.EFFECT_CANNOT_DIE)) {
+            if (cDefenderUnit._currentHealth.GetVal() <= fAttack) {
+                fAttack = cDefenderUnit._currentHealth.GetVal() - 1;
+            }
+        }
+
         cDefenderUnit.ReceiveDamage(fAttack);
 
         _ActivatePostEffect(cAttackerUnit, fAttack);
-        
+
+        ResourceManager.instance.GenerateDynamicText(cDefenderUnit.transform.position, fAttack.ToString());
+
         Global.DEBUG_PRINT("Final Damage=" + fAttack);
     }
 
@@ -284,12 +410,12 @@ public class CombatManager : MonoBehaviour {
         if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_STAT_INCREASE_CRIT_RATE_TURN, out float val)) {
             nCritRate += (int)val;
         }
-        
+
         if (cAttackerUnit.HasEffectParam(EffectType.EFFECT_DAMAGE_CRIT_HIT)) {
             return true;
         }
-        
-        int nRand = Random.Range(0, Global.PERCENTAGE_CONSTANT + 1); // +1 coz exclusive
+
+        int nRand = UnityEngine.Random.Range(0, Global.PERCENTAGE_CONSTANT + 1); // +1 coz exclusive
         if (nRand < nCritRate) {
             return true;
         }
@@ -310,13 +436,22 @@ public class CombatManager : MonoBehaviour {
         return Global.PERCENTAGE_CONSTANT / (Global.PERCENTAGE_CONSTANT + cDefenderUnit.GetRes() * Global.RESISTANCE_PERCENTAGE_CONSTANT);
     }
 
-    void _ActivateRollEffect(EffectScriptableObject cEffect) {
-        EffectTargetType eTargetType = cEffect.GetTargetType();
-        List<UnitObject> arrTargetUnit = _GetTargetUnitBasedOnTargetType(eTargetType, cEffect);
+    void _ActivateEffect(Deck cDeck, EffectScriptableObject cEffect) {
+        List<UnitObject> arrTargetUnit = _GetTargetUnitBasedOnTargetType(cDeck, cEffect);
 
         foreach (UnitObject unit in arrTargetUnit) {
             if (unit == null) {
                 continue;
+            }
+
+            if (cEffect.GetExecType() == EffectExecType.COUNT_SPECIFIED) {
+                unit.AddTempEffect(cEffect);
+                return;
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_BASE_HP)) {
+                unit._currentHealth.AddTempMax(cEffect.GetEffectVal());
+                unit._currentHealth.AddVal(cEffect.GetEffectVal());
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_ATK)) {
@@ -330,8 +465,19 @@ public class CombatManager : MonoBehaviour {
                 unit._currentShield.AddVal(cEffect.GetEffectVal());
             }
 
+            if (cEffect.IsEffectType(EffectType.EFFECT_SHIELD_REMOVE)) {
+                unit._currentShield.MinusVal(unit._currentShield.GetVal());
+            }
+
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_RES)) {
                 unit._currentRes.AddVal(cEffect.GetEffectVal());
+            }
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_REDUCE_RES_PERCENT)) {
+                float fReduceVal = unit._currentRes.GetVal() * cEffect.GetEffectVal() * Global.PERCENTAGE_CONSTANT;
+                unit._currentRes.AddVal(fReduceVal);
+            }
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_REDUCE_RES)) {
+                unit._currentRes.MinusVal(cEffect.GetEffectVal());
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_DAMAGE_IGNORE_SHIELD)) {
@@ -345,6 +491,10 @@ public class CombatManager : MonoBehaviour {
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_INCREASE_CRIT_RATE)) {
                 unit._currentCritRate.AddVal(cEffect.GetEffectVal());
             }
+            if (cEffect.IsEffectType(EffectType.EFFECT_STAT_REDUCE_CRIT_RATE_PERCENT)) {
+                float fReduceVal = unit._currentCritRate.GetVal() * cEffect.GetEffectVal() * Global.PERCENTAGE_CONSTANT;
+                unit._currentCritRate.AddVal(fReduceVal);
+            }
             if (cEffect.IsEffectType(EffectType.EFFECT_STAT_REDUCE_CRIT_RATE)) {
                 unit._currentCritRate.MinusVal(cEffect.GetEffectVal());
             }
@@ -352,6 +502,29 @@ public class CombatManager : MonoBehaviour {
             if (cEffect.IsEffectType(EffectType.EFFECT_REVIVE)) {
                 unit.Revive();
                 unit._currentHealth.SetVal(cEffect.GetEffectVal());
+            }
+            if (cEffect.IsEffectType(EffectType.EFFECT_REVIVE_FULL)) {
+                unit.Revive();
+                unit._currentHealth.SetVal(unit._currentHealth.GetMax());
+            }
+            if (cEffect.IsEffectType(EffectType.EFFECT_DIE_REVIVE)) {
+                unit.death_count++;
+                unit._currentHealth.SetVal(unit._currentHealth.GetMax());
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_INSTANT_KILL)) {
+                unit.ReceiveDamage(unit._currentHealth.GetVal());
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_TRIGGER_ALL_SINGLE)) {
+                EffectList listEffect = unit.GetRollEffectList(MatchType.SINGLE);
+                foreach (EffectScriptableObject singleEffect in listEffect) {
+                    _ActivateEffect(cDeck, singleEffect);
+                }
+            }
+
+            if (cEffect.IsEffectType(EffectType.EFFECT_DAMAGE_FLAT_DAMAGE)) {
+                unit.ReceiveDamage(cEffect.GetEffectVal());
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_CLEANSE)) {
@@ -364,13 +537,29 @@ public class CombatManager : MonoBehaviour {
                 });
             }
 
-            if (cEffect.GetExecType() == EffectExecType.TURN_SPECIFIED) {
-                unit.AddTempEffect(cEffect);
-            }
-
             Global.DEBUG_PRINT("[Effect] Triggered " + cEffect.GetTypeName() +
                                 " val=" + cEffect.GetEffectVal() +
                                 " unit_index=" + unit.index);
+        }
+    }
+
+    void _ActivateTempEffect(Deck cDeck, EffectObject cEffect) {
+        List<UnitObject> arrTargetUnit = _GetTargetUnitBasedOnTargetType(cDeck, cEffect.effectSO);
+
+        float val = cEffect.GetEffectVal();
+        EffectType eType = cEffect.effectSO.GetEffectType();
+        foreach (UnitObject unit in arrTargetUnit) {
+            if (eType == EffectType.EFFECT_HEAL_TURN) {
+                unit._currentHealth.AddVal(val);
+            }
+
+            if (eType == EffectType.EFFECT_STAT_INCREASE_RES_TURN) {
+                unit._currentRes.AddVal(val);
+            }
+
+            if (eType == EffectType.EFFECT_BLEED) {
+                unit._currentHealth.MinusVal(val);
+            }
         }
     }
 
@@ -378,7 +567,8 @@ public class CombatManager : MonoBehaviour {
         EffectMap mapTempEffect = unitObj.GetAllTempEffect();
         foreach (EffectObject effectObj in mapTempEffect) {
             EffectTargetType eTargetType = effectObj.GetEffectTargetType();
-            List<UnitObject> arrTargetUnit = _GetTargetUnitBasedOnTargetType(eTargetType, effectObj.effectSO);
+            Deck cDeck = DeckManager.instance.GetDeckByType(_eAttackerDeck);
+            List<UnitObject> arrTargetUnit = _GetTargetUnitBasedOnTargetType(cDeck, effectObj.effectSO);
 
             if (unitObj == null) {
                 return;
@@ -393,8 +583,10 @@ public class CombatManager : MonoBehaviour {
                     target._currentHealth.AddVal(fAttack);
                 }
 
-                if (unitObj.HasEffectParam(EffectType.EFFECT_DOUBLE_DAMAGE)) {
-                    target._currentHealth.MinusVal(fAttack);
+                if (unitObj.HasEffectParam(EffectType.EFFECT_DAMAGE_MULTIPLY_POST)) {
+                    if (unitObj.GetEffectParam(EffectType.EFFECT_DAMAGE_MULTIPLY_POST, out float val)) {
+                        target._currentHealth.MinusVal(fAttack * val);
+                    }
                 }
             }
         }
@@ -402,147 +594,74 @@ public class CombatManager : MonoBehaviour {
         unitObj.Resolve(EffectResolveType.RESOLVE_POST_ATTACK);
     }
 
-    List<UnitObject> _GetTargetUnitBasedOnTargetType(EffectTargetType eTargetType, EffectScriptableObject cEffect) {
-        List<UnitObject> arrTarget = new List<UnitObject>();
-        Deck cDeck = DeckManager.instance.GetDeckByType(_eAttackerDeck);
+    List<UnitObject> _GetTargetUnitBasedOnTargetType(Deck cDeck, EffectScriptableObject effectSO) {
+        return _GetTargetUnitBasedOnTargetType(cDeck, effectSO.GetTargetType(), effectSO.GetTargetCondition(), effectSO.GetTargetParam());
+    }
 
-        eDeckType eOtherType = _eAttackerDeck == eDeckType.PLAYER ? eDeckType.ENEMY : eDeckType.PLAYER;
+    List<UnitObject> _GetTargetUnitBasedOnTargetType(Deck cDeck, EffectTargetType eTargetType, EffectTargetCondition eTargetCondition = EffectTargetCondition.NONE, float eTargetParam = 0.0f) {
+        List<UnitObject> arrTarget = new List<UnitObject>();
+        if (eTargetType == EffectTargetType.SELF) {
+            arrTarget.Add(cDeck.GetUnitObject(_nAttackerIndex));
+            return arrTarget;
+        }
+
+        eDeckType eOtherType = cDeck.GetDeckType() == eDeckType.PLAYER ? eDeckType.ENEMY : eDeckType.PLAYER;
         Deck cOtherDeck = DeckManager.instance.GetDeckByType(eOtherType);
+
+        Deck cTargetDeck = eTargetType == EffectTargetType.SELF ? cDeck : cOtherDeck;
 
         if (cDeck == null || cOtherDeck == null) {
             return arrTarget;
         }
 
-        switch (eTargetType) {
-            case EffectTargetType.SELF:
-                arrTarget.Add(cDeck.GetUnitObject(_nAttackerIndex));
-                break;
-            case EffectTargetType.TEAM_LOWEST_HP: {
-                    int nLowestHealthIndex = GetLowestHealth(cDeck);
-                    arrTarget.Add(cDeck.GetUnitObject(nLowestHealthIndex));
+        switch (eTargetCondition) {
+            case EffectTargetCondition.LOWEST_HP: {
+                    int nLowestHealthIndex = GetLowestHealth(cTargetDeck);
+                    arrTarget.Add(cTargetDeck.GetUnitObject(nLowestHealthIndex));
                     break;
                 }
-            case EffectTargetType.TEAM_HOLY:
-                arrTarget = _GetUnitByArchetype(cDeck, eUnitArchetype.HOLY);
+            case EffectTargetCondition.HOLY:
+                arrTarget = DeckHelperFunc.GetUnitByArchetype(cTargetDeck, eUnitArchetype.HOLY);
                 break;
-            case EffectTargetType.TEAM_DECK:
-                arrTarget = cDeck.GetAllAliveUnit();
+            case EffectTargetCondition.UNDEAD:
+                arrTarget = DeckHelperFunc.GetUnitByArchetype(cTargetDeck, eUnitArchetype.UNDEAD);
                 break;
-            case EffectTargetType.TEAM_DEAD:
-                arrTarget = _GetAllDeadUnit(cDeck);
+            case EffectTargetCondition.ELF:
+                arrTarget = DeckHelperFunc.GetUnitByArchetype(cTargetDeck, eUnitArchetype.ELF);
                 break;
-            case EffectTargetType.ENEMY_DECK:
-                arrTarget = cOtherDeck.GetAllAliveUnit();
+            case EffectTargetCondition.DECK:
+                arrTarget = DeckHelperFunc.GetAllAliveUnit(cTargetDeck);
                 break;
-            case EffectTargetType.ENEMY_LOWEST_HP: {
-                    int nLowestHealthIndex = GetLowestHealth(cOtherDeck);
-                    arrTarget.Add(cOtherDeck.GetUnitObject(nLowestHealthIndex));
-                    break;
-                }
-            case EffectTargetType.ENEMY_FRONTLINE:
-                arrTarget = _GetAllUnitFrontLine(cOtherDeck);
+            case EffectTargetCondition.DEAD:
+                arrTarget = DeckHelperFunc.GetAllDeadUnit(cTargetDeck);
                 break;
-            case EffectTargetType.ENEMY_RANDOM:
-                arrTarget = _GetRandomEnemy(cOtherDeck, 1);
+            case EffectTargetCondition.RANDOM:
+                arrTarget = DeckHelperFunc.GetRandomAliveUnit(cTargetDeck, (int)eTargetParam);
                 break;
-            case EffectTargetType.ENEMY_RANDOM_3:
-                arrTarget = _GetRandomEnemy(cOtherDeck, 3);
+            case EffectTargetCondition.RANDOM_UNDEAD:
+                arrTarget = DeckHelperFunc.GetRandomAliveUnit(cTargetDeck, (int)eTargetParam, eUnitArchetype.UNDEAD);
                 break;
-            case EffectTargetType.ENEMY_BELOW_HP:
-                arrTarget = _GetAllUnitBelowHp(cOtherDeck, cEffect.GetEffectVal());
+            case EffectTargetCondition.RANDOM_BELOW_HP_PERCENT_1:
+                arrTarget = DeckHelperFunc.GetAllUnitBelowHpPercent(cTargetDeck, eTargetParam);
+                arrTarget = DeckHelperFunc.PickRandomFromList(arrTarget, 1);
+                break;
+            case EffectTargetCondition.FRONTLINE:
+                arrTarget = DeckHelperFunc.GetAllUnitFrontLine(cTargetDeck);
+                break;
+            case EffectTargetCondition.ALL_UNIT_BELOW_HP_PERCENT:
+                arrTarget = DeckHelperFunc.GetAllUnitBelowHpPercent(cTargetDeck, eTargetParam);
                 break;
 
         }
 
         return arrTarget;
     }
-
-    List<UnitObject> _GetUnitByArchetype(Deck cDeck, eUnitArchetype eUnitArchetype) {
-        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
-            if (unit == null) {
-                return false;
-            }
-
-            if (unit.IsDead()) {
-                return false;
-            }
-
-            if (unit.unitSO.eUnitArchetype != eUnitArchetype) {
-                return false;
-            }
-
-            return true;
-        });
-    }
-
-    List<UnitObject> _GetAllDeadUnit(Deck cDeck) {
-        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
-            if (unit == null) {
-                return false;
-            }
-
-            if (!unit.IsDead()) {
-                return false;
-            }
-
-            return true;
-        });
-    }
-
-    List<UnitObject> _GetAllUnitFrontLine(Deck cDeck) {
-        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
-            if (unit == null) {
-                return false;
-            }
-
-            if (!unit.IsDead()) {
-                return false;
-            }
-
-            if (!unit.IsFrontPosition()) {
-                return false;
-            }
-
-            return true;
-        });
-    }
-
-    List<UnitObject> _GetAllUnitBelowHp(Deck cDeck, float hp) {
-        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
-            if (unit == null) {
-                return false;
-            }
-
-            if (!unit.IsDead()) {
-                return false;
-            }
-
-            if (unit._currentHealth.GetVal() > hp) {
-                return false;
-            }
-
-            return true;
-        });
-    }
-
-    List<UnitObject> _GetRandomEnemy(Deck cDeck, int count) {
-        int i = 0;
-        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
-            if (unit == null) {
-                return false;
-            }
-
-            if (!unit.IsDead()) {
-                return false;
-            }
-
-            if (i == count) {
-                return false;
-            }
-
-            i++;
-
-            return true;
-        });
+    
+    EffectTargetCondition _GetTargetConditionFromTempEffect(UnitObject cUnit, EffectType eType) {
+        EffectTargetCondition eTargetCondition = EffectTargetCondition.LOWEST_HP;
+        if (cUnit.GetEffectSO(eType, out EffectScriptableObject effectSO)) {
+            eTargetCondition = effectSO.GetTargetCondition();
+        }
+        return eTargetCondition;
     }
 }

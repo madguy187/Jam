@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -15,7 +16,7 @@ public class CreatePrefabFromMenu {
     const string UNIT_PREFAB_PATH = "ScriptableObject/UnitSO/Unit";
     const string UNIT_PREFAB_FULL_PATH = "Assets/Resources/" + UNIT_PREFAB_PATH;
 
-    const string UNIT_PREFAB_DATA_PATH = "/Resources/" + UNIT_PREFAB_PATH;
+    const string HEALTH_BAR_PATH = "UI/UIHealthBar/UIHealthBar";
 
     const string FOLDER_SEPARATOR = "/";
 
@@ -45,24 +46,57 @@ public class CreatePrefabFromMenu {
         AssetDatabase.Refresh();
     }
 
-    static GameObject GetDefaultPrefabUnit() {
+    static GameObject GetPrefabUnit(string path) {
         // Create a new GameObject (or use an existing one)
-        string prefabPath = UNIT_DEFAULT_PREFAB_PATH;
-        GameObject prefab = Resources.Load<GameObject>(prefabPath);
+        GameObject prefab = Resources.Load<GameObject>(path);
         return prefab;
     }
 
-    static void CreateUnit(string unitName) {
-        if (CheckIfPrefabExist(unitName)) {
-            FileUtil.DeleteFileOrDirectory(Application.dataPath + UNIT_PREFAB_DATA_PATH + FOLDER_SEPARATOR + unitName + ".prefab");
-            FileUtil.DeleteFileOrDirectory(Application.dataPath + UNIT_PREFAB_DATA_PATH + FOLDER_SEPARATOR + unitName + ".meta");
+    static void AttachHealthBar(ref GameObject obj) {
+        GameObject objHealthBar = null;
+        if (obj.GetComponentInChildren<UIHealthBar>() == null) {
+            GameObject prefab = Resources.Load<GameObject>(HEALTH_BAR_PATH);
+            objHealthBar = GameObject.Instantiate(prefab);
+            objHealthBar.transform.parent = obj.transform;
+        } else {
+            objHealthBar = obj.GetComponentInChildren<UIHealthBar>().gameObject;
         }
 
-        // Create a new GameObject (or use an existing one)
-        GameObject prefab = GetDefaultPrefabUnit();
-        GameObject gameObject = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+        UnitObject unitComp = obj.GetComponent<UnitObject>();
+        UIHealthBar healthBarComp = objHealthBar.GetComponent<UIHealthBar>();
+        healthBarComp.SetUnit(unitComp);
 
-        UnitObject comp = gameObject.GetComponent<UnitObject>();
+        Vector3 pos = new Vector3(0.0f, obj.transform.position.y + 0.9f, 0.0f);
+        RectTransform healthBarTrans = objHealthBar.GetComponent<RectTransform>();
+        healthBarTrans.anchoredPosition = pos;
+    }
+
+    static void CreateUnit(string unitName) {
+        GameObject prefab = null;
+
+        bool isCreateNew = false;
+        if (CheckIfPrefabExist(unitName)) {
+            prefab = GetPrefabUnit(UNIT_PREFAB_PATH + FOLDER_SEPARATOR + unitName);
+            //FileUtil.DeleteFileOrDirectory(Application.dataPath + UNIT_PREFAB_DATA_PATH + FOLDER_SEPARATOR + unitName + ".prefab");
+            //FileUtil.DeleteFileOrDirectory(Application.dataPath + UNIT_PREFAB_DATA_PATH + FOLDER_SEPARATOR + unitName + ".meta");
+        } else {
+            // Create a new GameObject
+            isCreateNew = true;
+            prefab = GetPrefabUnit(UNIT_DEFAULT_PREFAB_PATH);
+        }
+
+        GameObject gameObj = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+        gameObj.transform.position = Vector3.zero;
+
+        float size = 2.0f;
+        gameObj.transform.localScale = new Vector3(size, size, size);
+
+        UnitObject comp = gameObj.GetComponent<UnitObject>();
+        if (comp == null) {
+            comp = gameObj.AddComponent<UnitObject>();
+        }
+
+        AttachHealthBar(ref gameObj);
 
         string infoPath = UNIT_SCRIPTABLE_PATH + FOLDER_SEPARATOR + unitName;
         List<UnitScriptableObject> unitSO = Resources.LoadAll<UnitScriptableObject>(infoPath).ToList();
@@ -78,6 +112,10 @@ public class CreatePrefabFromMenu {
         EffectList zigzag = new EffectList();
         EffectList fullgrid = new EffectList();
         foreach (EffectScriptableObject effect in effects) {
+            if (!effect.GetLock()) {
+                Debug.Log(effect.name + " is not locked");
+            }
+
             if (effect.name.Contains("Single")) {
                 single.AddEffect(effect);
             }
@@ -110,16 +148,20 @@ public class CreatePrefabFromMenu {
         // Save the GameObject as a prefab
         string assetPath = UNIT_PREFAB_FULL_PATH + FOLDER_SEPARATOR + unitName + ".prefab"; // Define the asset path
         bool prefabSuccess;
-        PrefabUtility.SaveAsPrefabAsset(gameObject, assetPath, out prefabSuccess);
+        PrefabUtility.SaveAsPrefabAsset(gameObj, assetPath, out prefabSuccess);
 
         if (prefabSuccess) {
-            Debug.Log("Prefab created successfully at: " + assetPath);
+            if (isCreateNew) {
+                Debug.Log("Prefab created successfully at: " + assetPath);
+            } else {
+                Debug.Log("Prefab updated successfully at: " + assetPath);
+            }
         } else {
             Debug.LogError("Failed to create prefab.");
         }
 
         // Optionally destroy the temporary GameObject
-        GameObject.DestroyImmediate(gameObject);
+        GameObject.DestroyImmediate(gameObj);
     }
 
     static bool CheckIfPrefabExist(string unitName) {

@@ -12,10 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
   m_Name: HolyBlade_Diagonal_AtkHeal
   m_EditorClassIdentifier: 
-  _eType: 9
+  _eType: 22
+  _fEffectVal: 0
   _eTargetType: 1
+  _eTargetCondition: 1
+  _eTargetParam: 0
   _eExecType: 2
   _effectAffinityType: 0
-  _effectResolveType: 3
-  _fEffectVal: 3
-  _fEffectTurn: 1
+  _effectResolveType: 4
+  _fEffectCount: 1
+  IsLocked: 1

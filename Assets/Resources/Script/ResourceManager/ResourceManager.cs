@@ -8,6 +8,8 @@ public class ResourceManager : MonoBehaviour {
     Dictionary<string, GameObject> _mapUnitSO = new Dictionary<string, GameObject>();
     Dictionary<string, RelicScriptableObject> _mapRelicSO = new Dictionary<string, RelicScriptableObject>();
 
+    [SerializeField] GameObject prefabDynamicText = null;
+
     void Awake() {
         if (instance != null) {
             Destroy(instance);
@@ -67,12 +69,30 @@ public class ResourceManager : MonoBehaviour {
 
         return null;
     }
-    
+
     public RelicScriptableObject GetRelic(string unitName) {
         if (_mapRelicSO.ContainsKey(unitName)) {
             return _mapRelicSO[unitName];
         }
 
         return null;
+    }
+
+    public void GenerateDynamicText(Vector3 pos, string text, float lifetime = 2.0f) {
+        if (prefabDynamicText == null) {
+            return;
+        }
+
+        GameObject objText = Instantiate(prefabDynamicText);
+        if (objText == null) {
+            return;
+        }
+
+        UIDynamicNumber textComp = objText.GetComponent<UIDynamicNumber>();
+        if (textComp == null) {
+            return;
+        }
+
+        textComp.Init(pos, lifetime, text);
     }
 }

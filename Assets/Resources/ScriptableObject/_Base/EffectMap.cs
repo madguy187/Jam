@@ -36,6 +36,14 @@ public class EffectMap : IEnumerable<EffectObject> {
         return 0.0f;
     }
 
+    public EffectScriptableObject GetEffectSO(EffectType eType) {
+        if (_dictEffect.ContainsKey(eType)) {
+            return _dictEffect[eType].effectSO;
+        }
+
+        return null;
+    }
+
     public void Clear() {
         _dictEffect.Clear();
     }

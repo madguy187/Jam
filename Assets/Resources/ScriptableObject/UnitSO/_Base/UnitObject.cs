@@ -1,17 +1,26 @@
 using System;
-using System.Collections.Generic;
+using TMPro.EditorUtilities;
 using UnityEngine;
 
 public class UnitStat {
     float val = 0.0f;
     float max = 0.0f;
+    float tempMax = 0.0f;
 
     public UnitStat(float _val) { val = _val; }
 
     public void SetMax(float _max) { max = _max; }
+    public void AddTempMax(float _tempMax) { tempMax = _tempMax; }
+
+    public void Reset() {
+        val = max;
+        tempMax = 0.0f;
+    }
+
     public void SetVal(float _val) {
-        if (max > 0 && _val > max) {
-            _val = max;
+        float _max = GetMax();
+        if (_max > 0 && _val > _max) {
+            _val = _max;
         }
 
         if (_val < 0) {
@@ -22,10 +31,12 @@ public class UnitStat {
     }
 
     public float GetVal() { return val; }
+    public float GetMax() { return max + tempMax; }
 
     public void AddVal(float _val) {
-        if (max > 0 && val + _val > max) {
-            _val = max - val;
+        float _max = GetMax();
+        if (_max > 0 && val + _val > _max) {
+            _val = _max - val;
         }
         val += _val;
     }
@@ -61,6 +72,7 @@ public class UnitObject : MonoBehaviour {
     EffectMap _listTempEffect = new EffectMap();
 
     public int index { get; set; }
+    public int death_count { get; set; } = 0;
 
     public UnitStat _currentHealth = new UnitStat(0.0f);
     public UnitStat _currentAttack = new UnitStat(0.0f);
@@ -79,6 +91,23 @@ public class UnitObject : MonoBehaviour {
 
     public Action onDeath { private get; set; } = null;
 
+    SPUM_Prefabs _prefabs = null;
+
+    public void Awake() {
+        _prefabs = GetComponent<SPUM_Prefabs>();
+        _prefabs.OverrideControllerInit();
+    }
+
+    public void Update() {
+        if (Input.GetKeyDown(KeyCode.Q)) {
+            PlayStateAnimation(PlayerState.ATTACK);
+        }
+
+        if (Input.GetKeyDown(KeyCode.W)) {
+            PlayStateAnimation(PlayerState.IDLE);
+        }
+    }
+
     public void Init() {
         _currentHealth.SetVal(unitSO.hp);
         _currentHealth.SetMax(unitSO.hp);
@@ -93,9 +122,15 @@ public class UnitObject : MonoBehaviour {
     public void AddTempEffect(EffectScriptableObject effectSO) {
         EffectObject effect = new EffectObject();
         effect.effectSO = effectSO;
-        effect.Add(effectSO.GetEffectVal(), effectSO.GetEffectTurn());
+        effect.Add(effectSO.GetEffectVal(), effectSO.GetEffectCount());
 
         _listTempEffect.AddEffect(effectSO.GetEffectType(), effect);
+    }
+
+    public void AddTempEffect(EffectType effectType, EffectTargetType eTarget, EffectTargetCondition eCondition, float eParam, EffectAffinityType eAffinity, EffectResolveType eResolve, int nCount) {
+        EffectScriptableObject effectSO = ScriptableObject.CreateInstance<EffectScriptableObject>();
+        effectSO.InitScriptableInstance(effectType, eTarget, eCondition, eParam, EffectExecType.COUNT_SPECIFIED, eAffinity, eResolve, nCount);
+        AddTempEffect(effectSO);
     }
 
     public void RemoveEffect(EffectType eType) {
@@ -113,6 +148,15 @@ public class UnitObject : MonoBehaviour {
     public bool GetEffectParam(EffectType eType, out float val) {
         val = _listTempEffect.GetParam(eType);
         if (val > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public bool GetEffectSO(EffectType eType, out EffectScriptableObject val) {
+        val = _listTempEffect.GetEffectSO(eType);
+        if (val != null) {
             return true;
         }
 
@@ -213,6 +257,7 @@ public class UnitObject : MonoBehaviour {
 
     public void Revive() {
         _bIsDead = false;
+        PlayStateAnimation(PlayerState.IDLE);
     }
 
     void _TriggerDeath() {
@@ -224,6 +269,15 @@ public class UnitObject : MonoBehaviour {
             onDeath();
         }
 
+        PlayStateAnimation(PlayerState.DEATH);
         _bIsDead = true;
+    }
+
+    public void PlayStateAnimation(PlayerState state){
+        if (_prefabs == null) {
+            return;
+        }
+
+        _prefabs.PlayAnimation(state, 0);
     }
 }

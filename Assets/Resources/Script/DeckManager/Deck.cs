@@ -4,11 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Deck : IEnumerable<UnitObject> {
+    eDeckType _eType = eDeckType.NONE;
+    public eDeckType GetDeckType() { return _eType; }
+
     List<UnitObject> _vecUnit = new List<UnitObject>();
     List<UnitPosition> _vecPosition = new List<UnitPosition>();
     public int GetDeckMaxSize() { return _vecPosition.Count; }
 
-    public void Init(List<UnitPosition> vecPos) {
+    public void Init(eDeckType eType, List<UnitPosition> vecPos) {
+        _eType = eType;
         _vecPosition = vecPos;
         Global.DEBUG_PRINT("[Deck] Init Deck with Size: " + _vecPosition.Count);
 
@@ -59,28 +63,6 @@ public class Deck : IEnumerable<UnitObject> {
         }
 
         return _vecUnit[index];
-    }
-
-    public List<UnitObject> GetAllAliveUnit(eUnitPosition eUnitPos = eUnitPosition.NONE) {
-        List<UnitObject> arrUnit = new List<UnitObject>();
-        foreach (UnitObject unit in _vecUnit) {
-            if (unit == null) {
-                continue;
-            }
-
-            if (unit.IsDead()) {
-                continue;
-            }
-
-            if (eUnitPos != eUnitPosition.NONE) {
-                if (unit.GetUnitPosition() != eUnitPos) {
-                    continue;
-                }
-            }
-
-            arrUnit.Add(unit);
-        }
-        return arrUnit;
     }
 
     public List<UnitObject> GetUnitByPredicate(Predicate<UnitObject> predicate) {
