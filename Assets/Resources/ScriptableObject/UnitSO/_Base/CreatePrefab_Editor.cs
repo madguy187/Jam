@@ -20,14 +20,6 @@ public class CreatePrefabFromMenu {
 
     const string FOLDER_SEPARATOR = "/";
 
-    [MenuItem("Assets/Create/Scriptable Object/EditEnum", priority = 11)]
-    public static void EditEnumVal() {
-        string path = Application.dataPath + "/Resources/ScriptableObject/_Base";
-        using (StreamReader outputFile = new StreamReader(Path.Combine(path, "EffectType.cs"), true)) {
-            Debug.Log(outputFile.ReadLine());
-        }
-    }
-
     [MenuItem("Assets/Create/Scriptable Object/LoadAll", priority = 11)]
     public static void LoadAllSO() {
         string[] folders = AssetDatabase.GetSubFolders(UNIT_SCRIPTABLE_FULL_PATH);
