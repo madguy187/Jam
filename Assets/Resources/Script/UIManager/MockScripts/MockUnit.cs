@@ -28,23 +28,25 @@ public class MockUnit
         };
     }
     
-    public void EquipRelic(MockRelic relic)
+    public bool EquipRelic(MockRelic relic)
     {
         if (!equippedRelics.Contains(relic)) {
             equippedRelics.Add(relic);
             Global.DEBUG_PRINT($"[MockUnit::EquipRelic] Equipped relic: {relic.relicName} to unit: {unitName}, size of equipped relics: {equippedRelics.Count}");
-        } else {
-            Global.DEBUG_PRINT($"[MockUnit::EquipRelic] Relic: {relic.relicName} is already equipped to unit: {unitName}");
+            return true;
         }
+        Global.DEBUG_PRINT($"[MockUnit::EquipRelic] Relic: {relic.relicName} is already equipped to unit: {unitName}");
+        return false;
     }
 
-    public void UnequipRelic(MockRelic relic)
+    public bool UnequipRelic(MockRelic relic)
     {
         if (equippedRelics.Contains(relic)) {
             equippedRelics.Remove(relic);
             Global.DEBUG_PRINT($"[MockUnit::UnequipRelic] Unequipped relic: {relic.relicName} from unit: {unitName}, size of equipped relics: {equippedRelics.Count}");
-        } else {
-            Global.DEBUG_PRINT($"[MockUnit::UnequipRelic] Relic: {relic.relicName} not found in unit: {unitName}");
+            return true;
         }
+        Global.DEBUG_PRINT($"[MockUnit::UnequipRelic] Relic: {relic.relicName} not found in unit: {unitName}");
+        return false;
     }
 }

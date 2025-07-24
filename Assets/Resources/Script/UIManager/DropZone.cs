@@ -68,39 +68,83 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
             dragHandler.OnDropRejected();
             return;
         }
+
         if (itemTracker == null) {
             Global.DEBUG_PRINT("[DropZone::OnDrop] ItemTracker is null.");
             dragHandler.OnDropRejected();
             return;
         }
+
         if (!itemTracker.CanAccept(trackerType, draggedItemType)) {
             Global.DEBUG_PRINT("[DropZone::OnDrop] Cannot drop more items, max limit reached.");
             dragHandler.OnDropRejected();
             return;
         }
 
-        // If we reach here, we can accept the drop but this is specific for relic slots for a unit
-        if (allowedType == AllowedItemType.RelicsOnly && draggedItemType == MockItemType.Relic) {
-            // Get the current active unit from the layout
-            UnitSettingLayout layout = GetComponentInParent<UnitSettingLayout>();
-            if (layout.ActiveUnit != null) {
-                layout.ActiveUnit.EquipRelic(dragHandler.GetDraggedItem().relicData);
-                Global.DEBUG_PRINT($"Equipped {dragHandler.GetDraggedItem().relicData.relicName} to {layout.ActiveUnit.unitName}");
-            }
-        }
+        UnitSettingLayout layout = GetComponentInParent<UnitSettingLayout>();
+        MockPlayerInventory inventory = layout?.ActiveInventory;
 
-        // Should not fail here but just in case...
-        if (!SnapToFirstAvailableSlot(eventData.pointerDrag/*, eventData*/)) {
+        if (inventory == null) {
+            Global.DEBUG_PRINT("[DropZone::OnDrop] Inventory is null.");
             dragHandler.OnDropRejected();
             return;
         }
 
-        // If passed all checks, accept drop
-        // eventData.pointerDrag.transform.SetParent(contentParent, false);
+        var draggedItem = dragHandler.GetDraggedItem();
+
+        // === Handle relics ===
+        if (draggedItemType == MockItemType.Relic)
+        {
+            MockUnit activeUnit = layout?.ActiveUnit;
+
+            if (activeUnit == null) {
+                Global.DEBUG_PRINT("[DropZone::OnDrop] No active unit to equip/unequip relic.");
+                dragHandler.OnDropRejected();
+                return;
+            }
+
+            if (trackerType == TrackerType.BagContainer) {
+                // Unequip relic
+                bool success = activeUnit.UnequipRelic(draggedItem.relicData);
+                if (success) {
+                    layout.RefreshRelicUI();
+                    Global.DEBUG_PRINT($"[DropZone] Unequipped relic {draggedItem.relicData.relicName} from {activeUnit.unitName} to bag.");
+                } else {
+                    Global.DEBUG_PRINT($"[DropZone] Relic {draggedItem.relicData.relicName} not found on {activeUnit.unitName}.");
+                    dragHandler.OnDropRejected();
+                    return;
+                }
+            }
+            else if (allowedType == AllowedItemType.RelicsOnly) {
+                // Equip relic
+                activeUnit.EquipRelic(draggedItem.relicData);
+                layout.RefreshRelicUI();
+                Global.DEBUG_PRINT($"Equipped {draggedItem.relicData.relicName} to {activeUnit.unitName}");
+            }
+        }
+
+        // === Handle units ===
+        if (draggedItemType == MockItemType.Unit) {
+            if (trackerType == TrackerType.BagContainer) {
+                inventory.MoveUnitToBag(draggedItem.unitData);
+                Global.DEBUG_PRINT($"Moved {draggedItem.unitData.unitName} to Bag");
+            } else if (trackerType == TrackerType.UnitContainer) {
+                inventory.MoveUnitToTeam(draggedItem);
+                Global.DEBUG_PRINT($"Moved {draggedItem.unitData.unitName} to Team");
+            }
+        }
+
+        // Snap UI and finalize
+        if (!SnapToFirstAvailableSlot(eventData.pointerDrag)) {
+            dragHandler.OnDropRejected();
+            return;
+        }
+
         LayoutRebuilder.MarkLayoutForRebuild(contentParent.GetComponent<RectTransform>());
         itemTracker.AddItem(trackerType, draggedItemType);
         dragHandler.OnDropAccepted();
     }
+
 
     public bool SnapToFirstAvailableSlot(GameObject draggedGO)
     {

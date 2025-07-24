@@ -41,7 +41,7 @@ public class UnitSettingLayout : MonoBehaviour {
             GenerateFixedBagSlots();
             hasInitialized = true;
         }
-        
+
         RefreshUI();
         relicContainer.gameObject.SetActive(false);
         Debug.Log("[UnitSettingsLayout::Init] UnitSettingLayout initialized with player inventory.");
@@ -92,7 +92,8 @@ public class UnitSettingLayout : MonoBehaviour {
         gameObject.SetActive(false);
     }
 
-    public void SetupDropZones() {
+    public void SetupDropZones()
+    {
         // TeamUnitContainer only accepts units
         DropZoneSetup.AddDropZone(teamUnitContainer.gameObject, DropZone.AllowedItemType.UnitsOnly);
 
@@ -103,7 +104,8 @@ public class UnitSettingLayout : MonoBehaviour {
         DropZoneSetup.AddDropZone(bagContainer.gameObject, DropZone.AllowedItemType.UnitsAndRelics);
     }
 
-    private void GenerateFixedTeamSlots() {
+    private void GenerateFixedTeamSlots()
+    {
         // Clear old slots
         foreach (Transform child in teamUnitContainer) {
             Destroy(child.gameObject);
@@ -115,7 +117,8 @@ public class UnitSettingLayout : MonoBehaviour {
         }
     }
 
-    void ClearTeamUnitButtonsOnly() {
+    void ClearTeamUnitButtonsOnly()
+    {
         foreach (Transform slot in teamUnitContainer) {
             if (slot.childCount > 0) {
                 // Destroy any UnitButton children inside the slot
@@ -126,7 +129,8 @@ public class UnitSettingLayout : MonoBehaviour {
         }
     }
 
-    void PopulateTeamUnits() {
+    void PopulateTeamUnits()
+    {
         int unitIndex = 0;
 
         foreach (Transform slot in teamUnitContainer) {
@@ -156,7 +160,8 @@ public class UnitSettingLayout : MonoBehaviour {
         }
     }
 
-    void ClearBagItemsOnly() {
+    void ClearBagItemsOnly()
+    {
         foreach (Transform slot in bagContainer) {
             foreach (Transform child in slot) {
                 Destroy(child.gameObject); // Remove the item inside the slot
@@ -164,7 +169,8 @@ public class UnitSettingLayout : MonoBehaviour {
         }
     }
 
-    private void GenerateFixedBagSlots() {
+    private void GenerateFixedBagSlots()
+    {
         for (int i = 0; i < tracker.maxItems; i++) {
             Instantiate(itemSlotPrefab, bagContainer);
         }
@@ -172,7 +178,8 @@ public class UnitSettingLayout : MonoBehaviour {
         Global.DEBUG_PRINT($"[UnitSettingsLayout::GenerateFixedBagSlots] BagContainer has {tracker.maxItems} slots");
     }
 
-    private void PopulateBagItems() {
+    private void PopulateBagItems()
+    {
         int bagItemIndex = 0;
 
         foreach (Transform slot in bagContainer) {
@@ -210,7 +217,8 @@ public class UnitSettingLayout : MonoBehaviour {
         }
     }
 
-    void ClearUnitRelicsOnly() {
+    void ClearUnitRelicsOnly()
+    {
         foreach (Transform slot in relicContainer) {
             foreach (Transform child in slot) {
                 Destroy(child.gameObject);
@@ -218,7 +226,8 @@ public class UnitSettingLayout : MonoBehaviour {
         }
     }
 
-    private void GenerateFixedUnitRelicSlots() {
+    private void GenerateFixedUnitRelicSlots()
+    {
         for (int i = 0; i < tracker.maxRelics / tracker.maxUnits; i++) {
             Instantiate(relicSlotPrefab, relicContainer);
         }
@@ -246,4 +255,5 @@ public class UnitSettingLayout : MonoBehaviour {
     }
 
     public MockUnit ActiveUnit => activeUnit;
+    public MockPlayerInventory ActiveInventory => inventory;
 }
