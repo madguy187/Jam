@@ -71,31 +71,52 @@ public class EffectScriptableObject : ScriptableObject, ISerializationCallbackRe
     [Header("Do not allow changes, this is done to fix the enum from changing")]
     [SerializeField] bool IsLocked = false;
 
-    string _strEditorOriginal_EffectType;
-    string _strEditorOriginal_EffectTargetType;
-    string _strEditorOriginal_EffectTargetCondition;
-    string _strEditorOriginal_EffectExecType;
-    string _strEditorOriginal_EffectAffinityType;
-    string _strEditorOriginal_EffectResolveType;
+    string _strEditorOriginal_EffectType = "";
+    string _strEditorOriginal_EffectTargetType = "";
+    string _strEditorOriginal_EffectTargetCondition = "";
+    string _strEditorOriginal_EffectExecType = "";
+    string _strEditorOriginal_EffectAffinityType = "";
+    string _strEditorOriginal_EffectResolveType = "";
 
     public void OnBeforeSerialize() {
-        _strEditorOriginal_EffectType = _eType.ToString();
-        _strEditorOriginal_EffectTargetType = _eTargetType.ToString();
-        _strEditorOriginal_EffectTargetCondition = _eTargetCondition.ToString();
-        _strEditorOriginal_EffectExecType = _eExecType.ToString();
-        _strEditorOriginal_EffectAffinityType = _effectAffinityType.ToString();
-        _strEditorOriginal_EffectResolveType = _effectResolveType.ToString();
+        _strEditorOriginal_EffectType = SaveEnum(_eType);
+        _strEditorOriginal_EffectTargetType = SaveEnum(_eTargetType);
+        _strEditorOriginal_EffectTargetCondition = SaveEnum(_eTargetCondition);
+        _strEditorOriginal_EffectExecType = SaveEnum(_eExecType);
+        _strEditorOriginal_EffectAffinityType = SaveEnum(_effectAffinityType);
+        _strEditorOriginal_EffectResolveType = SaveEnum(_effectResolveType);
     }
 
     public void OnAfterDeserialize() {
         if (IsLocked) {
-            _eType = (EffectType)Enum.Parse(typeof(EffectType), _strEditorOriginal_EffectType, true);
-            _eTargetType = (EffectTargetType)Enum.Parse(typeof(EffectTargetType), _strEditorOriginal_EffectTargetType, true);
-            _eTargetCondition = (EffectTargetCondition)Enum.Parse(typeof(EffectTargetCondition), _strEditorOriginal_EffectTargetCondition, true);
-            _eExecType = (EffectExecType)Enum.Parse(typeof(EffectExecType), _strEditorOriginal_EffectExecType, true);
-            _effectAffinityType = (EffectAffinityType)Enum.Parse(typeof(EffectAffinityType), _strEditorOriginal_EffectAffinityType, true);
-            _effectResolveType = (EffectResolveType)Enum.Parse(typeof(EffectResolveType), _strEditorOriginal_EffectResolveType, true);
+            LoadEnum(_strEditorOriginal_EffectType, ref _eType);
+            LoadEnum(_strEditorOriginal_EffectTargetType, ref _eTargetType);
+            LoadEnum(_strEditorOriginal_EffectTargetCondition, ref _eTargetCondition);
+            LoadEnum(_strEditorOriginal_EffectExecType, ref _eExecType);
+            LoadEnum(_strEditorOriginal_EffectAffinityType, ref _effectAffinityType);
+            LoadEnum(_strEditorOriginal_EffectResolveType, ref _effectResolveType);
         }
+    }
+
+    public void LoadEnum<T>(string enumName, ref T enumVal) {
+        if (enumName == "") {
+            return;
+        }
+
+        System.Object obj = (T)Enum.Parse(typeof(T), enumName, true);
+        if (obj == null) {
+            return;
+        }
+
+        enumVal = (T)obj;
+    }
+
+    public string SaveEnum<T>(T enumVal) {
+        if (enumVal != null) {
+            return enumVal.ToString();
+        }
+
+        return "";
     }
 
     public bool GetLock() {
