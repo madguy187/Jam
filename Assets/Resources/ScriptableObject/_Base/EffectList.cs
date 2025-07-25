@@ -46,6 +46,13 @@ public class EffectList : IEnumerable<EffectScriptableObject> {
         }
     }
 
+    public void Clear() {
+        if (_listScriptableObject == null) {
+            _listScriptableObject = new List<EffectScriptableObject>();
+        }
+        _listScriptableObject.Clear();
+    }
+
     // For IEnumerable<EffectScriptableObject>
     public IEnumerator<EffectScriptableObject> GetEnumerator() { return _listScriptableObject.GetEnumerator(); }
     IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }

@@ -37,6 +37,24 @@ public class CombatManager : MonoBehaviour {
 
     public void InitRound() {
         DeckManager.instance.InitDeckEffect();
+
+        Deck cPlayerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
+        List<UnitObject> listObjectPlayer = DeckHelperFunc.GetAllAliveUnit(cPlayerDeck);
+        foreach (UnitObject unit in listObjectPlayer) {
+            EffectList listEffect = unit.GetRelicEffectList();
+            foreach (EffectScriptableObject effectSO in listEffect) {
+                _ActivateEffect(cPlayerDeck, effectSO);
+            }
+        }
+
+        Deck cEnemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+        List<UnitObject> listObjectEnemy = DeckHelperFunc.GetAllAliveUnit(cEnemyDeck);
+        foreach (UnitObject unit in listObjectEnemy) {
+            EffectList listEffect = unit.GetRelicEffectList();
+            foreach (EffectScriptableObject effectSO in listEffect) {
+                _ActivateEffect(cPlayerDeck, effectSO);
+            }
+        }
     }
 
     public void StartBattleLoop(List<Match> matches) {
@@ -447,6 +465,10 @@ public class CombatManager : MonoBehaviour {
 
         foreach (UnitObject unit in arrTargetUnit) {
             if (unit == null) {
+                continue;
+            }
+
+            if (unit.IsDead()) {
                 continue;
             }
 
