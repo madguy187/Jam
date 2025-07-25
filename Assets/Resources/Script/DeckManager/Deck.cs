@@ -132,8 +132,12 @@ public class Deck : IEnumerable<UnitObject> {
             if (unit == null) {
                 continue;
             }
+
+            if (unit.IsDead()) {
+                continue;
+            }
             
-            unit.InitTempEffect();
+            unit.LoadRelic();
         }
     }
 
