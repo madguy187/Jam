@@ -35,11 +35,7 @@ public class UIRerollButton : MonoBehaviour
     
     private void OnClick()
     {
-        // Init probabilities if this is the first reroll
-        SlotController.instance.InitializeProbabilitiesIfNeeded();
-        
-        // Then do the normal reroll
-        SlotController.instance.FillGridWithRandomSymbols();
+        SkillSlotMachine.instance.Spin();
     }
     
     public void TriggerRoll()
