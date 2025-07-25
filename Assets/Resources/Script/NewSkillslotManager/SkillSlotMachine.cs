@@ -13,13 +13,15 @@ public class SkillSlotMachine : MonoBehaviour
     [SerializeField] private SkillSlotGrid rightColumn;
 
     [Header("Roll Settings")]
-    [Tooltip("Optional stagger between starting each column (seconds)")]
     [SerializeField] private float columnStartDelay = 0f;
 
     [Header("Spin Cost Settings")]
     [SerializeField] private int baseSpinCost = 2;
 
     private int spinsThisTurn = 0;
+
+    // Persistent 3×3 grid reused each spin for MatchDetector
+    private SlotGrid detectorGrid;
 
     private readonly List<SkillSlotGrid> columns = new List<SkillSlotGrid>();
     private SpinResult lastSpinResult;
@@ -44,13 +46,42 @@ public class SkillSlotMachine : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        if (leftColumn != null) columns.Add(leftColumn);
-        if (centreColumn != null) columns.Add(centreColumn);
-        if (rightColumn != null) columns.Add(rightColumn);
 
-        // Auto-find buttons if not wired
-        if (rerollButton == null) rerollButton = FindObjectOfType<UIRerollButton>();
-        if (attackButton == null) attackButton = FindObjectOfType<UIAttack>();
+        InitColumns();
+        InitUI();
+        InitState();
+    }
+
+    private void InitColumns()
+    {
+        columns.Clear();
+        if (leftColumn   != null) 
+        {
+            columns.Add(leftColumn);
+        }
+
+        if (centreColumn != null) 
+        {
+            columns.Add(centreColumn);
+        }
+
+        if (rightColumn  != null) 
+        {
+            columns.Add(rightColumn);
+        }
+    }
+
+    private void InitUI()
+    {
+        if (rerollButton == null || attackButton == null)
+        {
+            Debug.LogError("[SkillSlotMachine] UI button references not set in Inspector.");
+        }
+    }
+
+    private void InitState()
+    {
+        detectorGrid = new SlotGrid(3,3);
     }
 
     public bool IsRolling()
@@ -123,7 +154,7 @@ public class SkillSlotMachine : MonoBehaviour
             }
         }
 
-        // Convert to SymbolType array (length 9) for MatchDetector / SlotController
+        // Convert to SymbolType array for MatchDetector / SlotController
         SymbolType[] symbols = new SymbolType[9];
         for (int r = 0; r < 3; r++)
         {
@@ -182,7 +213,10 @@ public class SkillSlotMachine : MonoBehaviour
 
     private int GetCurrentSpinCost()
     {
-        if (spinsThisTurn == 0) return 0;
+        if (spinsThisTurn == 0)
+        {
+            return 0;
+        }
         return baseSpinCost + ((spinsThisTurn - 1) * 2);
     }
 
@@ -195,16 +229,16 @@ public class SkillSlotMachine : MonoBehaviour
     // Match detection & rewards 
     private void ProcessSpinResults(SymbolType[] symbols)
     {
-        // Build a SlotGrid for detection
-        SlotGrid grid = new SlotGrid(3,3);
+        // Reuse persistent detector grid (no allocation each spin)
+        detectorGrid.ClearGrid();
         for (int i = 0; i < 9; i++)
         {
             int row = i / 3;
             int col = i % 3;
-            grid.SetSlot(row, col, symbols[i]);
+            detectorGrid.SetSlot(row, col, symbols[i]);
         }
 
-        MatchDetector detector = new MatchDetector(grid);
+        MatchDetector detector = new MatchDetector(detectorGrid);
         List<Match> matches = detector.DetectMatches();
 
         // Map symbol → archetype so rewards & debug show correct value

@@ -6,10 +6,6 @@ using TMPro;
 public class UIRerollButton : MonoBehaviour
 {
     private Button button;
-
-    [Header("References")]
-    [SerializeField] private SkillSlotMachine slotMachine;
-    [SerializeField] private SkillSlotGrid skillSlotGrid; // fallback if machine not assigned
     
     private void InitializeComponents()
     {
@@ -19,20 +15,6 @@ public class UIRerollButton : MonoBehaviour
             Debug.LogError("[UIRollButton] Button component not found!");
             enabled = false;
             return;
-        }
-
-        if (slotMachine == null)
-        {
-            slotMachine = FindObjectOfType<SkillSlotMachine>();
-        }
-        if (skillSlotGrid == null && slotMachine == null)
-        {
-            skillSlotGrid = FindObjectOfType<SkillSlotGrid>();
-        }
-        if (slotMachine == null && skillSlotGrid == null)
-        {
-            Debug.LogError("[UIRollButton] No slot machine or grid found!");
-            enabled = false;
         }
     }
     
@@ -53,14 +35,7 @@ public class UIRerollButton : MonoBehaviour
     
     private void OnClick()
     {
-        if (slotMachine != null)
-        {
-            slotMachine.Spin();
-        }
-        else if (skillSlotGrid != null)
-        {
-            skillSlotGrid.Spin();
-        }
+        SkillSlotMachine.instance.Spin();
     }
     
     public void TriggerRoll()

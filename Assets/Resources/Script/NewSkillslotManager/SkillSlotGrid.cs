@@ -41,7 +41,6 @@ public class SkillSlotGrid : MonoBehaviour
     private bool isRolling = false;
     private List<UnitObject> cachedUnits = new List<UnitObject>();
     private List<Image> slotImages = new List<Image>();
-    private float currentRollPosition = 0f;
     private float slotSpacing;
     private float viewportHeight;
     private float totalColumnHeight;

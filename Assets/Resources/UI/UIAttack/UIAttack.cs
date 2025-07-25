@@ -6,37 +6,31 @@ public class UIAttack : MonoBehaviour
 {
     private Button button;
 
-    void Awake()
+    private void Awake()
     {
         button = GetComponent<Button>();
-        if (button != null)
+
+        if (button == null)
         {
-            button.onClick.AddListener(OnAttackClicked);
+            Debug.LogError("[UIAttack] Button component missing!");
+            enabled = false;
+            return;
         }
-        else
-        {
-            Debug.LogError("[UIAttack] No Button component found!");
-        }
+
+        button.onClick.AddListener(OnAttackClicked);
     }
 
-    void OnAttackClicked()
+    private void OnAttackClicked()
     {
-        SkillSlotMachine machine = FindObjectOfType<SkillSlotMachine>();
-        if (machine != null)
-        {
-            machine.EndPlayerTurn();
-        }
+        SkillSlotMachine.instance.EndPlayerTurn();
     }
 
     public void SetInteractable(bool interactable)
     {
-        if (button != null)
-        {
-            button.interactable = interactable;
-        }
+        button.interactable = interactable;
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         if (button != null)
         {
