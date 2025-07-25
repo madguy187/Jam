@@ -44,14 +44,6 @@ public class EffectObject {
 
     public void Resolve() {
         for (int i = vecEffectInfo.Count - 1; i >= 0; i--) {
-            if (GetEffectResolveType() != EffectResolveType.RESOLVE_TURN) {
-                continue;
-            }
-
-            if (vecEffectInfo[i].turn == Global.TEMP_EFFECT_ONLY_THIS_ROUND) {
-                continue;
-            }
-
             vecEffectInfo[i].turn--;
             if (vecEffectInfo[i].turn == 0) {
                 vecEffectInfo.RemoveAt(i);

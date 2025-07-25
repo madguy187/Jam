@@ -1,24 +1,35 @@
 using System;
 using UnityEngine;
 
-using UnityEditor;
-using System.Collections.Generic;
-
 [CreateAssetMenu(menuName = "Scriptable Object/Unit/EffectScriptableObject")]
-public class EffectScriptableObject : ScriptableObject, ISerializationCallbackReceiver {
+public class EffectScriptableObject : ScriptableObject {
 
+#if UNITY_EDITOR
+    public void SetEffectType(EffectType eType) { _eType = eType; }
+    public void SetEffectVal(float fVal) { _fEffectVal = fVal; }
+    public void SetEffectTargetType(EffectTargetType eTargetType) { _eTargetType = eTargetType; }
+    public void SetEffectTargetCondition(EffectTargetCondition eTargetCondition) { _eTargetCondition = eTargetCondition; }
+    public void SetEffectTargetParam(float fVal) { _fTargetParam = fVal; }
+    public void SetEffectExecType(EffectExecType eExecType) { _eExecType = eExecType; }
+    public void SetEffectAffinityType(EffectAffinityType effectAffinityType) { _effectAffinityType = effectAffinityType; }
+    public void SetEffectResolveType(EffectResolveType effectResolveType) { _effectResolveType = effectResolveType; }
+    public void SetEffectCount(int fVal) { _fEffectCount = fVal; }
+#endif
+
+    [Header("Do not change _strType")]
     [SerializeField] EffectType _eType;
     public EffectType GetEffectType() { return _eType; }
+
     [SerializeField] float _fEffectVal = 0;
 
     [Header("Target Param")]
     [SerializeField] EffectTargetType _eTargetType = EffectTargetType.SELF;
     [SerializeField] EffectTargetCondition _eTargetCondition = EffectTargetCondition.NONE;
-    [SerializeField] float _eTargetParam = 0.0f;
+    [SerializeField] float _fTargetParam = 0.0f;
 
     public EffectTargetType GetTargetType() { return _eTargetType; }
     public EffectTargetCondition GetTargetCondition() { return _eTargetCondition; }
-    public float GetTargetParam() { return _eTargetParam; }
+    public float GetTargetParam() { return _fTargetParam; }
 
     [Header("Exec Param")]
     [SerializeField] EffectExecType _eExecType = EffectExecType.TRIGGER_ONCE;
@@ -35,6 +46,7 @@ public class EffectScriptableObject : ScriptableObject, ISerializationCallbackRe
     [SerializeField] int _fEffectCount = 0;
 
     public void InitScriptableInstance(EffectType effectType,
+                                        float effectVal,
                                         EffectTargetType targetType,
                                         EffectTargetCondition targetCondition,
                                         float targetParam,
@@ -43,9 +55,10 @@ public class EffectScriptableObject : ScriptableObject, ISerializationCallbackRe
                                         EffectResolveType resolveType,
                                         int resolveCount) {
         _eType = effectType;
+        _fEffectVal = effectVal;
         _eTargetType = targetType;
         _eTargetCondition = targetCondition;
-        _eTargetParam = targetParam;
+        _fTargetParam = targetParam;
         _eExecType = execType;
         _effectAffinityType = affinityType;
         _effectResolveType = resolveType;
@@ -66,61 +79,4 @@ public class EffectScriptableObject : ScriptableObject, ISerializationCallbackRe
     public string GetTypeName() {
         return _eType.ToString();
     }
-
-#if UNITY_EDITOR
-    [Header("Do not allow changes, this is done to fix the enum from changing")]
-    [SerializeField] bool IsLocked = false;
-
-    string _strEditorOriginal_EffectType = "";
-    string _strEditorOriginal_EffectTargetType = "";
-    string _strEditorOriginal_EffectTargetCondition = "";
-    string _strEditorOriginal_EffectExecType = "";
-    string _strEditorOriginal_EffectAffinityType = "";
-    string _strEditorOriginal_EffectResolveType = "";
-
-    public void OnBeforeSerialize() {
-        _strEditorOriginal_EffectType = SaveEnum(_eType);
-        _strEditorOriginal_EffectTargetType = SaveEnum(_eTargetType);
-        _strEditorOriginal_EffectTargetCondition = SaveEnum(_eTargetCondition);
-        _strEditorOriginal_EffectExecType = SaveEnum(_eExecType);
-        _strEditorOriginal_EffectAffinityType = SaveEnum(_effectAffinityType);
-        _strEditorOriginal_EffectResolveType = SaveEnum(_effectResolveType);
-    }
-
-    public void OnAfterDeserialize() {
-        if (IsLocked) {
-            LoadEnum(_strEditorOriginal_EffectType, ref _eType);
-            LoadEnum(_strEditorOriginal_EffectTargetType, ref _eTargetType);
-            LoadEnum(_strEditorOriginal_EffectTargetCondition, ref _eTargetCondition);
-            LoadEnum(_strEditorOriginal_EffectExecType, ref _eExecType);
-            LoadEnum(_strEditorOriginal_EffectAffinityType, ref _effectAffinityType);
-            LoadEnum(_strEditorOriginal_EffectResolveType, ref _effectResolveType);
-        }
-    }
-
-    public void LoadEnum<T>(string enumName, ref T enumVal) {
-        if (enumName == "") {
-            return;
-        }
-
-        System.Object obj = (T)Enum.Parse(typeof(T), enumName, true);
-        if (obj == null) {
-            return;
-        }
-
-        enumVal = (T)obj;
-    }
-
-    public string SaveEnum<T>(T enumVal) {
-        if (enumVal != null) {
-            return enumVal.ToString();
-        }
-
-        return "";
-    }
-
-    public bool GetLock() {
-        return IsLocked;
-    }
-#endif
 }

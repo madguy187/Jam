@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using UnityEditor;
@@ -17,6 +16,7 @@ public class CreatePrefabFromMenu {
     const string UNIT_PREFAB_FULL_PATH = "Assets/Resources/" + UNIT_PREFAB_PATH;
 
     const string HEALTH_BAR_PATH = "UI/UIHealthBar/UIHealthBar";
+    const string EFFECT_GRID_PATH = "UI/UIEffect/UIEffectGrid";
 
     const string FOLDER_SEPARATOR = "/";
 
@@ -54,12 +54,12 @@ public class CreatePrefabFromMenu {
 
     static void AttachHealthBar(ref GameObject obj) {
         GameObject objHealthBar = null;
-        if (obj.GetComponentInChildren<UIHealthBar>() == null) {
+        if (obj.GetComponentInChildren<UIHealthBar>() != null) {
+            objHealthBar = obj.GetComponentInChildren<UIHealthBar>().gameObject;
+        } else {
             GameObject prefab = Resources.Load<GameObject>(HEALTH_BAR_PATH);
             objHealthBar = GameObject.Instantiate(prefab);
             objHealthBar.transform.parent = obj.transform;
-        } else {
-            objHealthBar = obj.GetComponentInChildren<UIHealthBar>().gameObject;
         }
 
         UnitObject unitComp = obj.GetComponent<UnitObject>();
@@ -68,6 +68,31 @@ public class CreatePrefabFromMenu {
 
         Vector3 pos = new Vector3(0.0f, obj.transform.position.y + 0.9f, 0.0f);
         RectTransform healthBarTrans = objHealthBar.GetComponent<RectTransform>();
+        healthBarTrans.anchoredPosition = pos;
+    }
+
+    static void AttachEffectGrid(ref GameObject obj) {
+        Transform transOldGrid = obj.transform.Find("UIEffectGrid(Clone)");
+        if (transOldGrid != null) {
+            GameObject.DestroyImmediate(transOldGrid.gameObject);
+        }
+        
+        // if (obj.GetComponentInChildren<UIEffectGrid>() != null) {
+        //     objGrid = obj.GetComponentInChildren<UIEffectGrid>().gameObject;
+        //     GameObject.Destroy(objGrid);
+        // }
+
+        GameObject prefab = Resources.Load<GameObject>(EFFECT_GRID_PATH);
+        GameObject objGrid = GameObject.Instantiate(prefab);
+        objGrid.transform.SetParent(obj.transform);
+
+        UnitObject unitComp = obj.GetComponent<UnitObject>();
+        UIEffectGrid effectComp = objGrid.GetComponent<UIEffectGrid>();
+        effectComp.SetUnit(unitComp);
+        unitComp.SetEffectUIGrid(effectComp);
+
+        Vector3 pos = new Vector3(0.0f, obj.transform.position.y, 0.0f);
+        RectTransform healthBarTrans = objGrid.GetComponent<RectTransform>();
         healthBarTrans.anchoredPosition = pos;
     }
 
@@ -97,6 +122,7 @@ public class CreatePrefabFromMenu {
         }
 
         AttachHealthBar(ref gameObj);
+        AttachEffectGrid(ref gameObj);
 
         string infoPath = UNIT_SCRIPTABLE_PATH + FOLDER_SEPARATOR + unitName;
         List<UnitScriptableObject> unitSO = Resources.LoadAll<UnitScriptableObject>(infoPath).ToList();
@@ -112,10 +138,6 @@ public class CreatePrefabFromMenu {
         EffectList zigzag = new EffectList();
         EffectList fullgrid = new EffectList();
         foreach (EffectScriptableObject effect in effects) {
-            if (!effect.GetLock()) {
-                Debug.Log(effect.name + " is not locked");
-            }
-
             if (effect.name.Contains("Single")) {
                 single.AddEffect(effect);
             }

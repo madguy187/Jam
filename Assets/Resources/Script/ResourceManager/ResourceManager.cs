@@ -7,6 +7,10 @@ public class ResourceManager : MonoBehaviour {
 
     Dictionary<string, GameObject> _mapUnitSO = new Dictionary<string, GameObject>();
     Dictionary<string, RelicScriptableObject> _mapRelicSO = new Dictionary<string, RelicScriptableObject>();
+    Dictionary<EffectType, EffectDetailScriptableObject> _mapEffectDetailSO = new Dictionary<EffectType, EffectDetailScriptableObject>();
+
+    [SerializeField] Sprite spriteDefault = null;
+    public Sprite GetDefaultEffectSprite() { return spriteDefault; }
 
     [SerializeField] GameObject prefabDynamicText = null;
 
@@ -28,6 +32,12 @@ public class ResourceManager : MonoBehaviour {
             _mapRelicSO.Add(obj.name, relicSO);
         }
         Global.DEBUG_PRINT("[Resources] Loaded Relics: " + _mapRelicSO.Count());
+
+        foreach (EffectDetailScriptableObject obj in Resources.LoadAll("ScriptableObject/EffectDetail", typeof(EffectDetailScriptableObject)).ToList()) {
+            EffectDetailScriptableObject effectDetailSO = obj;
+            _mapEffectDetailSO.Add(effectDetailSO.eEffectType, effectDetailSO);
+        }
+        Global.DEBUG_PRINT("[Resources] Loaded Effect Detail: " + _mapRelicSO.Count());
     }
 
     public GameObject Debug_RandUnit() {
@@ -73,6 +83,14 @@ public class ResourceManager : MonoBehaviour {
     public RelicScriptableObject GetRelic(string unitName) {
         if (_mapRelicSO.ContainsKey(unitName)) {
             return _mapRelicSO[unitName];
+        }
+
+        return null;
+    }
+
+    public EffectDetailScriptableObject GetEffectDetail(EffectType eType) {
+        if (_mapEffectDetailSO.ContainsKey(eType)) {
+            return _mapEffectDetailSO[eType];
         }
 
         return null;
