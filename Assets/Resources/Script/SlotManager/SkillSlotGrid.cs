@@ -28,8 +28,9 @@ public class SkillSlotGrid : MonoBehaviour
     [SerializeField] private int visibleSlots = 3;
 
     [Header("Roll Settings")]
-    [SerializeField] private float rollSpeed = 500f;
-    [SerializeField] private float snapDuration = 0.5f;
+    [SerializeField] private float rollSpeed = 300f;
+    [SerializeField] private float rollDuration = 2f;
+    [SerializeField] private AnimationCurve speedCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
     [Header("Debug Visualization")]
     [SerializeField] private bool showGizmos = true;
@@ -37,13 +38,58 @@ public class SkillSlotGrid : MonoBehaviour
     [SerializeField] private Color slotColor = new Color(1, 0, 0, 0.2f);
     [SerializeField] private Color pathColor = new Color(0, 0, 1, 0.5f);
 
+    [Header("Render Settings")]
+    [SerializeField] private float renderYOffset = 0.3f; 
+
+    [Header("Tuning")]
+    [SerializeField] private float snapYOffset = 0f; 
+
+    private bool unitsCached = false;
+
     private bool isRolling = false;
     private List<UnitObject> cachedUnits = new List<UnitObject>();
     private List<Image> slotImages = new List<Image>();
-    private float startY;
-    private float targetY;
-    private List<RenderTexture> renderTextures = new List<RenderTexture>();
-    private List<GameObject> tempCameras = new List<GameObject>();
+    private float currentRollPosition = 0f;
+    private float slotSpacing;
+    private float viewportHeight;
+    private float totalColumnHeight;
+    private float bottomThreshold;
+    private VerticalLayoutGroup layoutGroup;
+    private bool slotsInitialized = false;
+
+    public bool IsRolling()
+    {
+        return isRolling;
+    }
+
+    public float GetRollSpeed()
+    {
+        return rollSpeed;
+    }
+
+    public void SetRollSpeed(float value)
+    {
+        rollSpeed = Mathf.Max(0f, value);
+        return;
+    }
+
+    public float GetRollDuration()
+    {
+        return rollDuration;
+    }
+
+    public void SetRollDuration(float value)
+    {
+        rollDuration = Mathf.Max(0f, value);
+        return;
+    }
+
+
+    public void Spin()
+    {
+        if (isRolling || !unitsCached) return;
+        StartRoll();
+    }
 
     private void Start()
     {
@@ -55,56 +101,48 @@ public class SkillSlotGrid : MonoBehaviour
             return;
         }
 
-        // Cache all slot images
+        // Disable VerticalLayoutGroup if present so we can control positions manually
+        layoutGroup = slotColumnContainer.GetComponent<VerticalLayoutGroup>();
+        if (layoutGroup != null)
+        {
+            layoutGroup.enabled = false;
+        }
+
+        // Cache all slot images (children of container)
         Image[] images = slotColumnContainer.GetComponentsInChildren<Image>();
         if (images.Length == 0)
         {
             Debug.LogError("[SkillSlotGrid] No Image components found in children!");
             return;
         }
-        
         slotImages.AddRange(images);
         Debug.Log($"[SkillSlotGrid] Found {slotImages.Count} slot images");
 
-        // Set initial position
-        startY = slotColumnContainer.anchoredPosition.y;
-        Debug.Log($"[SkillSlotGrid] Initial Y position: {startY}");
+        // distance from centre of one slot to the next
+        slotSpacing      = slotHeight + spacing;        
+        // height of the visible 3-slot window           
+        viewportHeight   = slotSpacing * visibleSlots - spacing;   
+        // distance to move a slot from bottom back to top
+        totalColumnHeight = slotSpacing * slotImages.Count;        
+        // y where we recycle
+        bottomThreshold   = -(viewportHeight / 2f) - (slotSpacing * 0.5f); 
     }
 
     private void OnDestroy()
     {
-        // Cleanup render textures and cameras
-        CleanupRenderResources();
-    }
 
-    private void CleanupRenderResources()
-    {
-        foreach (var rt in renderTextures)
-        {
-            if (rt != null)
-            {
-                rt.Release();
-                Destroy(rt);
-            }
-        }
-        renderTextures.Clear();
-
-        foreach (var cam in tempCameras)
-        {
-            if (cam != null)
-            {
-                Destroy(cam);
-            }
-        }
-        tempCameras.Clear();
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Alpha9))
+        // Try to cache units automatically once at start
+        if (!unitsCached)
         {
-            Debug.Log("[SkillSlotGrid] Key 9 pressed");
-            StartRoll();
+            if (CachePlayerDeckUnits())
+            {
+                unitsCached = true;
+                PositionSlotsInitial();
+            }
         }
     }
 
@@ -112,12 +150,6 @@ public class SkillSlotGrid : MonoBehaviour
     {
         cachedUnits.Clear();
         
-        if (DeckManager.instance == null)
-        {
-            Debug.LogError("[SkillSlotGrid] DeckManager instance is null!");
-            return false;
-        }
-
         Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
         if (playerDeck == null)
         {
@@ -148,76 +180,118 @@ public class SkillSlotGrid : MonoBehaviour
             return;
         }
 
-        // Cleanup previous render resources
-        CleanupRenderResources();
-
-        Debug.Log("[SkillSlotGrid] Refreshing slot icons");
+        // Only randomise icons once up-front; do not touch visible slots again during spin
         foreach (Image img in slotImages)
         {
-            UnitObject randomUnit = cachedUnits[Random.Range(0, cachedUnits.Count)];
-            var (rt, cam) = RenderUnitToTexture(randomUnit);
-            
-            // Create sprite from render texture
-            Sprite sprite = Sprite.Create(rt.ToTexture2D(), new Rect(0, 0, rt.width, rt.height), new Vector2(0.5f, 0.5f));
-            img.sprite = sprite;
-            img.color = Color.white; // Make sure image is visible
-
-            // Store resources for cleanup
-            renderTextures.Add(rt);
-            tempCameras.Add(cam);
+            RandomizeIcon(img);
         }
+    }
+
+    private void RandomizeIcon(Image img)
+    {
+        if (cachedUnits.Count == 0) return;
+
+        UnitObject randomUnit = cachedUnits[Random.Range(0, cachedUnits.Count)];
+        var (rt, cam) = RenderUnitToTexture(randomUnit);
+
+        // Create sprite from render texture
+        Sprite sprite = Sprite.Create(rt.ToTexture2D(), new Rect(0, 0, rt.width, rt.height), new Vector2(0.5f, 0.5f));
+        img.sprite = sprite;
+        img.color = Color.white;
+
+        rt.Release();
+        Destroy(rt);
+        Destroy(cam);
+    }
+
+    private void PositionSlotsInitial()
+    {
+        float startY = slotSpacing;         
+        for (int i = 0; i < slotImages.Count; i++)
+        {
+            RectTransform rt = slotImages[i].rectTransform;
+            rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.pivot     = new Vector2(0.5f, 0.5f);
+            rt.sizeDelta = new Vector2(slotHeight, slotHeight);
+            rt.anchoredPosition = new Vector2(0f, startY - (i * slotSpacing));
+        }
+        slotsInitialized = true;
     }
 
     private void StartRoll()
     {
-        if (isRolling)
-        {
-            Debug.LogWarning("[SkillSlotGrid] Already rolling!");
-            return;
-        }
-
-        // Cache units when starting roll
-        if (!CachePlayerDeckUnits())
-        {
-            Debug.LogWarning("[SkillSlotGrid] Cannot start roll: No units available");
-            return;
-        }
-
-        Debug.Log("[SkillSlotGrid] Starting roll animation");
+        if (isRolling) return;
+        if (!unitsCached) return; 
         isRolling = true;
-        
-        // Calculate how far to roll (3 full slot heights)
-        float rollDistance = (slotHeight + spacing) * 3;
-        targetY = startY - rollDistance;
-
         StartCoroutine(RollAnimation());
     }
 
     private IEnumerator RollAnimation()
     {
-        Debug.Log("[SkillSlotGrid] Roll animation started");
-        float elapsedTime = 0f;
-        float rollTime = Mathf.Abs(targetY - startY) / rollSpeed;
-        Vector2 startPos = slotColumnContainer.anchoredPosition;
-        Vector2 targetPos = new Vector2(startPos.x, targetY);
-
-        while (elapsedTime < rollTime)
+        float elapsed = 0f;
+        while (elapsed < rollDuration)
         {
-            float t = elapsedTime / rollTime;
-            slotColumnContainer.anchoredPosition = Vector2.Lerp(startPos, targetPos, t);
-            elapsedTime += Time.deltaTime;
+            float speedFactor = speedCurve.Evaluate(elapsed / rollDuration); 
+            float deltaY = rollSpeed * speedFactor * Time.deltaTime;
+
+            // Move each slot downwards
+            foreach (Image img in slotImages)
+            {
+                RectTransform rt = img.rectTransform;
+                Vector2 pos = rt.anchoredPosition;
+                pos.y -= deltaY;
+
+                // If slot has moved below recycle threshold, wrap it to the top and randomize
+                if (pos.y < bottomThreshold)
+                {
+                    pos.y += totalColumnHeight;
+                    rt.anchoredPosition = pos;
+                    // ONLY this slot gets a new sprite
+                    RandomizeIcon(img); 
+                }
+                else
+                {
+                    rt.anchoredPosition = pos;
+                }
+            }
+
+            elapsed += Time.deltaTime;
             yield return null;
         }
 
-        Debug.Log("[SkillSlotGrid] Roll animation completed");
-        // Reset position and refresh icons
-        slotColumnContainer.anchoredPosition = new Vector2(startPos.x, startY);
-        RefreshSlotIcons();
-        
+        // Final alignment
+        // Find the slot whose centre is closest to the viewport centre  ...
+        Image nearest = null;
+        float minAbsY = float.MaxValue;
+        foreach (Image img in slotImages)
+        {
+            float y = img.rectTransform.anchoredPosition.y;
+            float abs = Mathf.Abs(y);
+            if (abs < minAbsY)
+            {
+                minAbsY = abs;
+                nearest = img;
+            }
+        }
+        if (nearest != null)
+        {
+             // how far we are from perfect centre
+            float offset = nearest.rectTransform.anchoredPosition.y;
+            // Shift every slot by -offset so that the nearest slot is perfectly centred
+            foreach (Image img in slotImages)
+            {
+                RectTransform rt = img.rectTransform;
+                Vector2 p = rt.anchoredPosition;
+                p.y -= offset;
+                // magic number to offset
+                p.y -= snapYOffset; 
+                rt.anchoredPosition = p;
+            }
+        }
+
         isRolling = false;
     }
 
-    // Helper to set layer recursively
     private void SetLayerRecursively(GameObject obj, int newLayer)
     {
         obj.layer = newLayer;
@@ -227,7 +301,6 @@ public class SkillSlotGrid : MonoBehaviour
         }
     }
 
-    // Return both RenderTexture and camera GameObject
     private (RenderTexture, GameObject) RenderUnitToTexture(UnitObject unit)
     {
         // Create a preview layer
@@ -248,7 +321,7 @@ public class SkillSlotGrid : MonoBehaviour
         RenderTexture rt = new RenderTexture(256, 256, 16);
         cam.targetTexture = rt;
 
-        cam.transform.position = unit.transform.position + new Vector3(0, 0, -10);
+        cam.transform.position = unit.transform.position + new Vector3(0, renderYOffset, -10);
         cam.orthographicSize = 1.5f;
 
         // Only render the preview layer
@@ -264,60 +337,5 @@ public class SkillSlotGrid : MonoBehaviour
 
         return (rt, camObj);
     }
-
-    private void OnDrawGizmos()
-    {
-        if (!showGizmos || slotColumnContainer == null) return;
-
-        // Cache world positions
-        Vector3[] corners = new Vector3[4];
-        slotColumnContainer.GetWorldCorners(corners);
-        float containerWidth = corners[2].x - corners[0].x;
-
-        // Draw viewport area (area where slots are visible)
-        float viewportHeight = (slotHeight + spacing) * visibleSlots - spacing;
-        Vector3 viewportCenter = transform.position;
-        Gizmos.color = viewportColor;
-        Gizmos.DrawCube(viewportCenter, new Vector3(containerWidth, viewportHeight, 1));
-
-        // Draw all slot positions
-        Gizmos.color = slotColor;
-        for (int i = 0; i < slotImages.Count; i++)
-        {
-            if (slotImages[i] != null)
-            {
-                Vector3 slotPos = slotImages[i].transform.position;
-                Gizmos.DrawCube(slotPos, new Vector3(slotHeight, slotHeight, 1));
-            }
-        }
-
-        // Draw roll path when rolling
-        if (isRolling)
-        {
-            Gizmos.color = pathColor;
-            Vector3 start = new Vector3(viewportCenter.x, startY, viewportCenter.z);
-            Vector3 target = new Vector3(viewportCenter.x, targetY, viewportCenter.z);
-            Gizmos.DrawLine(start, target);
-            
-            // Draw arrow at target
-            float arrowSize = 10f;
-            Vector3 right = new Vector3(arrowSize, 0, 0);
-            Vector3 up = new Vector3(0, arrowSize, 0);
-            Gizmos.DrawLine(target, target + right + up);
-            Gizmos.DrawLine(target, target - right + up);
-        }
-    }
-
-    // Optional: Add runtime debug visualization
-    private void OnGUI()
-    {
-        if (!showGizmos) return;
-
-        GUILayout.BeginArea(new Rect(10, 10, 200, 100));
-        GUILayout.Label($"Rolling: {isRolling}");
-        GUILayout.Label($"Start Y: {startY:F1}");
-        GUILayout.Label($"Target Y: {targetY:F1}");
-        GUILayout.Label($"Current Y: {slotColumnContainer.anchoredPosition.y:F1}");
-        GUILayout.EndArea();
-    }
+    
 } 

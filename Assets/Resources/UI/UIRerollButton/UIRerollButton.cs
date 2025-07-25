@@ -6,6 +6,9 @@ using TMPro;
 public class UIRerollButton : MonoBehaviour
 {
     private Button button;
+
+    [Header("References")]
+    [SerializeField] private SkillSlotGrid skillSlotGrid;
     
     private void InitializeComponents()
     {
@@ -15,6 +18,11 @@ public class UIRerollButton : MonoBehaviour
             Debug.LogError("[UIRollButton] Button component not found!");
             enabled = false;
             return;
+        }
+
+        if (skillSlotGrid == null)
+        {
+            Debug.LogError("[UIRollButton] SkillSlotGrid reference not found!");
         }
     }
     
@@ -35,11 +43,10 @@ public class UIRerollButton : MonoBehaviour
     
     private void OnClick()
     {
-        // Init probabilities if this is the first reroll
-        SlotController.instance.InitializeProbabilitiesIfNeeded();
-        
-        // Then do the normal reroll
-        SlotController.instance.FillGridWithRandomSymbols();
+        if (skillSlotGrid != null)
+        {
+            skillSlotGrid.Spin();
+        }
     }
     
     public void TriggerRoll()
