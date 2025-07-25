@@ -282,6 +282,7 @@ public class SkillSlotMachine : MonoBehaviour
         {
             Debug.Log("[SkillSlotMachine] All enemies dead, player wins!");
             GoldManager.instance.OnVictory();
+            SetButtonsInteractable(false);
             return;
         }
 

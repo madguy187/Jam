@@ -658,7 +658,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   config: {fileID: 11400000, guid: c5c8a8a0705cc43bda3b7982c81b8235, type: 2}
-  currentGold: 40
+  currentGold: 500
 --- !u!1 &547636075
 GameObject:
   m_ObjectHideFlags: 0
