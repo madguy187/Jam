@@ -21,7 +21,11 @@ public class UIAttack : MonoBehaviour
 
     void OnAttackClicked()
     {
-        SlotController.instance.EndPlayerTurn();
+        SkillSlotMachine machine = FindObjectOfType<SkillSlotMachine>();
+        if (machine != null)
+        {
+            machine.EndPlayerTurn();
+        }
     }
 
     public void SetInteractable(bool interactable)

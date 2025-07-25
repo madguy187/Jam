@@ -36,7 +36,7 @@ public class SymbolGenerator : MonoBehaviour
     public void UpdateProbabilities()
     {
         Deck currentDeck = DeckManager.instance.GetDeckByType(
-            SlotController.instance.IsEnemyTurn() ? eDeckType.ENEMY : eDeckType.PLAYER
+            SkillSlotMachine.IsEnemyTurnStatic ? eDeckType.ENEMY : eDeckType.PLAYER
         );
         ProbabilityCalculator.instance.CalculateProbabilities(currentDeck);
     }

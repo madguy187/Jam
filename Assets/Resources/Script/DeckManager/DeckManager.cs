@@ -23,45 +23,6 @@ public class DeckManager : MonoBehaviour {
         instance = this;
     }
 
-    void Start() {
-        {
-            List<UnitPosition> vecPos = new List<UnitPosition>();
-            UnitPosition[] vecPlayerUnitPos = _transPlayerPos.GetComponentsInChildren<UnitPosition>();
-            foreach (UnitPosition playerPos in vecPlayerUnitPos) {
-                vecPos.Add(playerPos);
-            }
-            cPlayerDeck.Init(eDeckType.PLAYER, vecPos);
-            Global.DEBUG_PRINT("[Deck] Loaded PlayerPos: " + vecPos.Count);
-        }
-
-        {
-            List<UnitPosition> vecPos = new List<UnitPosition>();
-            UnitPosition[] vecEnemyUnitPos = _transEnemyPos.GetComponentsInChildren<UnitPosition>();
-            foreach (UnitPosition enemyPos in vecEnemyUnitPos) {
-                vecPos.Add(enemyPos);
-            }
-            cEnemyDeck.Init(eDeckType.ENEMY, vecPos);
-            Global.DEBUG_PRINT("[Deck] Loaded EnemyPos: " + vecPos.Count);
-        }
-
-        // Auto-populate player deck with test units
-        PopulateTestUnits();
-    }
-
-    private void PopulateTestUnits()
-    {
-        // Add 5 random units to player deck
-        for (int i = 0; i < 5; i++)
-        {
-            GameObject prefab = ResourceManager.instance.Debug_RandUnit();
-            if (prefab != null)
-            {
-                cPlayerDeck.AddUnit(prefab);
-                Global.DEBUG_PRINT("Auto-loaded " + prefab.name + " into Player Team");
-            }
-        }
-    }
-
     void Update() {
         if (Input.GetKeyDown(KeyCode.Alpha1)) {
             GameObject prefab = ResourceManager.instance.Debug_RandUnit();
@@ -98,6 +59,28 @@ public class DeckManager : MonoBehaviour {
             RelicScriptableObject relic = ResourceManager.instance.Debug_RandRelic();
             listEnemy[rand].LoadRelic(relic);
             Global.DEBUG_PRINT("Loaded " + relic.name + " into " + listEnemy[rand].name + " index:" + rand + " team: Enemy");
+        }
+    }
+
+    void Start() {
+        {
+            List<UnitPosition> vecPos = new List<UnitPosition>();
+            UnitPosition[] vecPlayerUnitPos = _transPlayerPos.GetComponentsInChildren<UnitPosition>();
+            foreach (UnitPosition playerPos in vecPlayerUnitPos) {
+                vecPos.Add(playerPos);
+            }
+            cPlayerDeck.Init(eDeckType.PLAYER, vecPos);
+            Global.DEBUG_PRINT("[Deck] Loaded PlayerPos: " + vecPos.Count);
+        }
+
+        {
+            List<UnitPosition> vecPos = new List<UnitPosition>();
+            UnitPosition[] vecEnemyUnitPos = _transEnemyPos.GetComponentsInChildren<UnitPosition>();
+            foreach (UnitPosition enemyPos in vecEnemyUnitPos) {
+                vecPos.Add(enemyPos);
+            }
+            cEnemyDeck.Init(eDeckType.ENEMY, vecPos);
+            Global.DEBUG_PRINT("[Deck] Loaded EnemyPos: " + vecPos.Count);
         }
     }
 

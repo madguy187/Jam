@@ -32,19 +32,11 @@ public class SkillSlotGrid : MonoBehaviour
     [SerializeField] private float rollDuration = 2f;
     [SerializeField] private AnimationCurve speedCurve = AnimationCurve.EaseInOut(0, 0, 1, 1);
 
-    [Header("Debug Visualization")]
-    [SerializeField] private bool showGizmos = true;
-    [SerializeField] private Color viewportColor = new Color(0, 1, 0, 0.2f);
-    [SerializeField] private Color slotColor = new Color(1, 0, 0, 0.2f);
-    [SerializeField] private Color pathColor = new Color(0, 0, 1, 0.5f);
-
     [Header("Render Settings")]
     [SerializeField] private float renderYOffset = -0.15f; 
 
     [Header("Tuning")]
     [SerializeField] private float snapYOffset = 8f; 
-
-    private bool unitsCached = false;
 
     private bool isRolling = false;
     private List<UnitObject> cachedUnits = new List<UnitObject>();
@@ -90,7 +82,23 @@ public class SkillSlotGrid : MonoBehaviour
 
     public void Spin()
     {
-        if (isRolling || !unitsCached) return;
+        if (isRolling) return;
+
+        // Re-cache deck based on current turn each spin
+        CacheUnitsForCurrentTurn();
+
+        if (cachedUnits.Count == 0)
+        {
+            Debug.LogWarning("[SkillSlotGrid] Cannot spin – no cached units");
+            return;
+        }
+
+        // If slots were never initialised (first run), set positions
+        if (!slotsInitialized)
+        {
+            PositionSlotsInitial();
+        }
+
         StartRoll();
     }
 
@@ -136,42 +144,35 @@ public class SkillSlotGrid : MonoBehaviour
 
     }
 
-    private void Update()
-    {
-        // Try to cache units automatically once at start
-        if (!unitsCached)
-        {
-            if (CachePlayerDeckUnits())
-            {
-                unitsCached = true;
-                PositionSlotsInitial();
-            }
-        }
-    }
+    private void Update() { }
 
-    private bool CachePlayerDeckUnits()
+    private bool CacheUnitsForCurrentTurn()
     {
         cachedUnits.Clear();
-        
-        Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
-        if (playerDeck == null)
+
+        // We change deck here    
+        eDeckType deckType = SkillSlotMachine.IsEnemyTurnStatic ? eDeckType.ENEMY : eDeckType.PLAYER;
+
+        Debug.Log($"[SkillSlotGrid] Caching units for {deckType} turn");
+
+        Deck deck = DeckManager.instance.GetDeckByType(deckType);
+        if (deck == null)
         {
-            Debug.LogError("[SkillSlotGrid] Could not get player deck!");
+            Debug.LogError("[SkillSlotGrid] Could not get deck for " + deckType);
             return false;
         }
 
-        // Get all units from player deck
-        for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
+        for (int i = 0; i < deck.GetDeckMaxSize(); i++)
         {
-            UnitObject unit = playerDeck.GetUnitObject(i);
+            UnitObject unit = deck.GetUnitObject(i);
             if (unit != null && !unit.IsDead())
             {
                 cachedUnits.Add(unit);
-                Debug.Log($"[SkillSlotGrid] Added unit to cache: {unit.unitSO.unitName}");
+                // Debug.Log($"[SkillSlotGrid] Added unit to cache: {unit.unitSO.unitName}");
             }
         }
 
-        Debug.Log($"[SkillSlotGrid] Cached {cachedUnits.Count} player units");
+        // Debug.Log($"[SkillSlotGrid] Cached {cachedUnits.Count} units for {deckType}");
         return cachedUnits.Count > 0;
     }
 
@@ -194,21 +195,33 @@ public class SkillSlotGrid : MonoBehaviour
     {
         if (cachedUnits.Count == 0) return;
 
-        UnitObject randomUnit = cachedUnits[Random.Range(0, cachedUnits.Count)];
+        // Pick a symbol according to probability
+        SymbolType symbol = SymbolGenerator.instance.GenerateRandomSymbol();
+        eUnitArchetype archetype = SymbolGenerator.GetArchetypeForSymbol(symbol);
 
-        // Track archetype for result extraction later
+        // Store archetype for later extraction
         if (slotArchetypes.ContainsKey(img))
         {
-            slotArchetypes[img] = randomUnit.unitSO.eUnitArchetype;
+            slotArchetypes[img] = archetype;
         }
         else
         {
-            slotArchetypes.Add(img, randomUnit.unitSO.eUnitArchetype);
+            slotArchetypes.Add(img, archetype);
         }
+
+        if (symbol == SymbolType.EMPTY)
+        {
+            img.sprite = null;
+            img.color  = Color.clear;
+            return;
+        }
+
+        // Choose a cached unit matching this archetype if possible
+        List<UnitObject> candidates = cachedUnits.FindAll(u => u.unitSO.eUnitArchetype == archetype);
+        UnitObject randomUnit = candidates.Count > 0 ? candidates[Random.Range(0,candidates.Count)] : cachedUnits[Random.Range(0,cachedUnits.Count)];
 
         var (rt, cam) = RenderUnitToTexture(randomUnit);
 
-        // Create sprite from render texture
         Sprite sprite = Sprite.Create(rt.ToTexture2D(), new Rect(0, 0, rt.width, rt.height), new Vector2(0.5f, 0.5f));
         img.sprite = sprite;
         img.color = Color.white;
@@ -220,23 +233,25 @@ public class SkillSlotGrid : MonoBehaviour
 
     public List<eUnitArchetype> GetVisibleArchetypes()
     {
-        List<(Image img, float y)> candidates = new List<(Image, float)>();
+        // Grab the three slots whose centres are closest to viewport centre (y≈0)
+        List<(Image img, float absY, float y)> candidates = new List<(Image, float, float)>();
         foreach (Image img in slotImages)
         {
             float y = img.rectTransform.anchoredPosition.y;
-            if (Mathf.Abs(y) <= slotSpacing + 0.01f) 
-            {
-                candidates.Add((img, y));
-            }
+            candidates.Add((img, Mathf.Abs(y), y));
         }
 
-        // Sort descending Y 
-        candidates.Sort((a, b) => b.y.CompareTo(a.y));
+        // Sort by absolute distance then derive order by actual y for top→bottom
+        candidates.Sort((a, b) => a.absY.CompareTo(b.absY));
+        var nearestThree = candidates.GetRange(0, Mathf.Min(3, candidates.Count));
+
+        // Now sort those three by real y descending (top first)
+        nearestThree.Sort((a, b) => b.y.CompareTo(a.y));
 
         List<eUnitArchetype> result = new List<eUnitArchetype>();
-        for (int i = 0; i < Mathf.Min(3, candidates.Count); i++)
+        foreach (var tuple in nearestThree)
         {
-            Image img = candidates[i].img;
+            Image img = tuple.img;
             if (slotArchetypes.TryGetValue(img, out eUnitArchetype arch))
             {
                 result.Add(arch);
@@ -246,6 +261,7 @@ public class SkillSlotGrid : MonoBehaviour
                 result.Add(eUnitArchetype.NONE);
             }
         }
+
         return result;
     }
 
@@ -266,7 +282,6 @@ public class SkillSlotGrid : MonoBehaviour
     private void StartRoll()
     {
         if (isRolling) return;
-        if (!unitsCached) return; 
         isRolling = true;
         StartCoroutine(RollAnimation());
     }
