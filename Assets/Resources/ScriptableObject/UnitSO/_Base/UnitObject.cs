@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class UnitStat {
@@ -69,9 +71,22 @@ public class UnitObject : MonoBehaviour {
     [SerializeField] EffectList _listFullGridEffect;
     EffectList _listRelicEffect = new EffectList();
 
-    [SerializeField] EffectMap _listTempEffect = new EffectMap();
+    Dictionary<string, RelicScriptableObject> _listRelicSO = new Dictionary<string, RelicScriptableObject>();
+    public void AddRelic(RelicScriptableObject relicSO) {
+        if (_listRelicSO.ContainsKey(relicSO.GetRelicName())) {
+            return;
+        }
 
-    
+        _listRelicSO.Add(relicSO.GetRelicName(), relicSO);
+    }
+
+    public void RemoveRelic(RelicScriptableObject relicSO) {
+        if (_listRelicSO.ContainsKey(relicSO.GetRelicName())) {
+            _listRelicSO.Remove(relicSO.GetRelicName());
+        }
+    }
+
+    [SerializeField] EffectMap _listTempEffect = new EffectMap();
 
     public int index { get; set; }
     public int death_count { get; set; } = 0;
@@ -235,25 +250,19 @@ public class UnitObject : MonoBehaviour {
         return null;
     }
 
+    public EffectList GetRelicEffectList() {
+        return _listRelicEffect;
+    }
+
     public void Resolve(EffectResolveType eResolveType) {
         _listTempEffect.Resolve(eResolveType);
     }
 
-    public void LoadRelic(RelicScriptableObject relicSO) {
-        _listRelicEffect.LoadFromRelicSO(relicSO);
-    }
-
-    public void InitTempEffect() {
-        _listTempEffect.Clear();
-
-        if (!_listRelicEffect.IsValid()) {
-            return;
-        }
-
-        foreach (EffectScriptableObject effect in _listRelicEffect) {
-            if (effect.GetExecType() == EffectExecType.START_OF_ROUND) {
-                AddTempEffect(effect);
-            }
+    public void LoadRelic() {
+        _listRelicEffect.Clear();
+        foreach (KeyValuePair<string, RelicScriptableObject> pair in _listRelicSO) {
+            RelicScriptableObject relicSO = pair.Value;
+            _listRelicEffect.LoadFromRelicSO(relicSO);
         }
     }
 

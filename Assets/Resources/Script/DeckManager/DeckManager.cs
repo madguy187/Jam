@@ -52,7 +52,7 @@ public class DeckManager : MonoBehaviour {
             List<UnitObject> listPlayer = DeckHelperFunc.GetAllAliveUnit(cPlayerDeck);
             int rand = Random.Range(0, listPlayer.Count);
             RelicScriptableObject relic = ResourceManager.instance.Debug_RandRelic();
-            listPlayer[rand].LoadRelic(relic);
+            listPlayer[rand].AddRelic(relic);
             Global.DEBUG_PRINT("Loaded " + relic.name + " into " + listPlayer[rand].name + " index:" + rand + " team: Player");
         }
 
@@ -60,7 +60,7 @@ public class DeckManager : MonoBehaviour {
             List<UnitObject> listEnemy = DeckHelperFunc.GetAllAliveUnit(cEnemyDeck);
             int rand = Random.Range(0, listEnemy.Count);
             RelicScriptableObject relic = ResourceManager.instance.Debug_RandRelic();
-            listEnemy[rand].LoadRelic(relic);
+            listEnemy[rand].AddRelic(relic);
             Global.DEBUG_PRINT("Loaded " + relic.name + " into " + listEnemy[rand].name + " index:" + rand + " team: Enemy");
         }
     }
