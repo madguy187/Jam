@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 public static class RenderTextureExtensions
 {
@@ -48,7 +49,7 @@ public class SkillSlotGrid : MonoBehaviour
     private VerticalLayoutGroup layoutGroup;
     private bool slotsInitialized = false;
 
-    // Map each Image slot to its current unit archetype for result extraction
+    // Map each Image slot to its current unit archetype 
     private readonly Dictionary<Image, eUnitArchetype> slotArchetypes = new Dictionary<Image, eUnitArchetype>();
 
     public bool IsRolling()
@@ -208,10 +209,20 @@ public class SkillSlotGrid : MonoBehaviour
             slotArchetypes.Add(img, archetype);
         }
 
+        // Clean up old sprite and texture if they exist
+        if (img.sprite != null)
+        {
+            if (img.sprite.texture != null)
+            {
+                Destroy(img.sprite.texture);
+            }
+            Destroy(img.sprite);
+        }
+
         if (symbol == SymbolType.EMPTY)
         {
             img.sprite = null;
-            img.color  = Color.clear;
+            img.color = Color.clear;
             return;
         }
 
@@ -220,14 +231,28 @@ public class SkillSlotGrid : MonoBehaviour
         UnitObject randomUnit = candidates.Count > 0 ? candidates[Random.Range(0,candidates.Count)] : cachedUnits[Random.Range(0,cachedUnits.Count)];
 
         var (rt, cam) = RenderUnitToTexture(randomUnit);
+        if (rt != null)
+        {
+            // Create new sprite from the render texture
+            Texture2D tex = rt.ToTexture2D();
+            Sprite sprite = Sprite.Create(tex, new Rect(0, 0, rt.width, rt.height), new Vector2(0.5f, 0.5f));
+            img.sprite = sprite;
+            img.color = Color.white;
 
-        Sprite sprite = Sprite.Create(rt.ToTexture2D(), new Rect(0, 0, rt.width, rt.height), new Vector2(0.5f, 0.5f));
-        img.sprite = sprite;
-        img.color = Color.white;
+            // Clean up render texture
+            rt.Release();
+            Destroy(rt);
+        }
+        else
+        {
+            img.sprite = null;
+            img.color = Color.clear;
+        }
 
-        rt.Release();
-        Destroy(rt);
-        Destroy(cam);
+        if (cam != null)
+        {
+            Destroy(cam.gameObject);
+        }
     }
 
     public List<eUnitArchetype> GetVisibleArchetypes()
@@ -280,8 +305,13 @@ public class SkillSlotGrid : MonoBehaviour
 
     private void StartRoll()
     {
-        if (isRolling) return;
+        if (isRolling) 
+        {
+            return;
+        }
+        
         isRolling = true;
+
         StartCoroutine(RollAnimation());
     }
 
@@ -362,39 +392,80 @@ public class SkillSlotGrid : MonoBehaviour
 
     private (RenderTexture, GameObject) RenderUnitToTexture(UnitObject unit)
     {
-        // Create a preview layer
-        int previewLayer = 31;
+        // Get SPUM_Prefabs component
+        SPUM_Prefabs spumPrefab = unit.GetComponent<SPUM_Prefabs>();
+        if (spumPrefab == null)
+        {
+            Debug.LogError("[SkillSlotGrid] Unit does not have SPUM_Prefabs component!");
+            return (null, null);
+        }
 
-        // Store original layer
-        int originalLayer = unit.gameObject.layer;
+        // Locate HeadSet transform 
+        Transform headSet = null;
+        foreach (Transform t in unit.GetComponentsInChildren<Transform>(true))
+        {
+            if (t.name.Equals("HeadSet", System.StringComparison.OrdinalIgnoreCase))
+            {
+                headSet = t;
+                break;
+            }
+        }
 
-        // Set unit and all children to preview layer
-        SetLayerRecursively(unit.gameObject, previewLayer);
+        if (headSet == null)
+        {
+            Debug.LogWarning("[SkillSlotGrid] HeadSet not found on unit " + unit.name );
+        }
 
+        // Store original layers for restoration
+        Dictionary<GameObject,int> originalLayers = new Dictionary<GameObject,int>();
+
+        if (headSet != null)
+        {
+            foreach (Transform child in headSet.GetComponentsInChildren<Transform>(true))
+            {
+                originalLayers[child.gameObject] = child.gameObject.layer;
+                child.gameObject.layer = 31; // Preview layer
+            }
+        }
+        else
+        {
+            // fallback: whole unit
+            SetLayerRecursively(unit.gameObject, 31);
+            originalLayers[unit.gameObject] = unit.gameObject.layer;
+        }
+
+        // Create camera and render texture
         GameObject camObj = new GameObject("UnitPreviewCamera");
         Camera cam = camObj.AddComponent<Camera>();
         cam.clearFlags = CameraClearFlags.Color;
         cam.backgroundColor = Color.clear;
         cam.orthographic = true;
 
-        RenderTexture rt = new RenderTexture(256, 256, 16);
+        RenderTexture rt = new RenderTexture(128, 128, 16);
         cam.targetTexture = rt;
+        cam.orthographicSize = 1.0f;
 
-        cam.transform.position = unit.transform.position + new Vector3(0, renderYOffset, -10);
-        cam.orthographicSize = 1.5f;
+        Vector3 focusPos = (headSet != null ? headSet.position : unit.transform.position);
+        cam.transform.position = focusPos + new Vector3(0, renderYOffset, -10);
 
         // Only render the preview layer
-        cam.cullingMask = 1 << previewLayer;
+        cam.cullingMask = 1 << 31;
 
+        // Render
         cam.Render();
 
-        // Restore original layer
-        SetLayerRecursively(unit.gameObject, originalLayer);
+        // Restore original layers
+        foreach (var pair in originalLayers)
+        {
+            if (pair.Key != null)
+            {
+                pair.Key.layer = pair.Value;
+            }
+        }
 
         cam.enabled = false;
         camObj.SetActive(false);
 
         return (rt, camObj);
     }
-    
 } 
