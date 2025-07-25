@@ -8,7 +8,8 @@ public class UIRerollButton : MonoBehaviour
     private Button button;
 
     [Header("References")]
-    [SerializeField] private SkillSlotGrid skillSlotGrid;
+    [SerializeField] private SkillSlotMachine slotMachine;
+    [SerializeField] private SkillSlotGrid skillSlotGrid; // fallback if machine not assigned
     
     private void InitializeComponents()
     {
@@ -20,9 +21,18 @@ public class UIRerollButton : MonoBehaviour
             return;
         }
 
-        if (skillSlotGrid == null)
+        if (slotMachine == null)
         {
-            Debug.LogError("[UIRollButton] SkillSlotGrid reference not found!");
+            slotMachine = FindObjectOfType<SkillSlotMachine>();
+        }
+        if (skillSlotGrid == null && slotMachine == null)
+        {
+            skillSlotGrid = FindObjectOfType<SkillSlotGrid>();
+        }
+        if (slotMachine == null && skillSlotGrid == null)
+        {
+            Debug.LogError("[UIRollButton] No slot machine or grid found!");
+            enabled = false;
         }
     }
     
@@ -43,7 +53,11 @@ public class UIRerollButton : MonoBehaviour
     
     private void OnClick()
     {
-        if (skillSlotGrid != null)
+        if (slotMachine != null)
+        {
+            slotMachine.Spin();
+        }
+        else if (skillSlotGrid != null)
         {
             skillSlotGrid.Spin();
         }

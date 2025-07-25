@@ -143,6 +143,24 @@ public class SlotController : MonoBehaviour
         spinsThisTurn = 0;
     }
 
+    public void ApplyExternalSpin(SymbolType[] symbols)
+    {
+        if (symbols == null || symbols.Length != slotConfig.TotalGridSize)
+        {
+            Debug.LogError("[SlotController] ApplyExternalSpin: invalid symbols array");
+            return;
+        }
+
+        // Mark as spinning to prevent other user input during processing
+        isSpinning = true;
+
+        // Populate the grid with provided symbols
+        FillGridWithSymbols(symbols);
+
+        // Immediately process results (no gridUI animation path)
+        ProcessSpinResults();
+    }
+
     public void IncrementSpins()
     {
         spinsThisTurn++;
@@ -385,14 +403,25 @@ public class SlotController : MonoBehaviour
         
         Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
         SymbolType[] finalSymbols = SymbolGenerator.instance.GenerateSymbolsForDeck(enemyDeck);
-        
-        isSpinning = true;
-        gridUI.StartSpinAnimation(finalSymbols);
-        FillGridWithSymbols(finalSymbols);
-        
-        while (gridUI.GetIsSpinning())
+
+        // Use the unified SkillSlotMachine visuals if present
+        if (SkillSlotMachine.instance != null)
         {
-            yield return null;
+            yield return SkillSlotMachine.instance.SpinWithPresetSymbols(finalSymbols);
+        }
+        else
+        {
+            // Fallback to old gridUI animation if machine is missing
+            isSpinning = true;
+            if (gridUI != null)
+            {
+                gridUI.StartSpinAnimation(finalSymbols);
+                FillGridWithSymbols(finalSymbols);
+                while (gridUI.GetIsSpinning())
+                {
+                    yield return null;
+                }
+            }
         }
 
         ProcessEnemyTurnCombat();
@@ -486,6 +515,18 @@ public class SlotController : MonoBehaviour
         }
 
         spinResult.SetMatches(matches, totalGold);
+
+        // Debug: print each match directly
+        if (spinResult.GetAllMatches().Count > 0)
+        {
+            Debug.Log("=== MATCHES FOUND ===");
+            foreach (Match m in spinResult.GetAllMatches())
+            {
+                string pos = string.Join("", m.GetPositions());
+                Debug.Log($"{m.GetMatchType()} : {m.GetArchetype()} @ {pos}");
+            }
+            Debug.Log("=====================");
+        }
         isSpinning = false;
 
         if (rerollButton != null)

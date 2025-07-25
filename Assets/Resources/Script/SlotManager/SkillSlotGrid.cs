@@ -39,10 +39,10 @@ public class SkillSlotGrid : MonoBehaviour
     [SerializeField] private Color pathColor = new Color(0, 0, 1, 0.5f);
 
     [Header("Render Settings")]
-    [SerializeField] private float renderYOffset = 0.3f; 
+    [SerializeField] private float renderYOffset = -0.15f; 
 
     [Header("Tuning")]
-    [SerializeField] private float snapYOffset = 0f; 
+    [SerializeField] private float snapYOffset = 8f; 
 
     private bool unitsCached = false;
 
@@ -56,6 +56,9 @@ public class SkillSlotGrid : MonoBehaviour
     private float bottomThreshold;
     private VerticalLayoutGroup layoutGroup;
     private bool slotsInitialized = false;
+
+    // Map each Image slot to its current unit archetype for result extraction
+    private readonly Dictionary<Image, eUnitArchetype> slotArchetypes = new Dictionary<Image, eUnitArchetype>();
 
     public bool IsRolling()
     {
@@ -192,6 +195,17 @@ public class SkillSlotGrid : MonoBehaviour
         if (cachedUnits.Count == 0) return;
 
         UnitObject randomUnit = cachedUnits[Random.Range(0, cachedUnits.Count)];
+
+        // Track archetype for result extraction later
+        if (slotArchetypes.ContainsKey(img))
+        {
+            slotArchetypes[img] = randomUnit.unitSO.eUnitArchetype;
+        }
+        else
+        {
+            slotArchetypes.Add(img, randomUnit.unitSO.eUnitArchetype);
+        }
+
         var (rt, cam) = RenderUnitToTexture(randomUnit);
 
         // Create sprite from render texture
@@ -202,6 +216,37 @@ public class SkillSlotGrid : MonoBehaviour
         rt.Release();
         Destroy(rt);
         Destroy(cam);
+    }
+
+    public List<eUnitArchetype> GetVisibleArchetypes()
+    {
+        List<(Image img, float y)> candidates = new List<(Image, float)>();
+        foreach (Image img in slotImages)
+        {
+            float y = img.rectTransform.anchoredPosition.y;
+            if (Mathf.Abs(y) <= slotSpacing + 0.01f) 
+            {
+                candidates.Add((img, y));
+            }
+        }
+
+        // Sort descending Y 
+        candidates.Sort((a, b) => b.y.CompareTo(a.y));
+
+        List<eUnitArchetype> result = new List<eUnitArchetype>();
+        for (int i = 0; i < Mathf.Min(3, candidates.Count); i++)
+        {
+            Image img = candidates[i].img;
+            if (slotArchetypes.TryGetValue(img, out eUnitArchetype arch))
+            {
+                result.Add(arch);
+            }
+            else
+            {
+                result.Add(eUnitArchetype.NONE);
+            }
+        }
+        return result;
     }
 
     private void PositionSlotsInitial()
@@ -275,7 +320,7 @@ public class SkillSlotGrid : MonoBehaviour
         }
         if (nearest != null)
         {
-             // how far we are from perfect centre
+            // how far we are from perfect centre
             float offset = nearest.rectTransform.anchoredPosition.y;
             // Shift every slot by -offset so that the nearest slot is perfectly centred
             foreach (Image img in slotImages)
