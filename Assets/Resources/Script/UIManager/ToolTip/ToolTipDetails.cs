@@ -27,7 +27,7 @@ public class ToolTipDetails : MonoBehaviour, IPointerEnterHandler, IPointerExitH
     }
 
     // Update is called once per frame
-    void Update()
+    virtual public void Update()
     {
         if (hasMouseOver && toolTipTimer < ToolTipDelaySeconds) {
             toolTipTimer += Time.deltaTime;

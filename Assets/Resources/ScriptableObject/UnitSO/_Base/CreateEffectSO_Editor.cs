@@ -1,0 +1,207 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
+
+public class CreateEffectSO_Editor {
+    const string DATA_PATH = "/Resources/ScriptableObject/UnitSO/Data/";
+    const string EFFECT_PATH = "Assets/Resources/ScriptableObject/UnitSO/UnitEffect";
+    const string FOLDER_SEPARATOR = "/";
+
+    const string EFFECT_DATA_FILE_NAME = "effect_output.csv";
+    const string UNIT_DATA_FILE_NAME = "unit_output.csv";
+
+    const char SEPARATOR = ',';
+
+    const string HEADER_EFFECT_NAME = "name";
+    const string HEADER_EFFECT_OUTPUT_TYPE = "output_type";
+    const string HEADER_EFFECT_ENUM = "enum";
+    const string HEADER_EFFECT_VAL = "val";
+    const string HEADER_EFFECT_TARGET_TYPE = "target_type";
+    const string HEADER_EFFECT_TARGET_CONDITION = "target_condition";
+    const string HEADER_EFFECT_TARGET_PARAM = "target_param";
+    const string HEADER_EFFECT_EXEC_TYPE = "exec_type";
+    const string HEADER_EFFECT_AFFINITY_TYPE = "affinity_type";
+    const string HEADER_EFFECT_RESOLUTION_TYPE = "resolution_type";
+    const string HEADER_EFFECT_COUNT = "count";
+    static List<string> _listHeader_Effect = new List<string> {
+        HEADER_EFFECT_NAME,
+        HEADER_EFFECT_OUTPUT_TYPE,
+        HEADER_EFFECT_ENUM,
+        HEADER_EFFECT_VAL,
+        HEADER_EFFECT_TARGET_TYPE,
+        HEADER_EFFECT_TARGET_CONDITION,
+        HEADER_EFFECT_TARGET_PARAM,
+        HEADER_EFFECT_EXEC_TYPE,
+        HEADER_EFFECT_AFFINITY_TYPE,
+        HEADER_EFFECT_RESOLUTION_TYPE,
+        HEADER_EFFECT_COUNT,
+    };
+
+    const string HEADER_UNIT_NAME = "name";
+    const string HEADER_UNIT_ARCHETYPE = "unit_archetype";
+    const string HEADER_UNIT_HP = "hp";
+    const string HEADER_UNIT_SHIELD = "shield";
+    const string HEADER_UNIT_ATK = "atk";
+    const string HEADER_UNIT_RES = "res";
+    const string HEADER_UNIT_CRIT_RATE = "crit_rate";
+    const string HEADER_UNIT_CRIT_MULTI = "crit_multi";
+    static List<string> _listHeader_Unit = new List<string> {
+        HEADER_UNIT_NAME,
+        HEADER_UNIT_ARCHETYPE,
+        HEADER_UNIT_HP,
+        HEADER_UNIT_SHIELD,
+        HEADER_UNIT_ATK,
+        HEADER_UNIT_RES,
+        HEADER_UNIT_CRIT_RATE,
+        HEADER_UNIT_CRIT_MULTI,
+    };
+
+    [MenuItem("Assets/Create/Scriptable Object/LoadSOByCsv", priority = 11)]
+    public static void LoadSOByCsv() {
+        LoadUnitSO();
+        LoadEffectSO();
+        Debug.Log("Loaded");
+
+        AssetDatabase.SaveAssets(); // Ensure changes are saved
+        AssetDatabase.Refresh(); // Refresh the Project window to show the new asset
+    }
+
+    public static void LoadEffectSO() {
+        string path = Application.dataPath + FOLDER_SEPARATOR + DATA_PATH + EFFECT_DATA_FILE_NAME;
+        //Pass the file path and file name to the StreamReader constructor
+        StreamReader sr = new StreamReader(path);
+        //Read the first line of text
+        string line = sr.ReadLine();
+        if (!CheckHeaderEffect(_listHeader_Effect, line)) {
+            Debug.Log("Header do not match");
+            return;
+        }
+
+        //Continue to read until you reach end of file
+        while (true) {
+            line = sr.ReadLine();
+            if (line == null) {
+                break;
+            }
+
+            if (LoadData(_listHeader_Effect, line, out Dictionary<string, string> dictData)) {
+                EffectScriptableObject newAsset = ScriptableObject.CreateInstance<EffectScriptableObject>();
+                newAsset.SetEffectType((EffectType)GetEnumFromName<EffectType>(dictData[HEADER_EFFECT_ENUM]));
+                newAsset.SetEffectVal(float.Parse(dictData[HEADER_EFFECT_VAL]));
+                newAsset.SetEffectTargetType((EffectTargetType)GetEnumFromName<EffectTargetType>(dictData[HEADER_EFFECT_TARGET_TYPE]));
+                newAsset.SetEffectTargetCondition((EffectTargetCondition)GetEnumFromName<EffectTargetCondition>(dictData[HEADER_EFFECT_TARGET_CONDITION]));
+                newAsset.SetEffectTargetParam(float.Parse(dictData[HEADER_EFFECT_TARGET_PARAM]));
+                newAsset.SetEffectExecType((EffectExecType)GetEnumFromName<EffectExecType>(dictData[HEADER_EFFECT_EXEC_TYPE]));
+                newAsset.SetEffectAffinityType((EffectAffinityType)GetEnumFromName<EffectAffinityType>(dictData[HEADER_EFFECT_AFFINITY_TYPE]));
+                newAsset.SetEffectResolveType((EffectResolveType)GetEnumFromName<EffectResolveType>(dictData[HEADER_EFFECT_RESOLUTION_TYPE]));
+                newAsset.SetEffectCount(int.Parse(dictData[HEADER_EFFECT_COUNT]));
+
+                string outputName = dictData[HEADER_EFFECT_NAME];
+                string outputType = dictData[HEADER_EFFECT_OUTPUT_TYPE];
+
+                if (outputType.Contains("roll")) {
+                    outputType = outputType.Replace("roll_", "");
+                    SaveRollObject(outputType, outputName, newAsset);
+                }
+            }
+        }
+        //close the file
+        sr.Close();
+    }
+
+    public static void LoadUnitSO() {
+        string path = Application.dataPath + FOLDER_SEPARATOR + DATA_PATH + UNIT_DATA_FILE_NAME;
+        //Pass the file path and file name to the StreamReader constructor
+        StreamReader sr = new StreamReader(path);
+        //Read the first line of text
+        string line = sr.ReadLine();
+        if (!CheckHeaderEffect(_listHeader_Unit, line)) {
+            Debug.Log("Header do not match");
+            return;
+        }
+
+        //Continue to read until you reach end of file
+        while (true) {
+            line = sr.ReadLine();
+            if (line == null) {
+                break;
+            }
+
+            if (LoadData(_listHeader_Unit, line, out Dictionary<string, string> dictData)) {
+                UnitScriptableObject newAsset = ScriptableObject.CreateInstance<UnitScriptableObject>();
+                newAsset.SetunitName(dictData[HEADER_UNIT_NAME]);
+                newAsset.SetunitArchetype((eUnitArchetype)GetEnumFromName<eUnitArchetype>(dictData[HEADER_UNIT_ARCHETYPE]));
+                newAsset.Sethp(float.Parse(dictData[HEADER_UNIT_HP]));
+                newAsset.Setattack(float.Parse(dictData[HEADER_UNIT_ATK]));
+                newAsset.Setshield(float.Parse(dictData[HEADER_UNIT_SHIELD]));
+                newAsset.SetcritRate(int.Parse(dictData[HEADER_UNIT_CRIT_RATE]));
+                newAsset.SetcritMulti(int.Parse(dictData[HEADER_UNIT_CRIT_MULTI]));
+                newAsset.Setres(float.Parse(dictData[HEADER_UNIT_RES]));
+
+                string outputName = dictData[HEADER_UNIT_NAME];
+
+                CreateFolder(outputName);
+
+                SaveRollObject(outputName, newAsset);
+            }
+        }
+        //close the file
+        sr.Close();
+    }
+
+    public static void CreateFolder(string unitName) {
+        string path = EFFECT_PATH;
+        if (AssetDatabase.IsValidFolder(path + FOLDER_SEPARATOR + unitName)) {
+            AssetDatabase.DeleteAsset(path + FOLDER_SEPARATOR + unitName);
+        }
+
+        Debug.Log(path);
+        AssetDatabase.CreateFolder(path, unitName);
+    }
+
+    public static void SaveRollObject(string strRollType, string strOutputName, EffectScriptableObject effectSO) {
+        string unitName = strOutputName;
+        strOutputName = unitName + "_" + strRollType + "_" + effectSO.GetEffectType();
+        AssetDatabase.CreateAsset(effectSO, EFFECT_PATH + FOLDER_SEPARATOR + unitName + FOLDER_SEPARATOR + strOutputName + ".asset");
+    }
+
+    public static void SaveRollObject(string strOutputName, UnitScriptableObject effectSO) {
+        string unitName = strOutputName;
+        strOutputName = unitName + "UnitSO";
+        AssetDatabase.CreateAsset(effectSO, EFFECT_PATH + FOLDER_SEPARATOR + unitName + FOLDER_SEPARATOR + strOutputName + ".asset");
+    }
+
+    public static bool CheckHeaderEffect(List<string> listHeader, string text) {
+        List<string> dataHeader = text.Split(SEPARATOR).ToList();
+        if (!dataHeader.SequenceEqual(listHeader)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static bool LoadData(List<string> listHeader, string text, out Dictionary<string, string> dictData) {
+        dictData = new Dictionary<string, string>();
+        List<string> data = text.Split(SEPARATOR).ToList();
+
+        if (data.Count != listHeader.Count) {
+            return false;
+        }
+
+        for (int i = 0; i < listHeader.Count; i++) {
+            string key = listHeader[i];
+            string value = data[i];
+            dictData.Add(key, value);
+        }
+
+        return true;
+    }
+
+    public static System.Object GetEnumFromName<T>(string strVal) {
+        System.Object obj = Enum.Parse(typeof(T), strVal, true);
+        return obj;
+    }
+}

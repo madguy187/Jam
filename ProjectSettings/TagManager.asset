@@ -47,3 +47,8 @@ TagManager:
   - name: DynamicNumber
     uniqueID: 1930827419
     locked: 0
+  - name: EffectGrid
+    uniqueID: 1851070399
+    locked: 0
+  m_RenderingLayers:
+  - Default

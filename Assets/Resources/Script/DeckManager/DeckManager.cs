@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Mono.Cecil;
 using UnityEngine;
 
 public enum eDeckType {
@@ -30,6 +31,8 @@ public class DeckManager : MonoBehaviour {
                 Global.DEBUG_PRINT("Error loading");
                 return;
             }
+
+            prefab = ResourceManager.instance.GetUnit("ForestWarden");
             
             cPlayerDeck.AddUnit(prefab);
             Global.DEBUG_PRINT("Loaded " + prefab.name + " into Player Team");
