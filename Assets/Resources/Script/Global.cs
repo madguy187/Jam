@@ -2,7 +2,7 @@ using UnityEngine;
 
 public static class Global {
     public const int GRID_SIZE = 3;
-    public static bool IS_DEBUG = true;
+    public static bool IS_DEBUG = false;
 
     // Combat
     public const int PERCENTAGE_CONSTANT = 100;
