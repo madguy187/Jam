@@ -9,6 +9,17 @@ public enum eUnitArchetype {
 
 [CreateAssetMenu(menuName = "Scriptable Object/Unit/UnitScriptableObject")]
 public class UnitScriptableObject : ScriptableObject {
+
+#if UNITY_EDITOR
+    public void SetunitName(string _unitName) { unitName = _unitName; }
+    public void SetunitArchetype(eUnitArchetype _eUnitArchetype) { eUnitArchetype = _eUnitArchetype; }
+    public void Sethp(float _hp) { hp = _hp; }
+    public void Setattack(float _attack) { attack = _attack; }
+    public void Setshield(float _shield) { shield = _shield; }
+    public void Setres(float _res) { res = _res; }
+    public void SetcritRate(int _critRate) { critRate = _critRate; }
+    public void SetcritMulti(int _critMulti) { critMulti = _critMulti; }
+#endif
     public string unitName;
 
     [Header("Main Stats")]

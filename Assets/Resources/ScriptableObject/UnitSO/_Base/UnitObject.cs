@@ -1,5 +1,4 @@
 using System;
-using TMPro.EditorUtilities;
 using UnityEngine;
 
 public class UnitStat {
@@ -49,7 +48,7 @@ public class UnitStat {
 }
 
 public class UnitObject : MonoBehaviour {
-    // ONLY FOR EDITOR MODE
+#if UNITY_EDITOR
     public void SetUnitSO(UnitScriptableObject _unitSO) { unitSO = _unitSO; }
     public void SetEffectList_Single(EffectList _list) { _listSingleEffect = _list; }
     public void SetEffectList_Horizontal(EffectList _list) { _listHorizontalEffect = _list; }
@@ -57,7 +56,8 @@ public class UnitObject : MonoBehaviour {
     public void SetEffectList_Diagonal(EffectList _list) { _listDiagonalEffect = _list; }
     public void SetEffectList_ZigZag(EffectList _list) { _listZigZagEffect = _list; }
     public void SetEffectList_FullGrid(EffectList _list) { _listFullGridEffect = _list; }
-    // ONLY FOR EDITOR MODE
+    public void SetEffectUIGrid(UIEffectGrid _grid) { _listTempEffect.SetGrid(_grid); }
+#endif
 
 
     [field: SerializeField] public UnitScriptableObject unitSO { get; private set; }
@@ -69,7 +69,9 @@ public class UnitObject : MonoBehaviour {
     [SerializeField] EffectList _listFullGridEffect;
     EffectList _listRelicEffect = new EffectList();
 
-    EffectMap _listTempEffect = new EffectMap();
+    [SerializeField] EffectMap _listTempEffect = new EffectMap();
+
+    
 
     public int index { get; set; }
     public int death_count { get; set; } = 0;
@@ -100,11 +102,11 @@ public class UnitObject : MonoBehaviour {
 
     public void Update() {
         if (Input.GetKeyDown(KeyCode.Q)) {
-            PlayStateAnimation(PlayerState.ATTACK);
+            AddTempEffect(EffectType.EFFECT_BLEED, 2.0f, EffectTargetType.SELF, EffectTargetCondition.NONE, 0.0f, EffectAffinityType.NONE, EffectResolveType.RESOLVE_TURN, 1);
         }
 
         if (Input.GetKeyDown(KeyCode.W)) {
-            PlayStateAnimation(PlayerState.IDLE);
+            RemoveEffect(EffectType.EFFECT_BLEED);
         }
     }
 
@@ -127,9 +129,9 @@ public class UnitObject : MonoBehaviour {
         _listTempEffect.AddEffect(effectSO.GetEffectType(), effect);
     }
 
-    public void AddTempEffect(EffectType effectType, EffectTargetType eTarget, EffectTargetCondition eCondition, float eParam, EffectAffinityType eAffinity, EffectResolveType eResolve, int nCount) {
+    public void AddTempEffect(EffectType effectType, float effectVal, EffectTargetType eTarget, EffectTargetCondition eCondition, float eParam, EffectAffinityType eAffinity, EffectResolveType eResolve, int nCount) {
         EffectScriptableObject effectSO = ScriptableObject.CreateInstance<EffectScriptableObject>();
-        effectSO.InitScriptableInstance(effectType, eTarget, eCondition, eParam, EffectExecType.COUNT_SPECIFIED, eAffinity, eResolve, nCount);
+        effectSO.InitScriptableInstance(effectType, effectVal, eTarget, eCondition, eParam, EffectExecType.COUNT_SPECIFIED, eAffinity, eResolve, nCount);
         AddTempEffect(effectSO);
     }
 

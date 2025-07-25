@@ -96,6 +96,7 @@ public class CombatManager : MonoBehaviour {
         eDeckType[] arrType = (eDeckType[])Enum.GetValues(typeof(eDeckType));
         int nTypeCount = arrType.Count();
         _eAttackerDeck++;
+
         if ((int)_eAttackerDeck >= nTypeCount) {
             _eAttackerDeck = eDeckType.NONE;
         }
@@ -224,6 +225,11 @@ public class CombatManager : MonoBehaviour {
 
     List<MatchType> _GetRollType(string unitName) {
         List<MatchType> listResult = new List<MatchType>();
+        listResult = new List<MatchType>() {
+            MatchType.SINGLE,
+            MatchType.HORIZONTAL,
+            MatchType.DIAGONAL,
+        };
         if (_listMatch == null) {
             return listResult;
         }
@@ -308,10 +314,10 @@ public class CombatManager : MonoBehaviour {
         if (cAttackerUnit.GetEffectParam(EffectType.EFFECT_SHADOW_BLADE_BLEED, out float fApplyCount)) {
             if (cDefenderUnit.HasEffectParam(EffectType.EFFECT_BLEED)) {
                 fAttack += 5;
-                cDefenderUnit.AddTempEffect(EffectType.EFFECT_BLEED, EffectTargetType.SELF, EffectTargetCondition.NONE, 0.0f, EffectAffinityType.NONE, EffectResolveType.RESOLVE_TURN, 2);
+                cDefenderUnit.AddTempEffect(EffectType.EFFECT_BLEED, 2.0f, EffectTargetType.SELF, EffectTargetCondition.NONE, 0.0f, EffectAffinityType.NONE, EffectResolveType.RESOLVE_TURN, 2);
             } else {
                 fAttack += 2;
-                cDefenderUnit.AddTempEffect(EffectType.EFFECT_BLEED, EffectTargetType.SELF, EffectTargetCondition.NONE, 0.0f, EffectAffinityType.NONE, EffectResolveType.RESOLVE_TURN, 3);
+                cDefenderUnit.AddTempEffect(EffectType.EFFECT_BLEED, 2.0f, EffectTargetType.SELF, EffectTargetCondition.NONE, 0.0f, EffectAffinityType.NONE, EffectResolveType.RESOLVE_TURN, 3);
             }
         }
 

@@ -8,8 +8,6 @@ public static class Global {
     public const int PERCENTAGE_CONSTANT = 100;
     public const int RESISTANCE_PERCENTAGE_CONSTANT = 10;
     public const int INVALID_INDEX = -1;
-    public const int TEMP_EFFECT_ONLY_THIS_TURN = 1;
-    public const int TEMP_EFFECT_ONLY_THIS_ROUND = 0;
 
     static public void DEBUG_PRINT(string strMessage) {
         if (!IS_DEBUG) {
