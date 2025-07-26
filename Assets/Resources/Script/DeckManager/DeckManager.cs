@@ -1,6 +1,10 @@
+using System;
 using System.Collections.Generic;
-using Mono.Cecil;
+using NUnit.Framework.Internal;
 using UnityEngine;
+using System.Linq;
+using Unity.VisualScripting;
+using UnityEditor;
 
 public enum eDeckType {
     NONE,
@@ -17,52 +21,138 @@ public class DeckManager : MonoBehaviour {
     Deck cPlayerDeck = new Deck();
     Deck cEnemyDeck = new Deck();
 
+    [Header("Debug")]
+    [SerializeField] string strDebugUnit = "";
+    [SerializeField] string strDebugRelic = "";
+    [SerializeField] eDeckType eDebugDeckType = eDeckType.NONE;
+    [SerializeField] int nDebugUnitIndex = 0;
+    [SerializeField] bool bDebugSingle = false;
+    [SerializeField] bool bDebugHorizontal = false;
+    [SerializeField] bool bDebugDiagonal = false;
+    [SerializeField] bool bDebugZigZag = false;
+    [SerializeField] bool bDebugXShape = false;
+    [SerializeField] bool bDebugFullGrid = false;
+
+    void OnGUI() {
+        Array enumValues = Enum.GetValues(typeof(eDeckType));
+        string[] enumNames = new string[enumValues.Length];
+
+        // Convert enum values to string names for the toolbar
+        for (int i = 0; i < enumValues.Length; i++) {
+            enumNames[i] = enumValues.GetValue(i).ToString();
+        }
+        // Display the enum as a toolbar
+        int newSelection = GUILayout.Toolbar((int)eDebugDeckType, enumNames);
+
+        // Update the enum value if a new option is selected
+        if (newSelection != (int)eDebugDeckType) {
+            eDebugDeckType = (eDeckType)enumValues.GetValue(newSelection);
+        }
+
+        if (GUILayout.Button("Add Random Unit To Deck")) {
+            GameObject prefab = ResourceManager.instance.Debug_RandUnit();
+            if (prefab == null) {
+                Debug.Log("Error loading");
+                return;
+            }
+
+            Deck cDeck = GetDeckByType(eDebugDeckType);
+            cDeck.AddUnit(prefab);
+            Debug.Log("Loaded " + prefab.name + " into " + eDebugDeckType + " Team");
+        }
+
+        // Create a header label
+        GUILayout.Space(20);
+        GUILayout.Label("Adding specified unit", EditorStyles.boldLabel);
+        strDebugUnit = GUILayout.TextField(strDebugUnit);
+        if (GUILayout.Button("Add Unit To Enemy Deck")) {
+            GameObject prefab = ResourceManager.instance.GetUnit(strDebugUnit);
+            if (prefab == null) {
+                return;
+            }
+            Deck cDeck = GetDeckByType(eDebugDeckType);
+
+            cDeck.AddUnit(prefab);
+            Debug.Log("Loaded " + prefab.name + " into " + eDebugDeckType + " Team");
+        }
+
+        GUILayout.Space(20);
+        GUILayout.Label("Adding relic to unit", EditorStyles.boldLabel);
+        string[] unitNum = { "1", "2", "3", "4", "5" };
+        // Display the enum as a toolbar
+        int newSelectionIndex = GUILayout.Toolbar(nDebugUnitIndex, unitNum);
+        // Update the enum value if a new option is selected
+        if (newSelectionIndex != nDebugUnitIndex) {
+            nDebugUnitIndex = newSelectionIndex;
+        }
+        strDebugRelic = GUILayout.TextField(strDebugRelic);
+        if (GUILayout.Button("Add Relic")) {
+            RelicScriptableObject relicSO = ResourceManager.instance.GetRelic(strDebugRelic);
+            if (relicSO == null) {
+                return;
+            }
+            Deck cDeck = GetDeckByType(eDebugDeckType);
+            UnitObject unit = cDeck.GetUnitObject(nDebugUnitIndex);
+            unit.AddRelic(relicSO);
+
+            Debug.Log("Loaded " + relicSO + " into " + eDebugDeckType + " Team");
+        }
+
+        GUILayout.Space(20);
+        GUILayout.Label("Combat Debug", EditorStyles.boldLabel);
+        if (GUILayout.Button("Init Round")) {
+            CombatManager.instance.InitRound();
+        }
+        bDebugSingle = GUILayout.Toggle(bDebugSingle, "Single");
+        bDebugHorizontal = GUILayout.Toggle(bDebugHorizontal, "Horizontal");
+        bDebugDiagonal = GUILayout.Toggle(bDebugDiagonal, "Diagonal");
+        bDebugZigZag = GUILayout.Toggle(bDebugZigZag, "ZigZag");
+        bDebugXShape = GUILayout.Toggle(bDebugXShape, "XShape");
+        bDebugFullGrid = GUILayout.Toggle(bDebugFullGrid, "FullGrid");
+        if (GUILayout.Button("Exec 1 turn")) {
+            List<Match> listMatch = new List<Match>();
+            List<UnitObject> listUnit = DeckHelperFunc.GetAllAliveUnit(GetDeckByType(eDeckType.PLAYER));
+            foreach (UnitObject unit in listUnit) {
+                if (bDebugSingle) {
+                    Match match = new Match(MatchType.SINGLE);
+                    match.SetUnitName(unit.unitSO.unitName);
+                    listMatch.Add(match);
+                }
+                if (bDebugHorizontal) {
+                    Match match = new Match(MatchType.HORIZONTAL);
+                    match.SetUnitName(unit.unitSO.unitName);
+                    listMatch.Add(match);
+                }
+                if (bDebugDiagonal) {
+                    Match match = new Match(MatchType.DIAGONAL);
+                    match.SetUnitName(unit.unitSO.unitName);
+                    listMatch.Add(match);
+                }
+                if (bDebugZigZag) {
+                    Match match = new Match(MatchType.ZIGZAG);
+                    match.SetUnitName(unit.unitSO.unitName);
+                    listMatch.Add(match);
+                }
+                if (bDebugXShape) {
+                    Match match = new Match(MatchType.XSHAPE);
+                    match.SetUnitName(unit.unitSO.unitName);
+                    listMatch.Add(match);
+                }
+                if (bDebugFullGrid) {
+                    Match match = new Match(MatchType.FULLGRID);
+                    match.SetUnitName(unit.unitSO.unitName);
+                    listMatch.Add(match);
+                }
+            }
+            CombatManager.instance.StartBattleLoop(listMatch);
+        }
+    }
+
     void Awake() {
         if (instance != null) {
             Destroy(instance);
         }
         instance = this;
-    }
-
-    void Update() {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            GameObject prefab = ResourceManager.instance.Debug_RandUnit();
-            if (prefab == null) {
-                Global.DEBUG_PRINT("Error loading");
-                return;
-            }
-
-            prefab = ResourceManager.instance.GetUnit("ForestWarden");
-            
-            cPlayerDeck.AddUnit(prefab);
-            Global.DEBUG_PRINT("Loaded " + prefab.name + " into Player Team");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            GameObject prefab = ResourceManager.instance.Debug_RandUnit();
-            if (prefab == null) {
-                Global.DEBUG_PRINT("Error loading");
-                return;
-            }
-            cEnemyDeck.AddUnit(prefab);
-            Global.DEBUG_PRINT("Loaded " + prefab.name + " into Enemy Team");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha3)) {
-            List<UnitObject> listPlayer = DeckHelperFunc.GetAllAliveUnit(cPlayerDeck);
-            int rand = Random.Range(0, listPlayer.Count);
-            RelicScriptableObject relic = ResourceManager.instance.Debug_RandRelic();
-            listPlayer[rand].AddRelic(relic);
-            Global.DEBUG_PRINT("Loaded " + relic.name + " into " + listPlayer[rand].name + " index:" + rand + " team: Player");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha4)) {
-            List<UnitObject> listEnemy = DeckHelperFunc.GetAllAliveUnit(cEnemyDeck);
-            int rand = Random.Range(0, listEnemy.Count);
-            RelicScriptableObject relic = ResourceManager.instance.Debug_RandRelic();
-            listEnemy[rand].AddRelic(relic);
-            Global.DEBUG_PRINT("Loaded " + relic.name + " into " + listEnemy[rand].name + " index:" + rand + " team: Enemy");
-        }
     }
 
     void Start() {
