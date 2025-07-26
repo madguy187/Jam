@@ -74,6 +74,12 @@ public class Match
         archetype = newArchetype;
     }
 
+#if UNITY_EDITOR
+    public Match(MatchType type) {
+        this.type = type;
+    }
+#endif
+
     public Match(MatchType type, List<Vector2Int> positions, SymbolType symbol) {
         if (positions == null) {
             Debug.LogWarning("[Match] Positions list cannot be null");
