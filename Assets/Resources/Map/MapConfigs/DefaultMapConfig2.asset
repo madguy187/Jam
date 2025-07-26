@@ -18,6 +18,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 18c7eaf48da41914f921f24cd48afcbe, type: 2}
   - {fileID: 11400000, guid: 5cdb0ab80020fd448a8dc0b42ce61a85, type: 2}
   - {fileID: 11400000, guid: f7cbb00b19185fc4884bd71b2b4926a6, type: 2}
+  - {fileID: 11400000, guid: 0da934caa9a217b449215bc97cb1a725, type: 2}
   randomNodes: 0100000002000000030000000400000006000000
   numOfPreBossNodes:
     min: 1

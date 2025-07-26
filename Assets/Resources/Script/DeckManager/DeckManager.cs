@@ -157,9 +157,11 @@ public class DeckManager : MonoBehaviour {
 
     void Awake() {
         if (instance != null) {
-            Destroy(instance);
+            Destroy(gameObject);
+        } else {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
         }
-        instance = this;
     }
 
     void Start() {
