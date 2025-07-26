@@ -7,8 +7,13 @@ public class ProbabilityCalculator : MonoBehaviour
 
     [Header("Base Probabilities")]
     [Tooltip("Base prob for empty slots (10-60%). Higher values mean more empty slots.")]
-    [SerializeField] [Range(0.1f, 0.6f)] 
-    private float baseEmptyProbability = 0.4f;
+    [SerializeField] [Range(0f, 0.6f)] 
+    private float baseEmptyProbability = 0.3f; 
+
+    public void SetEmptyProbability(float value)
+    {
+        baseEmptyProbability = Mathf.Clamp(value, 0f, 0.6f);
+    }
 
     [Tooltip("Minimum prob for each archetype present in deck (10-50%). Higher values ensure more consistent appearance of each archetype.")]
     [SerializeField] [Range(0.1f, 0.5f)] 
@@ -34,12 +39,12 @@ public class ProbabilityCalculator : MonoBehaviour
     private void InitializeProbabilities()
     {
         currentProbabilities.Clear();
-        SetDefaultProbabilities();
+        SetDefaultProbabilities(baseEmptyProbability);
     }
 
-    private void SetDefaultProbabilities()
+    private void SetDefaultProbabilities(float emptyProb)
     {
-        currentProbabilities[SymbolType.EMPTY] = baseEmptyProbability;
+        currentProbabilities[SymbolType.EMPTY] = emptyProb;
         currentProbabilities[SymbolType.HOLY] = 0f;
         currentProbabilities[SymbolType.UNDEAD] = 0f;
         currentProbabilities[SymbolType.ELF] = 0f;
@@ -60,21 +65,18 @@ public class ProbabilityCalculator : MonoBehaviour
 
         var (archetypes, archetypeCounts, totalUnits) = AnalyzeDeck(deck);
 
-        /*Debug.Log($"[ProbabilityCalculator] Found {archetypes.Count} archetypes in deck. Total units: {totalUnits}");
-        foreach (var archetype in archetypes)
-        {
-            Debug.Log($"[ProbabilityCalculator] Archetype: {archetype}, Count: {archetypeCounts[archetype]}");
-        }*/
+        // Decide empty probability based on archetype diversity
+        float emptyProbToUse = (archetypes.Count <= 1) ? baseEmptyProbability : 0f;
 
-        SetDefaultProbabilities();
+        SetDefaultProbabilities(emptyProbToUse);
 
         if (archetypes.Count == 0)
         {
-            currentProbabilities[SymbolType.EMPTY] = 1f;
+            currentProbabilities[SymbolType.EMPTY] = 1f; 
             return;
         }
 
-        DistributeProbabilities(archetypes);
+        DistributeProbabilities(archetypes, emptyProbToUse);
         NormalizeProbabilities();
     }
 
@@ -88,10 +90,8 @@ public class ProbabilityCalculator : MonoBehaviour
         foreach (var kvp in currentProbabilities)
         {
             cumulativeProb += kvp.Value;
-            /*Debug.Log($"[ProbabilityCalculator] Checking {kvp.Key}: prob={kvp.Value:F3}, cumulative={cumulativeProb:F3}");*/
             if (random <= cumulativeProb)
             {
-                /*Debug.Log($"[ProbabilityCalculator] Selected: {kvp.Key}");*/
                 return kvp.Key;
             }
         }
@@ -128,9 +128,9 @@ public class ProbabilityCalculator : MonoBehaviour
         return (archetypes, archetypeCounts, totalUnits);
     }
 
-    private void DistributeProbabilities(HashSet<eUnitArchetype> archetypes)
+    private void DistributeProbabilities(HashSet<eUnitArchetype> archetypes, float emptyProb)
     {
-        float remainingProb = 1f - baseEmptyProbability;
+        float remainingProb = Mathf.Max(0f, 1f - emptyProb);
         float probPerArchetype = remainingProb / archetypes.Count;
         /*Debug.Log($"[ProbabilityCalculator] Initial prob per archetype: {probPerArchetype:P1}");*/
 
@@ -164,6 +164,12 @@ public class ProbabilityCalculator : MonoBehaviour
         foreach (var key in keys)
         {
             currentProbabilities[key] *= multiplier;
+        }
+
+        // Ensure empty probability is exactly zero if baseEmptyProbability is zero
+        if (Mathf.Approximately(baseEmptyProbability, 0f))
+        {
+            currentProbabilities[SymbolType.EMPTY] = 0f;
         }
     }
 
