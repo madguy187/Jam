@@ -18,6 +18,10 @@ public class RelicScriptableObject : ScriptableObject, IEnumerable<EffectScripta
     public string GetRelicName() {
         return strRelicName;
     }
+
+    public Sprite GetRelicSprite() {
+        return spriteRelic;
+    }
     
     // For IEnumerable<EffectScriptableObject>
     public IEnumerator<EffectScriptableObject> GetEnumerator() { return listEffect.GetEnumerator(); }

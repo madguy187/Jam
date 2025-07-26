@@ -2,14 +2,14 @@ using UnityEngine;
 
 namespace Map 
 {
-    public enum NodeType 
-    {
+    public enum NodeType {
         Undefined,
         Enemy,
         MiniBoss,
         Encounter,
         Shop,
-        MajorBoss
+        MajorBoss,
+        Necromancer,
     }
 }
 

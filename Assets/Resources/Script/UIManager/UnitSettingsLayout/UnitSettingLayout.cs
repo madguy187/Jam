@@ -1,9 +1,13 @@
 using UnityEngine;
 using TMPro;
 using Map;
+using System.Collections.Generic;
+using System.Linq;
 
 public class UnitSettingLayout : MonoBehaviour 
 {
+    public static UnitSettingLayout instance;
+
     [Header("UI References")]
     public TMP_Text goldText;
     public Transform teamUnitContainer;
@@ -21,13 +25,20 @@ public class UnitSettingLayout : MonoBehaviour
     public UnitDetailsPanel unitDetailsPanel;
     public MockPlayerInventory inventory;
 
-    private MockUnit activeUnit;
+    private UnitObject activeUnit;
     public UnitButton currentSelectedUnitButton;
     private ItemTracker tracker;
     private bool hasInitialized = false;
 
-    public void Init()
-    {
+    public void Awake() {
+        if (instance != null) {
+            Destroy(instance);
+        }
+
+        instance = this;
+    }
+
+    public void Init() {
         tracker = ItemTracker.Instance;
         if (tracker == null) {
             Global.DEBUG_PRINT("[UnitSettingsLayout::Init] ItemTracker is null.");
@@ -61,8 +72,6 @@ public class UnitSettingLayout : MonoBehaviour
         ClearUnitRelicsOnly();
         if (activeUnit != null) {
             PopulateUnitRelics(activeUnit);
-        } else {
-            relicContainer.gameObject.SetActive(false);
         }
     }
 
@@ -75,7 +84,7 @@ public class UnitSettingLayout : MonoBehaviour
         }
     }
 
-    void ShowDetails(MockUnit unit)
+    void ShowDetails(UnitObject unit)
     {
         unitDetailsPanel.Show(unit);
         activeUnit = unit;
@@ -123,7 +132,7 @@ public class UnitSettingLayout : MonoBehaviour
         DropZoneSetup.AddDropZone(bagContainer.gameObject, DropZone.AllowedItemType.UnitsAndRelics);
     }
     
-    void HighlightSelectedUnit(MockUnit unit)
+    void HighlightSelectedUnit(UnitObject unit)
     {
         if (currentSelectedUnitButton != null) {
             // Deselect the previously selected unit button
@@ -137,7 +146,7 @@ public class UnitSettingLayout : MonoBehaviour
                 currentSelectedUnitButton = unitButton;
                 break;
             } else {
-                Global.DEBUG_PRINT($"[UnitSettingLayout::HighlightSelectedUnit] No matching unit button found for {unitButton.GetUnit().unitName}");
+                Global.DEBUG_PRINT($"[UnitSettingLayout::HighlightSelectedUnit] No matching unit button found for {unitButton.GetUnit().name}");
             }
         }
     }
@@ -167,26 +176,26 @@ public class UnitSettingLayout : MonoBehaviour
         }
     }
 
-    private void PopulateTeamUnits()
-    {
-        int unitIndex = 0;
+    private void PopulateTeamUnits() {
+        List<UnitObject> listUnit = DeckHelperFunc.GetAllUnitIncludeEmpty(DeckManager.instance.GetDeckByType(eDeckType.PLAYER));
 
-        foreach (Transform slot in teamUnitContainer) {
-            // Safety check: stop if no more units to assign
-            if (unitIndex >= inventory.teamUnits.Count)
+        for (int i = 0; i < teamUnitContainer.childCount; i++) {
+            if (i >= listUnit.Count)
                 break;
 
+            var slot = teamUnitContainer.GetChild(i);
             // Check if slot is empty
             if (slot.childCount == 0) {
-                var unit = inventory.teamUnits[unitIndex];
-
+                UnitObject unit = listUnit[i];
+                if (unit == null) {
+                    continue;
+                }
                 GameObject unitGO = Instantiate(unitButtonPrefab, slot);
                 var unitItem = new MockInventoryItem(unit);
-                unit.uiGameObject = unitGO;
+                //unit.uiGameObject = unitGO; // nico: what is this?
                 unitGO.GetComponent<UnitButton>().Init(unit, unitItem, ShowDetails);
                 unitGO.GetComponent<DragHandler>().Init(unitItem);
                 unitGO.GetComponent<ToolTipDetails>().Init(unitDetailsPanel.GetAnyUnitName(unit), unitDetailsPanel.GetAnyUnitDetails(unit));
-                tracker.AddItem(TrackerType.UnitContainer, MockItemType.Unit);
 
                 // Optional but recommended: make it stretch to fill slot
                 RectTransform rt = unitGO.GetComponent<RectTransform>();
@@ -194,8 +203,6 @@ public class UnitSettingLayout : MonoBehaviour
                 rt.anchorMax = Vector2.one;
                 rt.offsetMin = Vector2.zero;
                 rt.offsetMax = Vector2.zero;
-
-                unitIndex++;
             }
         }
     }
@@ -218,18 +225,13 @@ public class UnitSettingLayout : MonoBehaviour
         Global.DEBUG_PRINT($"[UnitSettingsLayout::GenerateFixedBagSlots] BagContainer has {tracker.maxItems} slots");
     }
 
-    private void PopulateBagItems()
-    {
-        int bagItemIndex = 0;
-
-        foreach (Transform slot in bagContainer) {
-            if (bagItemIndex >= inventory.bagItems.Count)
+    private void PopulateBagItems() {
+        for (int i = 0; i < bagContainer.childCount; i++) {
+            if (i >= inventory.bagItems.Count)
                 break;
 
-            if (slot.childCount > 0)
-                continue;
-
-            var item = inventory.bagItems[bagItemIndex];
+            var slot = bagContainer.GetChild(i);
+            var item = inventory.bagItems[i];
             GameObject go;
 
             if (item.itemType == MockItemType.Unit) {
@@ -244,7 +246,6 @@ public class UnitSettingLayout : MonoBehaviour
                 go.GetComponent<RelicButton>().Init(item.relicData, item);
                 go.GetComponent<DragHandler>().Init(item);
             }
-            ItemTracker.Instance.AddItem(TrackerType.BagContainer, item.itemType);
 
             // Stretch to fit slot
             RectTransform rt = go.GetComponent<RectTransform>();
@@ -252,8 +253,6 @@ public class UnitSettingLayout : MonoBehaviour
             rt.anchorMax = Vector2.one;
             rt.offsetMin = Vector2.zero;
             rt.offsetMax = Vector2.zero;
-
-            bagItemIndex++;
         }
     }
 
@@ -273,27 +272,33 @@ public class UnitSettingLayout : MonoBehaviour
         }
     }
 
-    private void PopulateUnitRelics(MockUnit unit)
-    {
+    private void PopulateUnitRelics(UnitObject unit) {
+        int relicIndex = 0;
+        List<RelicScriptableObject> listRelic = unit.GetRelic();
         for (int i = 0; i < relicContainer.childCount; i++) {
+            if (relicIndex >= listRelic.Count)
+                break;
+
             var slot = relicContainer.GetChild(i);
-            if (i < unit.equippedRelics.Count) {
-                var relic = unit.equippedRelics[i];
-                GameObject go = Instantiate(relicButtonPrefab, slot);
-                var relicItem = new MockInventoryItem(relic);
-                go.GetComponent<RelicButton>().Init(relic, relicItem);
-                go.GetComponent<DragHandler>().Init(relicItem);
-                ItemTracker.Instance.AddItem(TrackerType.RelicContainer, MockItemType.Relic);
-                // Stretch to fit
-                RectTransform rt = go.GetComponent<RectTransform>();
-                rt.anchorMin = Vector2.zero;
-                rt.anchorMax = Vector2.one;
-                rt.offsetMin = Vector2.zero;
-                rt.offsetMax = Vector2.zero;
-            }
+            GameObject go = Instantiate(relicButtonPrefab, slot);
+
+            RelicScriptableObject relic = listRelic.ElementAt(i);
+            MockInventoryItem relicItem = new MockInventoryItem(relic);
+
+            go.GetComponent<RelicButton>().Init(relic, relicItem);
+            go.GetComponent<DragHandler>().Init(relicItem);
+            //ItemTracker.Instance.AddItem(TrackerType.RelicContainer, MockItemType.Relic);
+            // Stretch to fit
+            RectTransform rt = go.GetComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+
+            relicIndex++;
         }
     }
 
-    public MockUnit ActiveUnit => activeUnit;
+    public UnitObject ActiveUnit => activeUnit;
     public MockPlayerInventory ActiveInventory => inventory;
 }

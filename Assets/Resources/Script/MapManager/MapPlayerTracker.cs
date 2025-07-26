@@ -98,6 +98,10 @@ namespace Map
                     break;
                 case NodeType.Encounter:
                     break;
+                case NodeType.Necromancer:
+                    mapManager.SaveMap();
+                    SceneManager.LoadScene("Game_Necromancer");
+                    break;
                 case NodeType.Shop:
                     break;
                 case NodeType.MiniBoss:

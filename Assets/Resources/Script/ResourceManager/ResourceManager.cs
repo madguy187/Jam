@@ -40,9 +40,9 @@ public class ResourceManager : MonoBehaviour {
         Global.DEBUG_PRINT("[Resources] Loaded Effect Detail: " + _mapRelicSO.Count());
     }
 
-    public GameObject Debug_RandUnit() {
+    public string Debug_RandUnit() {
         int rand = Random.Range(0, _mapUnitSO.Count);
-        return _mapUnitSO.ElementAt(rand).Value;
+        return _mapUnitSO.ElementAt(rand).Key;
     }
 
     public RelicScriptableObject Debug_RandRelic() {

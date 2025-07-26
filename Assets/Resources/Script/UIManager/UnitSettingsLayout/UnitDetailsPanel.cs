@@ -15,9 +15,9 @@ public class UnitDetailsPanel : MonoBehaviour
     public Transform equippedRelicContainer;   // UI parent for relic slots
     public GameObject relicSlotPrefab;         // Prefab for displaying equipped relics
 
-    private MockUnit currentUnit;
+    private UnitObject currentUnit;
 
-    public void Show(MockUnit unit) 
+    public void Show(UnitObject unit) 
     {
         // for debug
         // gameObject.SetActive(true);
@@ -34,11 +34,11 @@ public class UnitDetailsPanel : MonoBehaviour
     {
         if (currentUnit == null) { return; }
 
-        nameText.text = currentUnit.unitName;
-        levelText.text = $"Lv {currentUnit.level}";
-        hpText.text = $"HP: {currentUnit.currentHP} / {currentUnit.maxHP}";
-        atkText.text = $"ATK: {currentUnit.attack}";
-        defText.text = $"NOR: {currentUnit.equippedRelics.Count}"; // Placeholder to check relic count
+        // nameText.text = currentUnit.unitName;
+        // levelText.text = $"Lv {currentUnit.level}";
+        // hpText.text = $"HP: {currentUnit.currentHP} / {currentUnit.maxHP}";
+        // atkText.text = $"ATK: {currentUnit.attack}";
+        // defText.text = $"NOR: {currentUnit.equippedRelics.Count}"; // Placeholder to check relic count
 
         UpdateEquippedRelics();
     }
@@ -54,17 +54,18 @@ public class UnitDetailsPanel : MonoBehaviour
         // }
     }
 
-    public string GetAnyUnitName(MockUnit unit) => unit?.unitName ?? "NULL";
+    public string GetAnyUnitName(UnitObject unit) => unit?.unitSO?.unitName ?? "NULL";
 
-    public string GetAnyUnitDetails(MockUnit unit) 
+    public string GetAnyUnitDetails(UnitObject unit) 
     {
         if (unit == null) return "NULL";
-        return $"Lv {unit.level}\n" +
-               $"HP: {unit.currentHP} / {unit.maxHP}\n" +
-               $"ATK: {unit.attack}\n" +
-               $"DEF: {unit.defense}\n" +
-               $"Relics: {unit.equippedRelics.Count}";
+        return "";
+        // return $"Lv {unit.level}\n" +
+        //        $"HP: {unit.currentHP} / {unit.maxHP}\n" +
+        //        $"ATK: {unit.attack}\n" +
+        //        $"DEF: {unit.defense}\n" +
+        //        $"Relics: {unit.equippedRelics.Count}";
     }
 
-    public MockUnit GetCurrentUnit() => currentUnit;
+    public UnitObject GetCurrentUnit() => currentUnit;
 }

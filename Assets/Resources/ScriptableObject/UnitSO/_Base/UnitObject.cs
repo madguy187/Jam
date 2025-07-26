@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -81,10 +82,17 @@ public class UnitObject : MonoBehaviour {
         _listRelicSO.Add(relicSO.GetRelicName(), relicSO);
     }
 
-    public void RemoveRelic(RelicScriptableObject relicSO) {
+    public bool RemoveRelic(RelicScriptableObject relicSO) {
         if (_listRelicSO.ContainsKey(relicSO.GetRelicName())) {
             _listRelicSO.Remove(relicSO.GetRelicName());
+            return true;
         }
+
+        return false;
+    }
+
+    public List<RelicScriptableObject> GetRelic() {
+        return _listRelicSO.Values.ToList();
     }
 
     [SerializeField] EffectMap _listTempEffect = new EffectMap();

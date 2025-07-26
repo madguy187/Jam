@@ -49,6 +49,7 @@ public class CreateEffectSO_Editor {
 
     const string HEADER_UNIT_NAME = "name";
     const string HEADER_UNIT_ARCHETYPE = "unit_archetype";
+    const string HEADER_UNIT_TIER = "tier";
     const string HEADER_UNIT_HP = "hp";
     const string HEADER_UNIT_SHIELD = "shield";
     const string HEADER_UNIT_ATK = "atk";
@@ -58,6 +59,7 @@ public class CreateEffectSO_Editor {
     static List<string> _listHeader_Unit = new List<string> {
         HEADER_UNIT_NAME,
         HEADER_UNIT_ARCHETYPE,
+        HEADER_UNIT_TIER,
         HEADER_UNIT_HP,
         HEADER_UNIT_SHIELD,
         HEADER_UNIT_ATK,
@@ -152,6 +154,7 @@ public class CreateEffectSO_Editor {
                 UnitScriptableObject newAsset = ScriptableObject.CreateInstance<UnitScriptableObject>();
                 newAsset.SetunitName(dictData[HEADER_UNIT_NAME]);
                 newAsset.SetunitArchetype((eUnitArchetype)GetEnumFromName<eUnitArchetype>(dictData[HEADER_UNIT_ARCHETYPE]));
+                newAsset.SetunitTier((eUnitTier)GetEnumFromName<eUnitArchetype>(dictData[HEADER_UNIT_TIER]));
                 newAsset.Sethp(float.Parse(dictData[HEADER_UNIT_HP]));
                 newAsset.Setattack(float.Parse(dictData[HEADER_UNIT_ATK]));
                 newAsset.Setshield(float.Parse(dictData[HEADER_UNIT_SHIELD]));

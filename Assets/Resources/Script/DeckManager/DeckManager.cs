@@ -56,15 +56,15 @@ public class DeckManager : MonoBehaviour {
         }
 
         if (GUILayout.Button("Add Random Unit To Deck")) {
-            GameObject prefab = ResourceManager.instance.Debug_RandUnit();
-            if (prefab == null) {
+            string strPrefab = ResourceManager.instance.Debug_RandUnit();
+            if (strPrefab == null) {
                 Debug.Log("Error loading");
                 return;
             }
 
-            Deck cDeck = GetDeckByType(eDebugDeckType);
-            cDeck.AddUnit(prefab);
-            Debug.Log("Loaded " + prefab.name + " into " + eDebugDeckType + " Team");
+            AddUnit(eDebugDeckType, strPrefab);
+
+            Debug.Log("Loaded " + strPrefab + " into " + eDebugDeckType + " Team");
         }
 
         // Create a header label
