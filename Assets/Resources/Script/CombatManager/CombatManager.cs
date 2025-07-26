@@ -69,14 +69,6 @@ public class CombatManager : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            UnitSettingLayout.instance.OpenLayout();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            UnitSettingLayout.instance.CloseLayout();
-        }
-
         switch (_state) {
             case eCombatState.WAIT:
                 return;
