@@ -22,18 +22,23 @@ public class DeckManager : MonoBehaviour {
     Deck cEnemyDeck = new Deck();
 
     [Header("Debug")]
-    [SerializeField] string strDebugUnit = "";
-    [SerializeField] string strDebugRelic = "";
-    [SerializeField] eDeckType eDebugDeckType = eDeckType.NONE;
-    [SerializeField] int nDebugUnitIndex = 0;
-    [SerializeField] bool bDebugSingle = false;
-    [SerializeField] bool bDebugHorizontal = false;
-    [SerializeField] bool bDebugDiagonal = false;
-    [SerializeField] bool bDebugZigZag = false;
-    [SerializeField] bool bDebugXShape = false;
-    [SerializeField] bool bDebugFullGrid = false;
+    [SerializeField] bool bShowDebug = false;
+    string strDebugUnit = "";
+    string strDebugRelic = "";
+    eDeckType eDebugDeckType = eDeckType.NONE;
+    int nDebugUnitIndex = 0;
+    bool bDebugSingle = false;
+    bool bDebugHorizontal = false;
+    bool bDebugDiagonal = false;
+    bool bDebugZigZag = false;
+    bool bDebugXShape = false;
+    bool bDebugFullGrid = false;
 
     void OnGUI() {
+        if (!bShowDebug) {
+            return;
+        }
+        
         Array enumValues = Enum.GetValues(typeof(eDeckType));
         string[] enumNames = new string[enumValues.Length];
 
