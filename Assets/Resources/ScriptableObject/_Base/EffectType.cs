@@ -48,4 +48,5 @@ public enum EffectType {
     EFFECT_BLEED,
     EFFECT_SHADOW_BLADE_BLEED,
     EFFECT_INSTANT_KILL,
+    EFFECT_DODGE,
 }

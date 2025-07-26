@@ -13,8 +13,14 @@ public class CreatePrefabFromMenu {
     const string UNIT_SCRIPTABLE_PATH = "ScriptableObject/UnitSO/UnitEffect";
     const string UNIT_SCRIPTABLE_FULL_PATH = "Assets/Resources/" + UNIT_SCRIPTABLE_PATH;
 
+    const string UNIT_SCRIPTABLE_MOB_PATH = "ScriptableObject/UnitSO/MobEffect";
+    const string UNIT_SCRIPTABLE_MOB_FULL_PATH = "Assets/Resources/" + UNIT_SCRIPTABLE_MOB_PATH;
+
     const string UNIT_PREFAB_PATH = "ScriptableObject/UnitSO/Unit";
     const string UNIT_PREFAB_FULL_PATH = "Assets/Resources/" + UNIT_PREFAB_PATH;
+
+    const string UNIT_PREFAB_MOB_PATH = "ScriptableObject/UnitSO/Mob";
+    const string UNIT_PREFAB_MOB_FULL_PATH = "Assets/Resources/" + UNIT_PREFAB_MOB_PATH;
 
     const string UNIT_RELIC_FULL_PATH = "Assets/Resources/ScriptableObject/RelicSO/Relic";
     const string UNIT_RELIC_EFFECT_PATH = "ScriptableObject/RelicSO/RelicEffect";
@@ -29,9 +35,13 @@ public class CreatePrefabFromMenu {
     [MenuItem("Assets/Create/Scriptable Object/LoadAll", priority = 11)]
     public static void LoadAllSO() {
         string[] folders = AssetDatabase.GetSubFolders(UNIT_SCRIPTABLE_FULL_PATH);
-
         foreach (string path in folders) {
-            CreateUnit(Path.GetFileName(path));
+            CreateUnit(UNIT_PREFAB_PATH, UNIT_PREFAB_FULL_PATH, UNIT_SCRIPTABLE_PATH, Path.GetFileName(path));
+        }
+
+        string[] foldersMob = AssetDatabase.GetSubFolders(UNIT_SCRIPTABLE_MOB_FULL_PATH);
+        foreach (string path in foldersMob) {
+            CreateUnit(UNIT_PREFAB_MOB_PATH, UNIT_PREFAB_MOB_FULL_PATH, UNIT_SCRIPTABLE_MOB_PATH, Path.GetFileName(path));
         }
 
         AssetDatabase.Refresh();
@@ -114,12 +124,12 @@ public class CreatePrefabFromMenu {
         healthBarTrans.anchoredPosition = pos;
     }
 
-    static void CreateUnit(string unitName) {
+    static void CreateUnit(string path, string outputPath, string scriptablePath, string unitName) {
         GameObject prefab = null;
 
         bool isCreateNew = false;
-        if (CheckIfPrefabExist(UNIT_PREFAB_PATH, unitName)) {
-            prefab = GetPrefabUnit(UNIT_PREFAB_PATH + FOLDER_SEPARATOR + unitName);
+        if (CheckIfPrefabExist(path, unitName)) {
+            prefab = GetPrefabUnit(path + FOLDER_SEPARATOR + unitName);
             //FileUtil.DeleteFileOrDirectory(Application.dataPath + UNIT_PREFAB_DATA_PATH + FOLDER_SEPARATOR + unitName + ".prefab");
             //FileUtil.DeleteFileOrDirectory(Application.dataPath + UNIT_PREFAB_DATA_PATH + FOLDER_SEPARATOR + unitName + ".meta");
         } else {
@@ -142,11 +152,12 @@ public class CreatePrefabFromMenu {
         AttachHealthBar(ref gameObj);
         AttachEffectGrid(ref gameObj);
 
-        string infoPath = UNIT_SCRIPTABLE_PATH + FOLDER_SEPARATOR + unitName;
+        string infoPath = scriptablePath + FOLDER_SEPARATOR + unitName;
         List<UnitScriptableObject> unitSO = Resources.LoadAll<UnitScriptableObject>(infoPath).ToList();
         foreach (UnitScriptableObject unit in unitSO) {
             comp.SetUnitSO(unit);
         }
+
 
         List<EffectScriptableObject> effects = Resources.LoadAll<EffectScriptableObject>(infoPath).ToList();
         EffectList single = new EffectList();
@@ -186,7 +197,7 @@ public class CreatePrefabFromMenu {
         // Add components, modify the GameObject as needed
 
         // Save the GameObject as a prefab
-        string assetPath = UNIT_PREFAB_FULL_PATH + FOLDER_SEPARATOR + unitName + ".prefab"; // Define the asset path
+        string assetPath = outputPath + FOLDER_SEPARATOR + unitName + ".prefab"; // Define the asset path
         bool prefabSuccess;
         PrefabUtility.SaveAsPrefabAsset(gameObj, assetPath, out prefabSuccess);
 

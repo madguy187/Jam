@@ -342,6 +342,15 @@ public class CombatManager : MonoBehaviour {
             }
         }
 
+        if (cDefenderUnit.HasEffectParam(EffectType.EFFECT_DODGE)) {
+            if (cDefenderUnit.GetEffectParam(EffectType.EFFECT_DODGE, out float val)) {
+                int rand = UnityEngine.Random.Range(0, Global.PERCENTAGE_CONSTANT + 1);
+                if (rand < val / Global.PERCENTAGE_CONSTANT) {
+                    fAttack = 0.0f;
+                }
+            }
+        }
+
         fAttack = Mathf.Floor(fAttack);
 
         if (cDefenderUnit.HasEffectParam(EffectType.EFFECT_REFLECT)) {
