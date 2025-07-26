@@ -69,11 +69,6 @@ public class CombatManager : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.Alpha5)) {
-            InitRound();
-            StartBattleLoop(null);
-        }
-
         switch (_state) {
             case eCombatState.WAIT:
                 return;
@@ -636,7 +631,7 @@ public class CombatManager : MonoBehaviour {
         eDeckType eOtherType = cDeck.GetDeckType() == eDeckType.PLAYER ? eDeckType.ENEMY : eDeckType.PLAYER;
         Deck cOtherDeck = DeckManager.instance.GetDeckByType(eOtherType);
 
-        Deck cTargetDeck = eTargetType == EffectTargetType.SELF ? cDeck : cOtherDeck;
+        Deck cTargetDeck = eTargetType == EffectTargetType.TEAM ? cDeck : cOtherDeck;
 
         if (cDeck == null || cOtherDeck == null) {
             return arrTarget;
