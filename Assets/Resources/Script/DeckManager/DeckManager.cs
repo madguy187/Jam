@@ -21,6 +21,7 @@ public class DeckManager : MonoBehaviour {
     Deck cPlayerDeck = new Deck();
     Deck cEnemyDeck = new Deck();
 
+#if UNITY_EDITOR
     [Header("Debug")]
     [SerializeField] bool bShowDebug = false;
     string strDebugUnit = "";
@@ -152,6 +153,7 @@ public class DeckManager : MonoBehaviour {
             CombatManager.instance.StartBattleLoop(listMatch);
         }
     }
+#endif
 
     void Awake() {
         if (instance != null) {
