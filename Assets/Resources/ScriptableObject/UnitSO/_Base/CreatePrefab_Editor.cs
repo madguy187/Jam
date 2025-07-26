@@ -15,6 +15,11 @@ public class CreatePrefabFromMenu {
     const string UNIT_PREFAB_PATH = "ScriptableObject/UnitSO/Unit";
     const string UNIT_PREFAB_FULL_PATH = "Assets/Resources/" + UNIT_PREFAB_PATH;
 
+    const string UNIT_RELIC_FULL_PATH = "Assets/Resources/ScriptableObject/RelicSO/Relic";
+    const string UNIT_RELIC_EFFECT_PATH = "ScriptableObject/RelicSO/RelicEffect";
+    const string UNIT_RELIC_EFFECT_FULL_PATH = "Assets/Resources/" + UNIT_RELIC_EFFECT_PATH;
+    const string UNIT_DEFAULT_RELIC_FULL_PATH = "Assets/Resources/" + "ScriptableObject/RelicSO/_Base/RelicDefault.asset";
+
     const string HEALTH_BAR_PATH = "UI/UIHealthBar/UIHealthBar";
     const string EFFECT_GRID_PATH = "UI/UIEffect/UIEffectGrid";
 
@@ -23,12 +28,24 @@ public class CreatePrefabFromMenu {
     [MenuItem("Assets/Create/Scriptable Object/LoadAll", priority = 11)]
     public static void LoadAllSO() {
         string[] folders = AssetDatabase.GetSubFolders(UNIT_SCRIPTABLE_FULL_PATH);
-        
+
         foreach (string path in folders) {
             CreateUnit(Path.GetFileName(path));
         }
 
         AssetDatabase.Refresh();
+    }
+
+    [MenuItem("Assets/Create/Scriptable Object/LoadAllRelic", priority = 11)]
+    public static void LoadAllRelicSO() {
+        string[] folders = AssetDatabase.GetSubFolders(UNIT_RELIC_EFFECT_FULL_PATH);
+
+        foreach (string path in folders) {
+            CreateRelic(Path.GetFileName(path));
+        }
+
+        AssetDatabase.SaveAssets(); // Ensure changes are saved
+        AssetDatabase.Refresh(); // Refresh the Project window to show the new asset
     }
 
     [MenuItem("Assets/Create/Scriptable Object/CreateSO", priority = 11)]
@@ -76,7 +93,7 @@ public class CreatePrefabFromMenu {
         if (transOldGrid != null) {
             GameObject.DestroyImmediate(transOldGrid.gameObject);
         }
-        
+
         // if (obj.GetComponentInChildren<UIEffectGrid>() != null) {
         //     objGrid = obj.GetComponentInChildren<UIEffectGrid>().gameObject;
         //     GameObject.Destroy(objGrid);
@@ -100,7 +117,7 @@ public class CreatePrefabFromMenu {
         GameObject prefab = null;
 
         bool isCreateNew = false;
-        if (CheckIfPrefabExist(unitName)) {
+        if (CheckIfPrefabExist(UNIT_PREFAB_PATH, unitName)) {
             prefab = GetPrefabUnit(UNIT_PREFAB_PATH + FOLDER_SEPARATOR + unitName);
             //FileUtil.DeleteFileOrDirectory(Application.dataPath + UNIT_PREFAB_DATA_PATH + FOLDER_SEPARATOR + unitName + ".prefab");
             //FileUtil.DeleteFileOrDirectory(Application.dataPath + UNIT_PREFAB_DATA_PATH + FOLDER_SEPARATOR + unitName + ".meta");
@@ -186,8 +203,24 @@ public class CreatePrefabFromMenu {
         GameObject.DestroyImmediate(gameObj);
     }
 
-    static bool CheckIfPrefabExist(string unitName) {
-        string prefabPath = UNIT_PREFAB_PATH;
+    static public void CreateRelic(string relicName) {
+        string relic_path = UNIT_RELIC_FULL_PATH + FOLDER_SEPARATOR + relicName;
+        RelicScriptableObject relicSO = AssetDatabase.LoadAssetAtPath<RelicScriptableObject>(relic_path + ".asset");
+        if (relicSO == null) {
+            AssetDatabase.CopyAsset(UNIT_DEFAULT_RELIC_FULL_PATH, relic_path + ".asset");
+            relicSO = AssetDatabase.LoadAssetAtPath<RelicScriptableObject>(relic_path + ".asset");
+        }
+
+        string relic_effect_path = UNIT_RELIC_EFFECT_PATH + FOLDER_SEPARATOR + relicName;
+        List<EffectScriptableObject> effects = Resources.LoadAll<EffectScriptableObject>(relic_effect_path).ToList();
+        relicSO.SetEffectList(effects);
+
+        Debug.Log("enter");
+
+        EditorUtility.SetDirty(relicSO);
+    }
+
+    static bool CheckIfPrefabExist(string prefabPath, string unitName) {
         GameObject prefab = Resources.Load<GameObject>(prefabPath + FOLDER_SEPARATOR + unitName);
         if (prefab == null) {
             return false;

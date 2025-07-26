@@ -8,7 +8,13 @@ using UnityEngine;
 public class CreateEffectSO_Editor {
     const string DATA_PATH = "/Resources/ScriptableObject/UnitSO/Data/";
     const string EFFECT_PATH = "Assets/Resources/ScriptableObject/UnitSO/UnitEffect";
+    const string RELIC_EFFECT_PATH = "Assets/Resources/ScriptableObject/RelicSO/RelicEffect";
     const string FOLDER_SEPARATOR = "/";
+
+    const string UNIT_RELIC_FULL_PATH = "Assets/Resources/ScriptableObject/RelicSO/Relic";
+    const string UNIT_RELIC_EFFECT_PATH = "ScriptableObject/RelicSO/RelicEffect";
+    const string UNIT_RELIC_EFFECT_FULL_PATH = "Assets/Resources/" + UNIT_RELIC_EFFECT_PATH;
+    const string UNIT_DEFAULT_RELIC_FULL_PATH = "Assets/Resources/" + "ScriptableObject/RelicSO/_Base/RelicDefault.asset";
 
     const string EFFECT_DATA_FILE_NAME = "effect_output.csv";
     const string UNIT_DATA_FILE_NAME = "unit_output.csv";
@@ -61,8 +67,12 @@ public class CreateEffectSO_Editor {
 
     [MenuItem("Assets/Create/Scriptable Object/LoadSOByCsv", priority = 11)]
     public static void LoadSOByCsv() {
+        ClearAllParentFolder();
         LoadUnitSO();
         LoadEffectSO();
+
+        CreatePrefabFromMenu.LoadAllSO();
+        CreatePrefabFromMenu.LoadAllRelicSO();
         Debug.Log("Loaded");
 
         AssetDatabase.SaveAssets(); // Ensure changes are saved
@@ -102,9 +112,16 @@ public class CreateEffectSO_Editor {
                 string outputName = dictData[HEADER_EFFECT_NAME];
                 string outputType = dictData[HEADER_EFFECT_OUTPUT_TYPE];
 
+
                 if (outputType.Contains("roll")) {
+                    CreateFolder(EFFECT_PATH, outputName, true);
                     outputType = outputType.Replace("roll_", "");
                     SaveRollObject(outputType, outputName, newAsset);
+                }
+
+                if (outputType.Contains("relic")) {
+                    CreateFolder(RELIC_EFFECT_PATH, outputName, true);
+                    SaveRelicEffectObject(outputName, newAsset);
                 }
             }
         }
@@ -143,7 +160,7 @@ public class CreateEffectSO_Editor {
 
                 string outputName = dictData[HEADER_UNIT_NAME];
 
-                CreateFolder(outputName);
+                CreateFolder(EFFECT_PATH, outputName, true);
 
                 SaveRollObject(outputName, newAsset);
             }
@@ -152,14 +169,31 @@ public class CreateEffectSO_Editor {
         sr.Close();
     }
 
-    public static void CreateFolder(string unitName) {
-        string path = EFFECT_PATH;
-        if (AssetDatabase.IsValidFolder(path + FOLDER_SEPARATOR + unitName)) {
-            AssetDatabase.DeleteAsset(path + FOLDER_SEPARATOR + unitName);
+    public static void CreateFolder(string path, string folderName, bool bCheckIfExist = false) {
+        if (bCheckIfExist) {
+            if (AssetDatabase.IsValidFolder(path + FOLDER_SEPARATOR + folderName)) {
+                return;
+            }
+        }
+        AssetDatabase.CreateFolder(path, folderName);
+    }
+
+    public static void ClearAllParentFolder() {
+        string effect_parent_path = EFFECT_PATH.Substring(0, EFFECT_PATH.LastIndexOf("/"));
+        string effect_folder_name = EFFECT_PATH.Substring(EFFECT_PATH.LastIndexOf("/") + 1);
+        string relic_parent_path = RELIC_EFFECT_PATH.Substring(0, RELIC_EFFECT_PATH.LastIndexOf("/"));
+        string relic_folder_name = RELIC_EFFECT_PATH.Substring(RELIC_EFFECT_PATH.LastIndexOf("/") + 1);
+
+        if (AssetDatabase.IsValidFolder(EFFECT_PATH)) {
+            AssetDatabase.DeleteAsset(EFFECT_PATH);
         }
 
-        Debug.Log(path);
-        AssetDatabase.CreateFolder(path, unitName);
+        if (AssetDatabase.IsValidFolder(RELIC_EFFECT_PATH)) {
+            AssetDatabase.DeleteAsset(RELIC_EFFECT_PATH);
+        }
+
+        CreateFolder(effect_parent_path, effect_folder_name);
+        CreateFolder(relic_parent_path, relic_folder_name);
     }
 
     public static void SaveRollObject(string strRollType, string strOutputName, EffectScriptableObject effectSO) {
@@ -172,6 +206,12 @@ public class CreateEffectSO_Editor {
         string unitName = strOutputName;
         strOutputName = unitName + "UnitSO";
         AssetDatabase.CreateAsset(effectSO, EFFECT_PATH + FOLDER_SEPARATOR + unitName + FOLDER_SEPARATOR + strOutputName + ".asset");
+    }
+
+    public static void SaveRelicEffectObject(string strOutputName, EffectScriptableObject effectSO) {
+        string relicName = strOutputName;
+        strOutputName = relicName + "_" + effectSO.GetEffectType();
+        AssetDatabase.CreateAsset(effectSO, RELIC_EFFECT_PATH + FOLDER_SEPARATOR + relicName + FOLDER_SEPARATOR + strOutputName + ".asset");
     }
 
     public static bool CheckHeaderEffect(List<string> listHeader, string text) {
