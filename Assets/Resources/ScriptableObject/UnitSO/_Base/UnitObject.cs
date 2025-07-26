@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
+[Serializable]
 public class UnitStat {
-    float val = 0.0f;
-    float max = 0.0f;
+    [SerializeField] float val = 0.0f;
+    [SerializeField] float max = 0.0f;
     float tempMax = 0.0f;
 
     public UnitStat(float _val) { val = _val; }
