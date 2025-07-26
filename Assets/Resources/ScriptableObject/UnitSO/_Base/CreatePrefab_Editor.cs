@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
 public class CreatePrefabFromMenu {
     const string UNIT_DEFAULT_PREFAB_PATH = "ScriptableObject/UnitSO/_Base/UnitPrefab";
     const string UNIT_DEFAULT_EFFECT_FULL_PATH = "Assets/Resources/" + "ScriptableObject/UnitSO/_Base/EffectDefault.asset";
@@ -227,3 +228,4 @@ public class CreatePrefabFromMenu {
         return true;
     }
 }
+#endif

@@ -5,6 +5,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
 public class CreateEffectSO_Editor {
     const string DATA_PATH = "/Resources/ScriptableObject/UnitSO/Data/";
     const string EFFECT_PATH = "Assets/Resources/ScriptableObject/UnitSO/UnitEffect";
@@ -245,3 +246,5 @@ public class CreateEffectSO_Editor {
         return obj;
     }
 }
+
+#endif
