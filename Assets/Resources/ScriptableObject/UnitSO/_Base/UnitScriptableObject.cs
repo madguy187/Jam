@@ -5,6 +5,7 @@ public enum eUnitArchetype {
     HOLY,
     UNDEAD,
     ELF,
+    MOB,
 }
 
 public enum eUnitTier {
