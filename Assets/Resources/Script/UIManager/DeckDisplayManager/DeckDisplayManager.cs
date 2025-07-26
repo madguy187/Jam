@@ -101,9 +101,21 @@ public class DeckDisplayManager : MonoBehaviour
         }
     }
 
+    public static Sprite RenderUnitToSprite(UnitObject unit) {
+        var (rt, cam) = RenderUnitToTexture(unit);
+        Texture2D tex = rt.ToTexture2D();
+        Sprite sprite = Sprite.Create(tex, new Rect(0, 0, rt.width, rt.height), new Vector2(0.5f, 0.5f));
+
+        // Clean up render texture
+        rt.Release();
+        Destroy(rt);
+        Destroy(cam);
+
+        return sprite;
+    }
+
     // Return both RenderTexture and camera GameObject
-    (RenderTexture, GameObject) RenderUnitToTexture(UnitObject unit)
-    {
+    public static (RenderTexture, GameObject) RenderUnitToTexture(UnitObject unit) {
         // Create a preview layer (e.g., Layer 31 in Unity)
         int previewLayer = 31; // Make sure this layer exists in your project
 
@@ -140,7 +152,7 @@ public class DeckDisplayManager : MonoBehaviour
     }
 
     // Helper to set layer recursively
-    void SetLayerRecursively(GameObject obj, int newLayer)
+    static void SetLayerRecursively(GameObject obj, int newLayer)
     {
         obj.layer = newLayer;
         foreach (Transform child in obj.transform)

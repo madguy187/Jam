@@ -21,6 +21,34 @@ public class Deck : IEnumerable<UnitObject> {
         }
     }
 
+    public void RemoveUnit(UnitObject unit) {
+        if (!IsValidUnitIndex(unit.index)) {
+            return;
+        }
+
+        _vecUnit[unit.index].transform.position = new Vector3(0.0f, -170.0f, 0.0f);
+
+        _vecUnit[unit.index] = null;
+    }
+
+    public UnitObject AddUnit(UnitObject unit) {
+        int nIndex = _GetEmptySlotIndex();
+        if (nIndex < 0) {
+            return null;
+        }
+
+        unit.index = nIndex;
+
+        Transform pos = _GetPosition(nIndex);
+        unit.transform.position = pos.position;
+
+        eUnitPosition eUnitPos = _GetUnitPosition(nIndex);
+        unit.SetUnitPosition(eUnitPos);
+
+        _vecUnit[nIndex] = unit;
+        return unit;
+    }
+
     public UnitObject AddUnit(GameObject prefab) {
         int nIndex = _GetEmptySlotIndex();
         if (nIndex < 0) {

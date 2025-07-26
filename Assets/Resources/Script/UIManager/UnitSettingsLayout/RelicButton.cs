@@ -9,7 +9,7 @@ public class RelicButton : MonoBehaviour
     public MockInventoryItem boundItem;
 
     // Initialize relic slot with relic and inventory item wrapper
-    public void Init(MockRelic relic, MockInventoryItem inventoryItem)
+    public void Init(RelicScriptableObject relic, MockInventoryItem inventoryItem)
     {
         if (relic == null) return;
 
@@ -17,8 +17,8 @@ public class RelicButton : MonoBehaviour
 
         if (iconImage != null)
         {
-            iconImage.sprite = relic.icon;
-            iconImage.enabled = relic.icon != null;
+            iconImage.sprite = relic.GetRelicSprite();
+            iconImage.enabled = relic.GetRelicSprite() != null;
         }
     }
 }

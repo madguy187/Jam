@@ -58,6 +58,12 @@ public static class DeckHelperFunc {
         });
     }
 
+    public static List<UnitObject> GetAllUnitIncludeEmpty(Deck cDeck) {
+        return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
+            return true;
+        });
+    }
+
     public static List<UnitObject> GetAllAliveUnit(Deck cDeck) {
         return cDeck.GetUnitByPredicate(delegate (UnitObject unit) {
             if (unit == null) {

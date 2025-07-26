@@ -143,6 +143,7 @@ MonoBehaviour:
   boundItem:
     itemType: 0
     unitData:
+      uiGameObject: {fileID: 0}
       unitName: 
       level: 0
       maxHP: 0
@@ -186,6 +187,7 @@ MonoBehaviour:
   draggedItem:
     itemType: 0
     unitData:
+      uiGameObject: {fileID: 0}
       unitName: 
       level: 0
       maxHP: 0
@@ -202,6 +204,7 @@ MonoBehaviour:
       bonusHP: 0
       bonusAttack: 0
       bonusDefense: 0
+  bShouldRemoveFromInventory: 0
 --- !u!114 &1521225764846984686
 MonoBehaviour:
   m_ObjectHideFlags: 0

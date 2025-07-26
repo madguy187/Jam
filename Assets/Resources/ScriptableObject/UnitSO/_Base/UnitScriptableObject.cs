@@ -7,11 +7,18 @@ public enum eUnitArchetype {
     ELF,
 }
 
+public enum eUnitTier {
+    STAR_1,
+    STAR_2,
+    STAR_3,
+}
+
 [CreateAssetMenu(menuName = "Scriptable Object/Unit/UnitScriptableObject")]
 public class UnitScriptableObject : ScriptableObject {
 
 #if UNITY_EDITOR
     public void SetunitName(string _unitName) { unitName = _unitName; }
+    public void SetunitTier(eUnitTier _eTier) { eTier = _eTier; }
     public void SetunitArchetype(eUnitArchetype _eUnitArchetype) { eUnitArchetype = _eUnitArchetype; }
     public void Sethp(float _hp) { hp = _hp; }
     public void Setattack(float _attack) { attack = _attack; }
@@ -21,6 +28,9 @@ public class UnitScriptableObject : ScriptableObject {
     public void SetcritMulti(int _critMulti) { critMulti = _critMulti; }
 #endif
     public string unitName;
+
+    [Header("Unit Stat")]
+    public eUnitTier eTier = eUnitTier.STAR_1;
 
     [Header("Main Stats")]
     public eUnitArchetype eUnitArchetype = eUnitArchetype.NONE;

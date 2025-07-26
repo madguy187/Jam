@@ -15,8 +15,7 @@ public class MockUnit
     public List<MockRelic> equippedRelics;
     public Sprite icon;
 
-    public MockUnit(string name, int lvl, Sprite icon) 
-    {
+    public MockUnit(string name, int lvl, Sprite icon) {
         unitName = name;
         level = lvl;
         maxHP = 100 + lvl * 10;

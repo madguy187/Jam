@@ -38,7 +38,7 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
             if (ItemTracker.Instance != null) {
                 var dropZone = originalParent.gameObject.GetComponentInParent<DropZone>();
                 if (dropZone != null) {
-                    ItemTracker.Instance.RemoveItem(dropZone.trackerType, draggedItem.GetItemType());
+                    ItemTracker.Instance.RemoveItem(dropZone.trackerType, draggedItem.itemType, draggedItem);
                     Global.DEBUG_PRINT($"[DragHandler::OnDropAccepted] Item {draggedItem.itemType} removed from tracker {dropZone.trackerType}");
                 } else {
                     Global.DEBUG_PRINT("[DragHandler::OnBeginDrag] DropZone is null for originalParent: " + originalParent.gameObject.name);
@@ -102,10 +102,10 @@ public class DragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndD
                 var activeUnit = layout?.ActiveUnit;
 
                 if (activeUnit != null && draggedItem.itemType == MockItemType.Relic) {
-                    activeUnit.UnequipRelic(draggedItem.relicData);
+                    activeUnit.RemoveRelic(draggedItem.relicData);
                     // layout.RefreshRelicUI();
                     // Destroy(gameObject);
-                    Global.DEBUG_PRINT($"[DragHandler] Unequipped relic {draggedItem.relicData.relicName} from {activeUnit.unitName}");
+                    Global.DEBUG_PRINT($"[DragHandler] Unequipped relic {draggedItem.relicData.name} from {activeUnit.name}");
                 }
             }
         }

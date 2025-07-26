@@ -1,10 +1,13 @@
+using System;
+using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public enum TrackerType
-{
+public enum TrackerType {
     BagContainer,
     UnitContainer,
-    RelicContainer
+    RelicContainer,
+    Revive
 }
 
 public class ItemTracker : MonoBehaviour {
@@ -14,14 +17,24 @@ public class ItemTracker : MonoBehaviour {
     [SerializeField] public int maxUnits = 5; // For UnitContainer
     [SerializeField] public int maxRelics = 15; // For RelicContainer
     [SerializeField] public int maxItems = 40; // For BagContainer (combined units + relics)
+    [SerializeField] public int maxRevive = 1; // For revival (units)
 
     [Header("Debug Info")]
     public int currentUnits = 0;
     public int currentRelics = 0;
     public int currentBagItems = 0;
+    public int currentRevive = 0;
 
-    private void Awake()
-    {
+    Dictionary<TrackerType, Action<MockItemType, MockInventoryItem>> mapOnAdd = new Dictionary<TrackerType, Action<MockItemType, MockInventoryItem>>();
+    Dictionary<TrackerType, Action<MockItemType, MockInventoryItem>> mapOnRemove = new Dictionary<TrackerType, Action<MockItemType, MockInventoryItem>>();
+    public void AddOnAdd(TrackerType type, Action<MockItemType, MockInventoryItem> action) {
+        mapOnAdd[type] = action;
+    }
+    public void AddOnRemove(TrackerType type, Action<MockItemType, MockInventoryItem> action) {
+        mapOnRemove[type] = action;
+    }
+
+    private void Awake() {
         if (Instance != null && Instance != this) {
             Destroy(gameObject); // Prevent duplicates
             return;
@@ -39,70 +52,68 @@ public class ItemTracker : MonoBehaviour {
                 return itemType == MockItemType.Relic && currentRelics < maxRelics;
             case TrackerType.BagContainer:
                 return currentBagItems < maxItems;
+            case TrackerType.Revive:
+                return itemType == MockItemType.Unit && currentRevive < maxRevive;
             default:
                 return false;
         }
     }
 
-    public bool AddItem(TrackerType trackerType, MockItemType itemType)
-    {
+    public bool AddItem(TrackerType trackerType, MockItemType itemType, MockInventoryItem item = null) {
         if (!CanAccept(trackerType, itemType)) {
             Global.DEBUG_PRINT($"[ItemTracker::AddItem] Cannot add item of type {itemType} to {trackerType}. Limit reached.");
             return false;
         }
 
+        if (mapOnAdd.ContainsKey(trackerType)) {
+            mapOnAdd[trackerType](itemType, item);
+        }
+
+        UpdateCount(trackerType, 1);
+
+        return true;
+    }
+
+    void UpdateCount(TrackerType trackerType, int count) {
         switch (trackerType) {
             case TrackerType.UnitContainer:
-                currentUnits++;
-                return true;
+                currentUnits += count;
+                break;
             case TrackerType.RelicContainer:
-                currentRelics++;
-                return true;
+                currentRelics += count;
+                break;
             case TrackerType.BagContainer:
-                currentBagItems++;
-                return true;
+                currentBagItems += count;
+                break;
+            case TrackerType.Revive:
+                currentRevive += count;
+                break;
             default:
-                return false;
+                break;
         }
     }
 
-    public bool RemoveItem(TrackerType trackerType, MockItemType itemType)
-    {
-        switch (trackerType) {
-            case TrackerType.UnitContainer:
-                if (currentUnits > 0) {
-                    currentUnits--;
-                    return true;
-                }
-                break;
-
-            case TrackerType.RelicContainer:
-                if (currentRelics > 0) {
-                    currentRelics--;
-                    return true;
-                }
-                break;
-
-            case TrackerType.BagContainer:
-                if (currentBagItems > 0) {
-                    currentBagItems--;
-                }
-                break;
+    public bool RemoveItem(TrackerType trackerType, MockItemType itemType, MockInventoryItem item = null) {
+        if (mapOnRemove.ContainsKey(trackerType)) {
+            mapOnRemove[trackerType](itemType, item);
         }
-        return false;
+        
+        UpdateCount(trackerType, -1);
+
+        return true;
     }
-    public int GetCurrentCount(MockItemType itemType)
-    {
+
+    public int GetCurrentCount(MockItemType itemType) {
         return itemType == MockItemType.Unit ? currentUnits : currentRelics;
     }
 
     public int GetCurrentBagItemCount() => currentBagItems;
 
-    public void ClearItems()
-    {
+    public void ClearItems() {
         currentUnits = 0;
         currentRelics = 0;
         currentBagItems = 0;
+        currentRevive = 0;
     }
     
     public void ResetCurrentRelicCount()

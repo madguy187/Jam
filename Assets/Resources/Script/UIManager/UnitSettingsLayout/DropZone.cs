@@ -81,7 +81,11 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
             return;
         }
 
-        UnitSettingLayout layout = GetComponentInParent<UnitSettingLayout>();
+        //UnitSettingLayout layout = GetComponentInParent<UnitSettingLayout>();
+        UnitSettingLayout layout = UnitSettingLayout.instance;
+        if (layout == null) {
+            Global.DEBUG_PRINT("[DropZone::OnDrop] layout null.");
+        }
         MockPlayerInventory inventory = layout?.ActiveInventory;
 
         if (inventory == null) {
@@ -94,7 +98,7 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
 
         // === Handle relics ===
         if (draggedItemType == MockItemType.Relic) {
-            MockUnit activeUnit = layout?.ActiveUnit;
+            UnitObject activeUnit = layout?.ActiveUnit;
 
             if (activeUnit == null) {
                 Global.DEBUG_PRINT("[DropZone::OnDrop] No active unit to equip/unequip relic.");
@@ -104,17 +108,17 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
 
             if (trackerType == TrackerType.BagContainer) {
                 // Unequip relic
-                bool success = activeUnit.UnequipRelic(draggedItem.relicData);
+                bool success = activeUnit.RemoveRelic(draggedItem.relicData);
                 if (success) {
                     inventory.bagItems.Remove(draggedItem);
                 } else {
-                    Global.DEBUG_PRINT($"[DropZone::OnDrop] Relic {draggedItem.relicData.relicName} not found on {activeUnit.unitName}.");
+                    Global.DEBUG_PRINT($"[DropZone::OnDrop] Relic {draggedItem.relicData.name} not found on {activeUnit.name}.");
                     dragHandler.OnDropRejected();
                     return;
                 }
             } else if (allowedType == AllowedItemType.RelicsOnly) {
                 // Equip relic
-                activeUnit.EquipRelic(draggedItem.relicData);
+                activeUnit.AddRelic(draggedItem.relicData);
                 inventory.bagItems.Remove(draggedItem);
             }
         }
@@ -122,11 +126,13 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
         // Handle units
         if (draggedItemType == MockItemType.Unit) {
             if (trackerType == TrackerType.BagContainer) {
-                inventory.MoveUnitToBag(draggedItem.unitData);
-                Global.DEBUG_PRINT($"[DropZone::OnDrop] Moved {draggedItem.unitData.unitName} to Bag");
+                //ItemTracker.Instance.AddItem(TrackerType.BagContainer, MockItemType.Unit, draggedItem);
+                //inventory.MoveUnitToBag(draggedItem);
+                Global.DEBUG_PRINT($"[DropZone::OnDrop] Moved {draggedItem.unitData.name} to Bag");
             } else if (trackerType == TrackerType.UnitContainer) {
-                inventory.MoveUnitToTeam(draggedItem);
-                Global.DEBUG_PRINT($"[DropZone::OnDrop] Moved {draggedItem.unitData.unitName} to Team");
+                //ItemTracker.Instance.RemoveItem(TrackerType.BagContainer, MockItemType.Unit, draggedItem);
+                //inventory.MoveUnitToTeam(draggedItem);
+                Global.DEBUG_PRINT($"[DropZone::OnDrop] Moved {draggedItem.unitData.name} to Team");
             }
         }
 
@@ -137,7 +143,7 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
         }
 
         LayoutRebuilder.MarkLayoutForRebuild(contentParent.GetComponent<RectTransform>());
-        itemTracker.AddItem(trackerType, draggedItemType);
+        itemTracker.AddItem(trackerType, draggedItemType, draggedItem);
         dragHandler.OnDropAccepted();
     }
 
@@ -149,7 +155,7 @@ public class DropZone : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
             if (slot.childCount == 0)
             {
                 // Snap to this slot
-                draggedGO.transform.SetParent(slot, false);
+                draggedGO.transform.SetParent(slot, true);
 
                 // Stretch to fit
                 RectTransform rt = draggedGO.GetComponent<RectTransform>();

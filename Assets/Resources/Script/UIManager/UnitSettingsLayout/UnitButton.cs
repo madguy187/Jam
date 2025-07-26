@@ -9,8 +9,8 @@ public class UnitButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public Image unitIcon;
     public TMP_Text nameText;
 
-    private MockUnit unitData;
-    private Action<MockUnit> onClickCallback;
+    private UnitObject unitData;
+    private Action<UnitObject> onClickCallback;
 
     // This is the inventory wrapper holding the unit or relic reference
     public MockInventoryItem boundItem;
@@ -25,7 +25,7 @@ public class UnitButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     }
 
     // Initialize with the unit and click callback, plus assign the inventory item
-    public void Init(MockUnit unit, MockInventoryItem inventoryItem, Action<MockUnit> onClick) {
+    public void Init(UnitObject unit, MockInventoryItem inventoryItem, Action<UnitObject> onClick) {
         unitData = unit;
         boundItem = inventoryItem;
         onClickCallback = onClick;
@@ -33,16 +33,18 @@ public class UnitButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         GetComponent<Button>().onClick.RemoveAllListeners(); // Safe rebind
         GetComponent<Button>().onClick.AddListener(OnClick);
 
-        nameText.text = unit.unitName;
-        if (unit.icon != null) {
-            unitIcon.sprite = unit.icon;
+        nameText.text = unit.unitSO.unitName;
+
+        Sprite sprite = DeckDisplayManager.RenderUnitToSprite(unit);
+        if (sprite != null) {
+            unitIcon.sprite = sprite;
         }
 
         SetSelected(false);
         SetHover(false);
     }
 
-    public void Init(MockUnit unit, Action<MockUnit> onClick) {
+    public void Init(UnitObject unit, Action<UnitObject> onClick) {
         Init(unit, null, onClick); // Call the main Init with null for boundItem
     }
 
@@ -66,7 +68,7 @@ public class UnitButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         unitIcon.rectTransform.localScale = isSelected ? selectedScale : normalScale;
     }
 
-    public MockUnit GetUnit() => unitData;
+    public UnitObject GetUnit() => unitData;
     
     public void OnPointerEnter(PointerEventData eventData)
     {
