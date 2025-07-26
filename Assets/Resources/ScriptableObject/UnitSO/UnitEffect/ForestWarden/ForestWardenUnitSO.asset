@@ -12,14 +12,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae3f48536174bf64a82442a0e1e19f19, type: 3}
   m_Name: ForestWardenUnitSO
   m_EditorClassIdentifier: 
-  unitName: Forest Warden
+  unitName: ForestWarden
   eUnitArchetype: 3
-  hp: 18
-  attack: 2
-  shield: 1
-  res: 2
-  critRate: 20
-  critMulti: 160
+  hp: 20
+  attack: 3
+  shield: 2
+  res: 3
+  critRate: 5
+  critMulti: 125
   singleMatchDescription: 
   horizontalMatchDescription: 
   diagonalMatchDescription: 

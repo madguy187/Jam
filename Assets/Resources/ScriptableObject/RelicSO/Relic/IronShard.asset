@@ -12,5 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5582afcca3112d4db68ad91c7708617, type: 3}
   m_Name: IronShard
   m_EditorClassIdentifier: 
+  strRelicName: 
+  spriteRelic: {fileID: 0}
   listEffect:
-  - {fileID: 11400000, guid: 63e5ee0306f9e824698de52c650657ba, type: 2}
+  - {fileID: 11400000, guid: 39b55ff98a3364842b7374f7b5fc51a0, type: 2}

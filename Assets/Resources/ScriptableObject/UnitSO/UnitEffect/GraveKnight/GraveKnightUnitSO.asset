@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae3f48536174bf64a82442a0e1e19f19, type: 3}
   m_Name: GraveKnightUnitSO
   m_EditorClassIdentifier: 
-  unitName: Grave Knight
+  unitName: GraveKnight
   eUnitArchetype: 2
   hp: 26
   attack: 4

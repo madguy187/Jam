@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae3f48536174bf64a82442a0e1e19f19, type: 3}
   m_Name: HolyBladeUnitSO
   m_EditorClassIdentifier: 
-  unitName: Holy Blade
+  unitName: HolyBlade
   eUnitArchetype: 1
   hp: 20
   attack: 6

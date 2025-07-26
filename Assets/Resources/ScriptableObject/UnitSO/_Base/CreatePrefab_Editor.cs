@@ -215,8 +215,6 @@ public class CreatePrefabFromMenu {
         List<EffectScriptableObject> effects = Resources.LoadAll<EffectScriptableObject>(relic_effect_path).ToList();
         relicSO.SetEffectList(effects);
 
-        Debug.Log("enter");
-
         EditorUtility.SetDirty(relicSO);
     }
 
