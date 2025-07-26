@@ -1,2 +1,12 @@
 name,unit_archetype,hp,shield,atk,res,crit_rate,crit_multi
 Paladin,HOLY,28,3,3,1,5,125
+Cleric,HOLY,22,2,2,4,5,125
+IceProphet,HOLY,18,2,2,2,10,150
+HolyBlade,HOLY,20,1,6,2,25,175
+BoneShaman,UNDEAD,20,1,2,3,5,125
+GraveKnight,UNDEAD,26,6,4,2,5,125
+Shadowblade,UNDEAD,13,1,7,1,25,175
+Soulpiercer,UNDEAD,17,2,7,1,20,160
+Windstalker,ELF,18,1,7,1,30,210
+ForestWarden,ELF,20,2,3,3,5,125
+Moonveil,ELF,18,1,2,2,20,160
