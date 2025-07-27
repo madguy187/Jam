@@ -11402,6 +11402,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SoulPiercer
       objectReference: {fileID: 0}
+    - target: {fileID: 4972551795953054476, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 0}

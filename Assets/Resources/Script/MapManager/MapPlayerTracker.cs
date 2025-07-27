@@ -97,12 +97,16 @@ namespace Map
                     SceneManager.LoadScene("Game");
                     break;
                 case NodeType.Encounter:
+                    mapManager.SaveMap();
+                    SceneManager.LoadScene("Game_StoryTeller");
                     break;
                 case NodeType.Necromancer:
                     mapManager.SaveMap();
                     SceneManager.LoadScene("Game_Necromancer");
                     break;
                 case NodeType.Shop:
+                    mapManager.SaveMap();
+                    SceneManager.LoadScene("Game_Shop");
                     break;
                 case NodeType.MiniBoss:
                     // Save map state before leaving
