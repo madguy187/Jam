@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: GoblinEnforcerUnitSO
   m_EditorClassIdentifier: 
   unitName: GoblinEnforcer
+  unitDescription: This is a unit description
+  unitCost: 0
   eTier: 1
   eUnitArchetype: 4
   hp: 28

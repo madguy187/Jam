@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: GoblinScoutUnitSO
   m_EditorClassIdentifier: 
   unitName: GoblinScout
+  unitDescription: This is a unit description
+  unitCost: 0
   eTier: 0
   eUnitArchetype: 4
   hp: 14

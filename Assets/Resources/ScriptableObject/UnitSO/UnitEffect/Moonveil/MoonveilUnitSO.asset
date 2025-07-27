@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: MoonveilUnitSO
   m_EditorClassIdentifier: 
   unitName: Moonveil
+  unitDescription: This is a unit description
+  unitCost: 0
   eTier: 2
   eUnitArchetype: 3
   hp: 18
