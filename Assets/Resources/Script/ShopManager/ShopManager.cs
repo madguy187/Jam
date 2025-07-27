@@ -51,7 +51,6 @@ public class ShopManager : MonoBehaviour
 
     void GenerateShopItems()
     {
-        Global.DEBUG_PRINT("[ShopManager::GenerateShopItems] Generating shop items...");
         for (int i = 0; i < itemUIs.Count; i++)
         {
             if (!itemUIs[i].Item.isSold)

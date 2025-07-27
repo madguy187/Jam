@@ -97,6 +97,8 @@ namespace Map
                     SceneManager.LoadScene("Game");
                     break;
                 case NodeType.Encounter:
+                    mapManager.SaveMap();
+                    SceneManager.LoadScene("Game_StoryTeller");
                     break;
                 case NodeType.Necromancer:
                     mapManager.SaveMap();
