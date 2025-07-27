@@ -10,11 +10,11 @@ Soulpiercer,UNDEAD,STAR_2,17,2,7,1,20,160
 Windstalker,ELF,STAR_3,18,1,7,1,30,210
 ForestWarden,ELF,STAR_3,20,2,3,3,5,125
 Moonveil,ELF,STAR_3,18,1,2,2,20,160
-Cave Rat,MOB,STAR_1,12,0,2,0,0,100
+CaveRat,MOB,STAR_1,12,0,2,0,0,100
 GoblinScout,MOB,STAR_1,14,1,3,0,5,110
 Slime,MOB,STAR_1,18,2,1,2,0,100
 SkeletalCrawler,MOB,STAR_1,15,0,2,1,0,100
 GoblinEnforcer,MOB,STAR_2,28,3,5,2,10,125
 Hound,MOB,STAR_2,22,1,4,1,15,130
-Bone Archer,MOB,STAR_2,20,0,6,0,20,150
-Widow Queen,MOB,STAR_3,36,3,7,2,25,175
+BoneArcher,MOB,STAR_2,20,0,6,0,20,150
+WidowQueen,MOB,STAR_3,36,3,7,2,25,175
