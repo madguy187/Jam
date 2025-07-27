@@ -21,7 +21,10 @@ public class ShopManager : MonoBehaviour
     public int refreshCost = 10;
     public float randomizeValue = 0.5f; // Adjust this to control the randomness of item selection
 
-    private void Start() {
+    private void Start()
+    {
+        var refreshButtonText = refreshButton.GetComponentInChildren<TextMeshProUGUI>();
+        refreshButtonText.text = $"Refresh ({refreshCost}g)";
         refreshButton.onClick.AddListener(OnRefreshClicked);
         GenerateDummyItems();
         GenerateShopItems();
