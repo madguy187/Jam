@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: WidowQueenUnitSO
   m_EditorClassIdentifier: 
   unitName: WidowQueen
+  unitDescription: This is a unit description
+  unitCost: 0
   eTier: 2
   eUnitArchetype: 4
   hp: 36

@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: SoulpiercerUnitSO
   m_EditorClassIdentifier: 
   unitName: Soulpiercer
+  unitDescription: This is a unit description
+  unitCost: 0
   eTier: 1
   eUnitArchetype: 2
   hp: 17

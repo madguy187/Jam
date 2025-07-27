@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: BoneArcherUnitSO
   m_EditorClassIdentifier: 
   unitName: BoneArcher
+  unitDescription: This is a unit description
+  unitCost: 0
   eTier: 1
   eUnitArchetype: 4
   hp: 20
