@@ -122,6 +122,8 @@ public class UnitObject : MonoBehaviour {
     public void Awake() {
         _prefabs = GetComponent<SPUM_Prefabs>();
         _prefabs.OverrideControllerInit();
+
+        DontDestroyOnLoad(gameObject);
     }
 
     public void Update() {
@@ -137,7 +139,6 @@ public class UnitObject : MonoBehaviour {
     public void Init(bool isEnemy = false) {
         float hp = unitSO.hp;
         if (isEnemy) {
-            Debug.Log("enter");
             hp *= EnemyManager.instance.GetDifficultyHealthPercent(IsBoss());
         }
         _currentHealth.SetVal(hp);
