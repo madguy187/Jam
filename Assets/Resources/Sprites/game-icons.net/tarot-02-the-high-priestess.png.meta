@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      tarot-02-the-high-priestess_0: -680577576742455041
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
