@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CombatManager : MonoBehaviour {
     enum eCombatState {
@@ -21,6 +22,8 @@ public class CombatManager : MonoBehaviour {
     int _nAttackerIndex = Global.INVALID_INDEX;
 
     List<Match> _listMatch = null;
+
+    string sceneNameOnFinish = "";
 
     void Awake() {
         if (instance != null) {
@@ -69,14 +72,6 @@ public class CombatManager : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            UnitSettingLayout.instance.OpenLayout();
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2)) {
-            UnitSettingLayout.instance.CloseLayout();
-        }
-
         switch (_state) {
             case eCombatState.WAIT:
                 return;
@@ -90,8 +85,28 @@ public class CombatManager : MonoBehaviour {
                 _state = eCombatState.WAIT;
                 _listMatch = null;
                 DeckManager.instance.ResolveTurnTempEffect();
+                _CheckEnd();
                 break;
         }
+    }
+
+    void _CheckEnd() {
+        List<UnitObject> listPlayerUnit = DeckHelperFunc.GetAllAliveUnit(DeckManager.instance.GetDeckByType(eDeckType.PLAYER));
+        List<UnitObject> listEnemyUnit = DeckHelperFunc.GetAllAliveUnit(DeckManager.instance.GetDeckByType(eDeckType.ENEMY));
+        if (listPlayerUnit.Count <= 0) {
+            sceneNameOnFinish = "Game_MainMenu";
+            UIFade.instance.FadeOut(2.0f);
+            UIFade.instance.SetOnFadeFinish(_SceneChangeFunc);
+        }
+        else if (listEnemyUnit.Count <= 0) {
+            sceneNameOnFinish = "Game_Map";
+            UIFade.instance.SetOnFadeFinish(_SceneChangeFunc);
+        }
+    }
+
+    void _SceneChangeFunc() {
+        UIFade.instance.FadeIn(2.0f);
+        SceneManager.LoadScene(sceneNameOnFinish);
     }
 
     void _AttackUpdate() {

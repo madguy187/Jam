@@ -50,7 +50,7 @@ public class ResourceManager : MonoBehaviour {
         return _mapRelicSO.ElementAt(rand).Value;
     }
 
-    public UnitObject CreateUnit(GameObject objPrefab) {
+    public UnitObject CreateUnit(GameObject objPrefab, bool isEnemy = false) {
         GameObject obj = Instantiate(objPrefab);
         if (obj == null) {
             return null;
@@ -67,7 +67,7 @@ public class ResourceManager : MonoBehaviour {
             unit.gameObject.AddComponent<UnitClickHandler>();
         }
 
-        unit.Init();
+        unit.Init(isEnemy);
 
         return unit;
     }
