@@ -97,7 +97,7 @@ public class RewardSceneManager : MonoBehaviour
         rewardIcon.sprite = item.icon;
         rewardName.text = item.name;
         rewardDesc.text = item.description;
-        claimButtonText.text = $"Claim {item.name}";
+        claimButtonText.text = $"Claim {RewardItemTypeConverter.ToString(item.type)}";
         claimButton.onClick.RemoveAllListeners();
         claimButton.onClick.AddListener(() => OnClaimPressed());
     }
