@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: PaladinUnitSO
   m_EditorClassIdentifier: 
   unitName: Paladin
+  eTier: 0
   eUnitArchetype: 1
   hp: 28
   attack: 3

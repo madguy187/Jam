@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: ShadowbladeUnitSO
   m_EditorClassIdentifier: 
   unitName: Shadowblade
+  eTier: 1
   eUnitArchetype: 2
   hp: 13
   attack: 7

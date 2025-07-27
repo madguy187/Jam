@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: IceProphetUnitSO
   m_EditorClassIdentifier: 
   unitName: IceProphet
+  eTier: 1
   eUnitArchetype: 1
   hp: 18
   attack: 2

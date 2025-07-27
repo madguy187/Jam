@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: HolyBladeUnitSO
   m_EditorClassIdentifier: 
   unitName: HolyBlade
+  eTier: 2
   eUnitArchetype: 1
   hp: 20
   attack: 6
