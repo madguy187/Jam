@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 namespace StoryManager
 {
@@ -133,11 +134,8 @@ namespace StoryManager
 
         private static Sprite GetIconFromPrefab(GameObject prefab)
         {
-            GameObject temp = Instantiate(prefab);
-            SpriteRenderer spriteRenderer = temp.GetComponentInChildren<SpriteRenderer>();
-            Sprite icon = spriteRenderer != null ? spriteRenderer.sprite : null;
-            DestroyImmediate(temp);
-            return icon;
+            SpriteRenderer sr = prefab.GetComponentInChildren<SpriteRenderer>(true);
+            return sr != null ? sr.sprite : null;
         }
 
         private void InitialiseUnitSlots()
@@ -200,7 +198,7 @@ namespace StoryManager
             }
             else
             {
-                Debug.Log("RecruitController: proceed to next scene.");
+                SceneManager.LoadScene("Game_Map");
             }
         }
 
