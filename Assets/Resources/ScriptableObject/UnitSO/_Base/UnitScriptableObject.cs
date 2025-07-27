@@ -28,7 +28,11 @@ public class UnitScriptableObject : ScriptableObject {
     public void SetcritRate(int _critRate) { critRate = _critRate; }
     public void SetcritMulti(int _critMulti) { critMulti = _critMulti; }
 #endif
-    public string unitName;
+    [SerializeField] public string unitName = "";
+    [SerializeField] public string unitDescription = "This is a unit description";
+    // [SerializeField] Sprite spriteRelic = null;  // Can't have this as it unit contains multiple sprites
+    [SerializeField] public int unitCost = 0;
+    
 
     [Header("Unit Stat")]
     public eUnitTier eTier = eUnitTier.STAR_1;
@@ -59,6 +63,21 @@ public class UnitScriptableObject : ScriptableObject {
     public string xShapeMatchDescription = "";
     [TextArea(2,3)]
     public string fullGridMatchDescription = "";
+
+    public string GetUnitName() 
+    {
+        return unitName;
+    }
+    
+    public string GetUnitDescription()
+    {
+        return unitDescription;
+    }
+
+    public int GetUnitCost() 
+    {
+        return unitCost;
+    }
 
     public string GetSkillDescription(MatchType matchType)
     {

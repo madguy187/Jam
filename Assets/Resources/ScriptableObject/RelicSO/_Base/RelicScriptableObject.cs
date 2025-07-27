@@ -12,17 +12,35 @@ public class RelicScriptableObject : ScriptableObject, IEnumerable<EffectScripta
 #endif
     
     [SerializeField] string strRelicName = "";
+    [SerializeField] string strRelicDescription = "This is a relic description";
+    [SerializeField] int relicCost = 0;
     [SerializeField] Sprite spriteRelic = null;
     [SerializeField] List<EffectScriptableObject> listEffect;
 
-    public string GetRelicName() {
+    public string GetRelicName() 
+    {
         return strRelicName;
     }
+    
+    public string GetRelicDescription() 
+    {
+        return strRelicDescription;
+    }
 
-    public Sprite GetRelicSprite() {
+    public Sprite GetRelicSprite() 
+    {
         return spriteRelic;
     }
-    
+
+    public int GetRelicCost() 
+    {
+        return relicCost;
+    }
+
+    public List<EffectScriptableObject> GetEffectList() {
+        return listEffect;
+    }
+
     // For IEnumerable<EffectScriptableObject>
     public IEnumerator<EffectScriptableObject> GetEnumerator() { return listEffect.GetEnumerator(); }
     IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
