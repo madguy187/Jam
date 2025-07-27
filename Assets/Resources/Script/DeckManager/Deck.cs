@@ -55,7 +55,7 @@ public class Deck : IEnumerable<UnitObject> {
             return null;
         }
 
-        UnitObject unit = ResourceManager.instance.CreateUnit(prefab);
+        UnitObject unit = ResourceManager.instance.CreateUnit(prefab, _eType == eDeckType.ENEMY);
         if (unit == null) {
             return null;
         }
