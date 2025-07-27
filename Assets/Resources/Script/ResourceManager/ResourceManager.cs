@@ -113,4 +113,9 @@ public class ResourceManager : MonoBehaviour {
 
         textComp.Init(pos, lifetime, text);
     }
+
+    public List<GameObject> GetAllUnitPrefabs()
+    {
+        return _mapUnitSO.Values.ToList();
+    }
 }
