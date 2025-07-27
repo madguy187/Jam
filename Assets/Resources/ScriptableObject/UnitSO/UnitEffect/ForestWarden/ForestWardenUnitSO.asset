@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: ForestWardenUnitSO
   m_EditorClassIdentifier: 
   unitName: ForestWarden
+  eTier: 2
   eUnitArchetype: 3
   hp: 20
   attack: 3

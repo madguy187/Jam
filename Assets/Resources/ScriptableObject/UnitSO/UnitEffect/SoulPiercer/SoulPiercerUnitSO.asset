@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: SoulpiercerUnitSO
   m_EditorClassIdentifier: 
   unitName: Soulpiercer
+  eTier: 1
   eUnitArchetype: 2
   hp: 17
   attack: 7

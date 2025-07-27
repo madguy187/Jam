@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: ClericUnitSO
   m_EditorClassIdentifier: 
   unitName: Cleric
+  eTier: 0
   eUnitArchetype: 1
   hp: 22
   attack: 2
