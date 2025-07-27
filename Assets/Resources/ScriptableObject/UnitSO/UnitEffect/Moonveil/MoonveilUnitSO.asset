@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: MoonveilUnitSO
   m_EditorClassIdentifier: 
   unitName: Moonveil
+  eTier: 2
   eUnitArchetype: 3
   hp: 18
   attack: 2
