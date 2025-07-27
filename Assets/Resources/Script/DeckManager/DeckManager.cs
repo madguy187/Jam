@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using NUnit.Framework.Internal;
 using UnityEngine;
-using System.Linq;
-using Unity.VisualScripting;
 using UnityEditor;
 
 public enum eDeckType {
@@ -20,6 +17,71 @@ public class DeckManager : MonoBehaviour {
 
     Deck cPlayerDeck = new Deck();
     Deck cEnemyDeck = new Deck();
+
+    void Awake() {
+        if (instance != null) {
+            Destroy(gameObject);
+        } else {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+    }
+
+    void Start() {
+        {
+            List<UnitPosition> vecPos = new List<UnitPosition>();
+            UnitPosition[] vecPlayerUnitPos = _transPlayerPos.GetComponentsInChildren<UnitPosition>();
+            foreach (UnitPosition playerPos in vecPlayerUnitPos) {
+                vecPos.Add(playerPos);
+            }
+            cPlayerDeck.Init(eDeckType.PLAYER, vecPos);
+            Global.DEBUG_PRINT("[Deck] Loaded PlayerPos: " + vecPos.Count);
+        }
+
+        {
+            List<UnitPosition> vecPos = new List<UnitPosition>();
+            UnitPosition[] vecEnemyUnitPos = _transEnemyPos.GetComponentsInChildren<UnitPosition>();
+            foreach (UnitPosition enemyPos in vecEnemyUnitPos) {
+                vecPos.Add(enemyPos);
+            }
+            cEnemyDeck.Init(eDeckType.ENEMY, vecPos);
+            Global.DEBUG_PRINT("[Deck] Loaded EnemyPos: " + vecPos.Count);
+        }
+    }
+
+    public UnitObject AddUnit(eDeckType eType, string strUnitName) {
+        Deck cDeck = GetDeckByType(eType);
+        UnitObject unit = cDeck.AddUnit(strUnitName);
+
+        return unit;
+    }
+
+    public Deck GetDeckByType(eDeckType eType) {
+        Deck cDeck = null;
+
+        switch (eType) {
+            case eDeckType.PLAYER:
+                cDeck = cPlayerDeck;
+                break;
+            case eDeckType.ENEMY:
+                cDeck = cEnemyDeck;
+                break;
+            default:
+                break;
+        }
+
+        return cDeck;
+    }
+
+    public void ResolveTurnTempEffect() {
+        cPlayerDeck.ResolveTurn();
+        cEnemyDeck.ResolveTurn();
+    }
+
+    public void InitDeckEffect() {
+        cPlayerDeck.InitDeck();
+        cEnemyDeck.InitDeck();
+    }
 
 #if UNITY_EDITOR
     [Header("Debug")]
@@ -154,69 +216,4 @@ public class DeckManager : MonoBehaviour {
         }
     }
 #endif
-
-    void Awake() {
-        if (instance != null) {
-            Destroy(gameObject);
-        } else {
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-    }
-
-    void Start() {
-        {
-            List<UnitPosition> vecPos = new List<UnitPosition>();
-            UnitPosition[] vecPlayerUnitPos = _transPlayerPos.GetComponentsInChildren<UnitPosition>();
-            foreach (UnitPosition playerPos in vecPlayerUnitPos) {
-                vecPos.Add(playerPos);
-            }
-            cPlayerDeck.Init(eDeckType.PLAYER, vecPos);
-            Global.DEBUG_PRINT("[Deck] Loaded PlayerPos: " + vecPos.Count);
-        }
-
-        {
-            List<UnitPosition> vecPos = new List<UnitPosition>();
-            UnitPosition[] vecEnemyUnitPos = _transEnemyPos.GetComponentsInChildren<UnitPosition>();
-            foreach (UnitPosition enemyPos in vecEnemyUnitPos) {
-                vecPos.Add(enemyPos);
-            }
-            cEnemyDeck.Init(eDeckType.ENEMY, vecPos);
-            Global.DEBUG_PRINT("[Deck] Loaded EnemyPos: " + vecPos.Count);
-        }
-    }
-
-    public UnitObject AddUnit(eDeckType eType, string strUnitName) {
-        Deck cDeck = GetDeckByType(eType);
-        UnitObject unit = cDeck.AddUnit(strUnitName);
-
-        return unit;
-    }
-
-    public Deck GetDeckByType(eDeckType eType) {
-        Deck cDeck = null;
-
-        switch (eType) {
-            case eDeckType.PLAYER:
-                cDeck = cPlayerDeck;
-                break;
-            case eDeckType.ENEMY:
-                cDeck = cEnemyDeck;
-                break;
-            default:
-                break;
-        }
-
-        return cDeck;
-    }
-
-    public void ResolveTurnTempEffect() {
-        cPlayerDeck.ResolveTurn();
-        cEnemyDeck.ResolveTurn();
-    }
-
-    public void InitDeckEffect() {
-        cPlayerDeck.InitDeck();
-        cEnemyDeck.InitDeck();
-    }
 }

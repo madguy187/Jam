@@ -9,6 +9,9 @@ public class ResourceManager : MonoBehaviour {
     Dictionary<string, RelicScriptableObject> _mapRelicSO = new Dictionary<string, RelicScriptableObject>();
     Dictionary<EffectType, EffectDetailScriptableObject> _mapEffectDetailSO = new Dictionary<EffectType, EffectDetailScriptableObject>();
 
+    Dictionary<string, GameObject> _mapMobSO = new Dictionary<string, GameObject>();
+    Dictionary<string, eUnitTier> _mapMobTier = new Dictionary<string, eUnitTier>();
+
     [SerializeField] Sprite spriteDefault = null;
     public Sprite GetDefaultEffectSprite() { return spriteDefault; }
 
@@ -16,7 +19,8 @@ public class ResourceManager : MonoBehaviour {
 
     void Awake() {
         if (instance != null) {
-            Destroy(instance);
+            Destroy(gameObject);
+            return;
         }
 
         instance = this;
@@ -26,6 +30,23 @@ public class ResourceManager : MonoBehaviour {
             _mapUnitSO.Add(obj.name, prefabUnit);
         }
         Global.DEBUG_PRINT("[Resources] Loaded Units: " + _mapUnitSO.Count());
+
+        foreach (Object obj in Resources.LoadAll("ScriptableObject/UnitSO/Mob", typeof(GameObject)).ToList()) {
+            GameObject prefabUnit = (GameObject)obj;
+            _mapMobSO.Add(obj.name, prefabUnit);
+
+            UnitObject unitComp = prefabUnit.GetComponent<UnitObject>();
+            if (unitComp == null) {
+                Global.DEBUG_PRINT("Prefab does not have UnitObject component");
+                continue;
+            }
+
+            eUnitTier tier = unitComp.unitSO.eTier;
+            if (!_mapMobTier.ContainsKey(obj.name)) {
+                _mapMobTier.Add(obj.name, tier);
+            }
+        }
+        Global.DEBUG_PRINT("[Resources] Loaded Mob: " + _mapMobSO.Count());
 
         foreach (RelicScriptableObject obj in Resources.LoadAll("ScriptableObject/RelicSO/Relic", typeof(RelicScriptableObject)).ToList()) {
             RelicScriptableObject relicSO = obj;
@@ -50,7 +71,7 @@ public class ResourceManager : MonoBehaviour {
         return _mapRelicSO.ElementAt(rand).Value;
     }
 
-    public UnitObject CreateUnit(GameObject objPrefab) {
+    public UnitObject CreateUnit(GameObject objPrefab, bool isEnemy = false) {
         GameObject obj = Instantiate(objPrefab);
         if (obj == null) {
             return null;
@@ -67,7 +88,7 @@ public class ResourceManager : MonoBehaviour {
             unit.gameObject.AddComponent<UnitClickHandler>();
         }
 
-        unit.Init();
+        unit.Init(isEnemy);
 
         return unit;
     }
@@ -78,6 +99,28 @@ public class ResourceManager : MonoBehaviour {
         }
 
         return null;
+    }
+
+    public GameObject GetMob(string mobName) {
+        if (_mapMobSO.ContainsKey(mobName)) {
+            return _mapMobSO[mobName];
+        }
+
+        return null;
+    }
+
+    public List<string> GetRandMobByTier(eUnitTier eTier, int count) {
+        List<string> listResult = new List<string>();
+        foreach (KeyValuePair<string, eUnitTier> pair in _mapMobTier) {
+            eUnitTier tier = pair.Value;
+            if (tier != eTier) {
+                continue;
+            }
+
+            listResult.Add(pair.Key);
+        }
+
+        return DeckHelperFunc.PickRandomFromList(listResult, count);
     }
 
     public RelicScriptableObject GetRelic(string unitName) {

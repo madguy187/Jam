@@ -123,10 +123,10 @@ public static class DeckHelperFunc {
         return PickRandomFromList(listUnit, count);
     }
 
-    public static List<UnitObject> PickRandomFromList(List<UnitObject> list, int count) {
+    public static List<T> PickRandomFromList<T>(List<T> list, int count) {
         list.Shuffle();
 
-        List<UnitObject> listResult = new List<UnitObject>();
+        List<T> listResult = new List<T>();
         for (int i = 0; i < count; i++) {
             if (i >= list.Count) {
                 break;

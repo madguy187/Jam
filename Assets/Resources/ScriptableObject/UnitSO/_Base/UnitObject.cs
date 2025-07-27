@@ -122,6 +122,8 @@ public class UnitObject : MonoBehaviour {
     public void Awake() {
         _prefabs = GetComponent<SPUM_Prefabs>();
         _prefabs.OverrideControllerInit();
+
+        DontDestroyOnLoad(gameObject);
     }
 
     public void Update() {
@@ -134,14 +136,28 @@ public class UnitObject : MonoBehaviour {
         }
     }
 
-    public void Init() {
-        _currentHealth.SetVal(unitSO.hp);
-        _currentHealth.SetMax(unitSO.hp);
+    public void Init(bool isEnemy = false) {
+        float hp = unitSO.hp;
+        if (isEnemy) {
+            hp *= EnemyManager.instance.GetDifficultyHealthPercent(IsBoss());
+        }
+        _currentHealth.SetVal(hp);
+        _currentHealth.SetMax(hp);
 
-        _currentAttack.SetVal(unitSO.attack);
+        float atk = unitSO.attack;
+        if (isEnemy) {
+            atk += EnemyManager.instance.GetDifficultyAtk();
+        }
+        _currentAttack.SetVal(atk);
         _currentShield.SetVal(unitSO.shield);
         _currentRes.SetVal(unitSO.res);
-        _currentCritRate.SetVal(unitSO.critRate);
+
+        int critRate = unitSO.critRate;
+        if (isEnemy) {
+            critRate += EnemyManager.instance.GetDifficultyCritRate();
+        }
+        _currentCritRate.SetVal(critRate);
+
         _currentCritMulti.SetVal(unitSO.critMulti);
     }
 
@@ -293,11 +309,15 @@ public class UnitObject : MonoBehaviour {
         _bIsDead = true;
     }
 
-    public void PlayStateAnimation(PlayerState state){
+    public void PlayStateAnimation(PlayerState state) {
         if (_prefabs == null) {
             return;
         }
 
         _prefabs.PlayAnimation(state, 0);
+    }
+
+    public bool IsBoss() {
+        return unitSO.eUnitArchetype == eUnitArchetype.MOB && unitSO.eTier == eUnitTier.STAR_3; 
     }
 }

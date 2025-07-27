@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: GraveKnightUnitSO
   m_EditorClassIdentifier: 
   unitName: GraveKnight
+  unitDescription: This is a unit description
+  unitCost: 0
+  eTier: 0
   eUnitArchetype: 2
   hp: 26
   attack: 4

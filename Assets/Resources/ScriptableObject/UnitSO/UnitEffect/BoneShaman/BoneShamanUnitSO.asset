@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: BoneShamanUnitSO
   m_EditorClassIdentifier: 
   unitName: BoneShaman
+  unitDescription: This is a unit description
+  unitCost: 0
+  eTier: 0
   eUnitArchetype: 2
   hp: 20
   attack: 2

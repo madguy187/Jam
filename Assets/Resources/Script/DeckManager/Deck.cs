@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Deck : IEnumerable<UnitObject> {
@@ -31,8 +32,21 @@ public class Deck : IEnumerable<UnitObject> {
         _vecUnit[unit.index] = null;
     }
 
-    public UnitObject AddUnit(UnitObject unit) {
-        int nIndex = _GetEmptySlotIndex();
+    public void DestroyAllUnit() {
+        for (int i = 0; i < _vecUnit.Count; i++) {
+            if (_vecUnit[i] == null) {
+                continue;
+            }
+            GameObject.Destroy(_vecUnit[i]);
+            _vecUnit[i] = null;
+        }
+    }
+
+    public UnitObject AddUnit(UnitObject unit, int nIndex = -1) {
+        if (nIndex < 0) {
+            nIndex = _GetEmptySlotIndex();
+        }
+
         if (nIndex < 0) {
             return null;
         }
@@ -55,7 +69,7 @@ public class Deck : IEnumerable<UnitObject> {
             return null;
         }
 
-        UnitObject unit = ResourceManager.instance.CreateUnit(prefab);
+        UnitObject unit = ResourceManager.instance.CreateUnit(prefab, _eType == eDeckType.ENEMY);
         if (unit == null) {
             return null;
         }

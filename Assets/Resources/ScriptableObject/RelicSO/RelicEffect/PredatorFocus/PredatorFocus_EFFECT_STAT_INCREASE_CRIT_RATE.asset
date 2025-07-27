@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
+  m_Name: PredatorFocus_EFFECT_STAT_INCREASE_CRIT_RATE
+  m_EditorClassIdentifier: 
+  _eType: 10
+  _fEffectVal: 5
+  _eTargetType: 0
+  _eTargetCondition: 0
+  _fTargetParam: 0
+  _eExecType: 1
+  _effectAffinityType: 0
+  _effectResolveType: 0
+  _fEffectCount: 0

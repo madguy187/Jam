@@ -13,6 +13,9 @@ MonoBehaviour:
   m_Name: WindstalkerUnitSO
   m_EditorClassIdentifier: 
   unitName: Windstalker
+  unitDescription: This is a unit description
+  unitCost: 0
+  eTier: 2
   eUnitArchetype: 3
   hp: 18
   attack: 7
