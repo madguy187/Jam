@@ -103,6 +103,8 @@ namespace Map
                     SceneManager.LoadScene("Game_Necromancer");
                     break;
                 case NodeType.Shop:
+                    mapManager.SaveMap();
+                    SceneManager.LoadScene("Game_Shop");
                     break;
                 case NodeType.MiniBoss:
                     // Save map state before leaving

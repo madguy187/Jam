@@ -13,6 +13,7 @@ public class ShopItemUI : MonoBehaviour
 
     private ShopItem currentItem;
     private System.Action<ShopItem> onBuyCallback;
+    public ShopItem Item => currentItem;
 
     public void Setup(ShopItem item, System.Action<ShopItem> onBuy)
     {

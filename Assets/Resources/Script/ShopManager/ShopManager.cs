@@ -10,39 +10,27 @@ public class ShopManager : MonoBehaviour
     public Transform itemContainer;
     public ShopItemUI itemPrefab;
 
-    public List<ShopItem> relicPool = new();
-    public List<ShopItem> unitPool = new();
-
-    private List<ShopItemUI> itemUIs = new();
+    private List<ShopItemUI> itemUIs = new List<ShopItemUI>();
+    private Dictionary<ShopItem, MockInventoryItem> shopToMockInventoryMap = new Dictionary<ShopItem, MockInventoryItem>();
 
     private int currentGold = 100;
 
     [Header("Shop Settings")]
-    public int refreshCost = 10;
+    public int refreshCost = 2;
     public float randomizeValue = 0.5f; // Adjust this to control the randomness of item selection
 
     private void Start()
     {
+        if (MockPlayerInventoryHolder.Instance == null) {
+            Global.DEBUG_PRINT("[ShopManager::Start] MockPlayerInventoryHolder instance is null!");
+        } else {
+            currentGold = MockPlayerInventoryHolder.Instance.playerInventory.gold;
+        }
         var refreshButtonText = refreshButton.GetComponentInChildren<TextMeshProUGUI>();
         refreshButtonText.text = $"Refresh ({refreshCost}g)";
         refreshButton.onClick.AddListener(OnRefreshClicked);
-        GenerateDummyItems();
         GenerateShopItems();
         UpdateGoldUI();
-    }
-
-    void GenerateDummyItems()
-    {
-        // Replace with your actual icons
-        Sprite dummyIcon1 = Resources.Load<Sprite>("Sprites/game-icons.net/brute");
-        Sprite dummyIcon2 = Resources.Load<Sprite>("Sprites/game-icons.net/monk-face");
-        Sprite dummyIcon3 = Resources.Load<Sprite>("Sprites/game-icons.net/mounted-knight");
-        Sprite dummyIcon4 = Resources.Load<Sprite>("Sprites/game-icons.net/orc-head");
-
-        relicPool.Add(new ShopItem("Relic of Strength", "So strong", ShopItemType.Relic, 30, dummyIcon1));
-        relicPool.Add(new ShopItem("Relic of Speed", "So speedy", ShopItemType.Relic, 25, dummyIcon2));
-        unitPool.Add(new ShopItem("Warrior", "A brave warrior", ShopItemType.Unit, 40, dummyIcon3));
-        unitPool.Add(new ShopItem("Archer", "A skilled archer", ShopItemType.Unit, 35, dummyIcon4));
     }
 
     void UpdateGoldUI()
@@ -54,30 +42,102 @@ public class ShopManager : MonoBehaviour
     {
         if (currentGold < refreshCost) { return; }
         currentGold -= refreshCost;
+        if (MockPlayerInventoryHolder.Instance != null) {
+            MockPlayerInventoryHolder.Instance.playerInventory.gold = currentGold;
+        }
         GenerateShopItems();
         UpdateGoldUI();
     }
 
     void GenerateShopItems()
     {
-        foreach (Transform child in itemContainer) {
-            Destroy(child.gameObject); 
+        Global.DEBUG_PRINT("[ShopManager::GenerateShopItems] Generating shop items...");
+        for (int i = 0; i < itemUIs.Count; i++)
+        {
+            if (!itemUIs[i].Item.isSold)
+            {
+                ShopItem newItem = GetRandomItem();
+                itemUIs[i].Setup(newItem, OnItemBought);
+            }
+            // Keep sold-out items unchanged
         }
-        itemUIs.Clear();
 
-        for (int i = 0; i < 3; i++) {
-            ShopItem item = GetRandomItem();
+        // Fill up any empty slots (in case initial shop has fewer than 3)
+        while (itemUIs.Count < 3)
+        {
+            ShopItem newItem = GetRandomItem();
             var itemUI = Instantiate(itemPrefab, itemContainer);
-            itemUI.Setup(item, OnItemBought);
+            itemUI.Setup(newItem, OnItemBought);
             itemUIs.Add(itemUI);
         }
     }
 
     ShopItem GetRandomItem()
     {
+        // Randomly pick either a relic or a unit
         bool isRelic = Random.value > randomizeValue;
-        var pool = isRelic ? relicPool : unitPool;
-        return new ShopItem(pool[Random.Range(0, pool.Count)]);
+        var resourceManager = ResourceManager.instance;
+        if (resourceManager == null) {
+            Global.DEBUG_PRINT("[ShopManager::GetRandomItem] ResourceManager instance is null!");
+            return null; // Handle error appropriately
+        }
+
+        if (isRelic)
+        {
+            var relicSO = resourceManager.Debug_RandRelic();
+            var shopItem = new ShopItem(
+                relicSO.GetRelicName(),
+                relicSO.GetRelicDescription(),
+                ShopItemType.Relic,
+                relicSO.GetRelicCost(),
+                relicSO.GetRelicSprite()
+            );
+            shopToMockInventoryMap[shopItem] = new MockInventoryItem(relicSO);
+            return shopItem;
+        }
+        else
+        {
+            string unitKey = resourceManager.Debug_RandUnit();
+            GameObject unitPrefab = resourceManager.GetUnit(unitKey);
+            if (unitPrefab == null) {
+                Global.DEBUG_PRINT($"[ShopManager::GetRandomItem] Unit prefab not found for key: {unitKey}");
+                return null;
+            }
+            // Instantiate unit temporarily in the scene
+            GameObject unitInstance = GameObject.Instantiate(unitPrefab);
+            unitInstance.SetActive(true);
+            UnitObject unitObj = unitInstance.GetComponent<UnitObject>();
+            var so = unitObj.unitSO;
+            Sprite unitIcon = GetUnitSprite(unitInstance);
+    
+            var shopItem = new ShopItem(
+                so.GetUnitName(),
+                so.GetUnitDescription(),
+                ShopItemType.Unit,
+                so.GetUnitCost(),
+                unitIcon
+            );
+            shopToMockInventoryMap[shopItem] = new MockInventoryItem(unitObj);
+            Destroy(unitInstance); // Clean up the temporary unit instance
+            return shopItem;
+        }
+    }
+
+    Sprite GetUnitSprite(GameObject unit)
+    {
+        RenderTexture tex;
+        GameObject camObj;
+        var unitRoot = unit.transform.Find("UnitRoot");
+        if (unitRoot == null) {
+            Global.DEBUG_PRINT("[ShopManager::GetUnitSprite] UnitRoot not found on unitPrefab!");
+            GameObject.DestroyImmediate(unit);
+            return null; // Or handle error properly
+        }
+        (tex, camObj) = RenderUtilities.RenderUnitToTexture(unitRoot.gameObject, 1.25f);
+        Sprite unitIcon = RenderUtilities.ConvertRenderTextureToSprite(tex);
+        Destroy(camObj);
+        Destroy(tex);
+        return unitIcon;
     }
 
     void OnItemBought(ShopItem item)
@@ -86,6 +146,23 @@ public class ShopManager : MonoBehaviour
         currentGold -= item.cost;
         item.isSold = true;
         UpdateGoldUI();
+
+        if (ItemTracker.Instance == null)
+        {
+            Global.DEBUG_PRINT("[ShopManager::OnItemBought] ItemTracker instance is null!");
+        } else {
+            // For unit or relic
+            if (item.type == ShopItemType.Unit) {
+                ItemTracker.Instance.AddItem(TrackerType.BagContainer, MockItemType.Unit, shopToMockInventoryMap[item]);
+            } else {
+                ItemTracker.Instance.AddItem(TrackerType.BagContainer, MockItemType.Relic, shopToMockInventoryMap[item]);
+            }
+            Global.DEBUG_PRINT($"[ShopManager::OnClaimPressed] Added {item.name} to inventory.");
+        }
+
+        // Hide refresh button if all items are sold out
+        bool allSoldOut = itemUIs.TrueForAll(ui => ui.Item.isSold);
+        refreshButton.gameObject.SetActive(!allSoldOut);
     }
 
 #if UNITY_EDITOR

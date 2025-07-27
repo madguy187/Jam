@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8316714481445432834}
   - component: {fileID: 1705714895672089939}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 1771128692744919838}
   - component: {fileID: 4383256309692353028}
   - component: {fileID: 6385219593691095941}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -198,7 +198,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5382711915814549966}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ArmR
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -230,7 +230,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1766162323783227591}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_RCloth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -262,7 +262,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7816647984263141133}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Weapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -295,7 +295,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4364649461961117723}
   - component: {fileID: 6669756635835676162}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: '12_Helmet2 '
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -381,7 +381,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1542763916759717371}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Helmet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -414,7 +414,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4383554185788628984}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_LEye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -449,7 +449,7 @@ GameObject:
   - component: {fileID: 317524250298057895}
   - component: {fileID: 3326626162191702671}
   - component: {fileID: 5570141045734771574}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -547,7 +547,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1649439861081843908}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Shoulder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -580,7 +580,7 @@ GameObject:
   m_Component:
   - component: {fileID: 493598063596276859}
   - component: {fileID: 1181607489135859905}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: R_Weapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -666,7 +666,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1313263985893975791}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_RCArm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -700,7 +700,7 @@ GameObject:
   - component: {fileID: 2758286235512311354}
   - component: {fileID: 6805855237190393839}
   - component: {fileID: 6924491309281579087}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -799,7 +799,7 @@ GameObject:
   m_Component:
   - component: {fileID: 521041162518059700}
   - component: {fileID: 1088874412789963523}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: BodyArmor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -885,7 +885,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3512594825616940648}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Shadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -918,7 +918,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6300697690746730043}
   - component: {fileID: 3646861619113966004}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: 20_L_Arm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1007,7 +1007,7 @@ GameObject:
   m_Component:
   - component: {fileID: 73588901257349467}
   - component: {fileID: 6988484647440422927}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: -15_R_Shoulder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1093,7 +1093,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9136387448646287441}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_LArm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1285,7 +1285,7 @@ GameObject:
   m_Component:
   - component: {fileID: 923413800467594065}
   - component: {fileID: 1390224448037480264}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: L_Shield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1372,7 +1372,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9068272240959806866}
   - component: {fileID: 5457649846484565434}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: PivotBack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1417,7 +1417,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4054615465293493466}
   - component: {fileID: 7102006673906407}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: R_Shield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1505,7 +1505,7 @@ GameObject:
   - component: {fileID: 4323775300840347693}
   - component: {fileID: 8219628148532311210}
   - component: {fileID: 6822988070143313739}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1753,7 +1753,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1946518176801481907}
   - component: {fileID: 2428032105777194138}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1839,7 +1839,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6766588664182277906}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ArmSet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1872,7 +1872,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1948664954299699268}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_ClothBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1904,7 +1904,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6798723655499553241}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_LFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1938,7 +1938,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5193613464389848156}
   - component: {fileID: 4570791917029131596}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: BodySet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1982,7 +1982,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5678225134055228045}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Eye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2018,7 +2018,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1425266352760962186}
   - component: {fileID: 3846758542673197028}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: 25_L_Shoulder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2106,7 +2106,7 @@ GameObject:
   - component: {fileID: 4748776565861508669}
   - component: {fileID: 8670533114951952874}
   - component: {fileID: 53836481349526490}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: UnitRoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2173,7 +2173,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8662045174301272912}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_REye
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2207,7 +2207,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7230208739687024520}
   - component: {fileID: 5016360109234307310}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _3L_Foot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2293,7 +2293,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2696683350213395026}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Shoulder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2325,7 +2325,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1559130631434042544}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Arm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2358,7 +2358,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4643464426041787761}
   - component: {fileID: 6718462913552212670}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ClothBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2444,7 +2444,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1991264471751747464}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HeadSet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2477,7 +2477,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2239196653498019280}
   - component: {fileID: 2772264004619593787}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: -20_R_Arm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2567,7 +2567,7 @@ GameObject:
   - component: {fileID: 2540591017780860958}
   - component: {fileID: 8298479026501960362}
   - component: {fileID: 4228887851220867320}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: 5_Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2709,7 +2709,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2319056958012395046}
   - component: {fileID: 881219917613987622}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: PivotFront
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2753,7 +2753,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 278345274011640888}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_RClose
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2785,7 +2785,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8149723708457730439}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_ArmorBody
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2818,7 +2818,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4322765930274507430}
   - component: {fileID: 4405881675043219019}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: PivotFront
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2863,7 +2863,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5791439983109420298}
   - component: {fileID: 6037362039979008735}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: PivotBack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2909,7 +2909,7 @@ GameObject:
   - component: {fileID: 8395524520337700064}
   - component: {fileID: 7534461761401818949}
   - component: {fileID: 2150266488427469012}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3007,7 +3007,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8589031074860439225}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3039,7 +3039,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8967812526623625561}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_LCArm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3072,7 +3072,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7648060381307574266}
   - component: {fileID: 7846414539077033609}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: L_Weapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3158,7 +3158,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9140286853424135882}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Back
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3190,7 +3190,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7997326700951286745}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_RFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3223,7 +3223,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3096294776268533277}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Weapon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3256,7 +3256,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5431606872742055990}
   - component: {fileID: 3481236985809034062}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Shadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3417,7 +3417,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8422014605942928300}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Arm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3449,7 +3449,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3175342812758146730}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_LCloth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3482,7 +3482,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3350377559269650928}
   - component: {fileID: 3070068911421125899}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: PivotFront
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3527,7 +3527,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5740742060369796479}
   - component: {fileID: 8627156449431580641}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: 11_Helmet1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3613,7 +3613,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8940592897828729588}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3649,7 +3649,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7636809544804636511}
   - component: {fileID: 6203410624928993866}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: -19_RCArm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3735,7 +3735,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7190799758699484062}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9739,7 +9739,7 @@ GameObject:
   - component: {fileID: 3175531155335866854}
   - component: {fileID: 7120816730174306265}
   - component: {fileID: 182225212483508402}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Front
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9838,7 +9838,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3933526593709483050}
   - component: {fileID: 4526092041606088657}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: 7_Hair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9925,7 +9925,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3277585833286264507}
   - component: {fileID: 1123778854011316860}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _11R_Cloth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10011,7 +10011,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3726342409242991710}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ArmL
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10043,7 +10043,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8969977605307937454}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_LClose
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10075,7 +10075,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7662511960489573394}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Shield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10299,7 +10299,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4031304248770683909}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Mustache
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10367,7 +10367,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4796441799509614244}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Shield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10400,7 +10400,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6861603685665392668}
   - component: {fileID: 5839603238673241011}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: 6_FaceHair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10486,7 +10486,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5096327167465842334}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_RArm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10521,7 +10521,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4175722109590410421}
   - component: {fileID: 162714333633160303}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Root
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11085,7 +11085,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2033355675583323440}
   - component: {fileID: 6765598524258317204}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: 21_LCArm
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11172,7 +11172,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4923164052647294145}
   - component: {fileID: 5309478485885549159}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: PivotFront
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11217,7 +11217,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9185838464234008359}
   - component: {fileID: 1075835623252924744}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _12R_Foot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11303,7 +11303,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4580578237934759020}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: P_Hair
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -11336,7 +11336,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5098966793013879188}
   - component: {fileID: 5690890432107126933}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: _2L_Cloth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
