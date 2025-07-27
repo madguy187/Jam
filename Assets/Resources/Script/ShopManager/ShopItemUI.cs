@@ -6,8 +6,9 @@ public class ShopItemUI : MonoBehaviour
 {
     [SerializeField] private Image iconImage;
     [SerializeField] private TextMeshProUGUI nameText;
-    [SerializeField] private TextMeshProUGUI costText;
+    [SerializeField] private TextMeshProUGUI descText;
     [SerializeField] private Button buyButton;
+    [SerializeField] private TextMeshProUGUI buyButtonText;
 
     private ShopItem currentItem;
     private System.Action<ShopItem> onBuyCallback;
@@ -19,8 +20,15 @@ public class ShopItemUI : MonoBehaviour
 
         iconImage.sprite = item.icon;
         nameText.text = item.name;
-        costText.text = item.isSold ? "Sold Out" : $"Cost: {item.cost}";
-        buyButton.interactable = !item.isSold;
+        descText.text = item.description;
+
+        if (item.isSold) {
+            buyButtonText.text = "Sold Out";
+            buyButton.interactable = false;
+        } else {
+            buyButtonText.text = $"Buy ({item.cost})";
+            buyButton.interactable = true;
+        }
 
         buyButton.onClick.RemoveAllListeners();
         buyButton.onClick.AddListener(() =>

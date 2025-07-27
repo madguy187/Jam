@@ -588,8 +588,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   iconImage: {fileID: 2993024050162804186}
   nameText: {fileID: 4275348714364593490}
-  costText: {fileID: 3326296409813933954}
+  descText: {fileID: 3326296409813933954}
   buyButton: {fileID: 4151277498539866892}
+  buyButtonText: {fileID: 1387012937617384202}
 --- !u!222 &1007357997310465667
 CanvasRenderer:
   m_ObjectHideFlags: 0

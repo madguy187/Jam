@@ -14,11 +14,14 @@ public class ShopManager : MonoBehaviour
     public List<ShopItem> unitPool = new();
 
     private List<ShopItemUI> itemUIs = new();
-    private int currentGold = 100;
-    private int refreshCost = 10;
 
-    private void Start()
-    {
+    private int currentGold = 100;
+
+    [Header("Shop Settings")]
+    public int refreshCost = 10;
+    public float randomizeValue = 0.5f; // Adjust this to control the randomness of item selection
+
+    private void Start() {
         refreshButton.onClick.AddListener(OnRefreshClicked);
         GenerateDummyItems();
         GenerateShopItems();
@@ -33,10 +36,10 @@ public class ShopManager : MonoBehaviour
         Sprite dummyIcon3 = Resources.Load<Sprite>("Sprites/game-icons.net/mounted-knight");
         Sprite dummyIcon4 = Resources.Load<Sprite>("Sprites/game-icons.net/orc-head");
 
-        relicPool.Add(new ShopItem("Relic of Strength", ItemType.Relic, 30, dummyIcon1));
-        relicPool.Add(new ShopItem("Relic of Speed", ItemType.Relic, 25, dummyIcon2));
-        unitPool.Add(new ShopItem("Warrior", ItemType.Unit, 40, dummyIcon3));
-        unitPool.Add(new ShopItem("Archer", ItemType.Unit, 35, dummyIcon4));
+        relicPool.Add(new ShopItem("Relic of Strength", "So strong", ItemType.Relic, 30, dummyIcon1));
+        relicPool.Add(new ShopItem("Relic of Speed", "So speedy", ItemType.Relic, 25, dummyIcon2));
+        unitPool.Add(new ShopItem("Warrior", "A brave warrior", ItemType.Unit, 40, dummyIcon3));
+        unitPool.Add(new ShopItem("Archer", "A skilled archer", ItemType.Unit, 35, dummyIcon4));
     }
 
     void UpdateGoldUI()
@@ -46,7 +49,7 @@ public class ShopManager : MonoBehaviour
 
     void OnRefreshClicked()
     {
-        if (currentGold < refreshCost) return;
+        if (currentGold < refreshCost) { return; }
         currentGold -= refreshCost;
         GenerateShopItems();
         UpdateGoldUI();
@@ -54,12 +57,12 @@ public class ShopManager : MonoBehaviour
 
     void GenerateShopItems()
     {
-        foreach (Transform child in itemContainer)
-            Destroy(child.gameObject);
+        foreach (Transform child in itemContainer) {
+            Destroy(child.gameObject); 
+        }
         itemUIs.Clear();
 
-        for (int i = 0; i < 3; i++)
-        {
+        for (int i = 0; i < 3; i++) {
             ShopItem item = GetRandomItem();
             var itemUI = Instantiate(itemPrefab, itemContainer);
             itemUI.Setup(item, OnItemBought);
@@ -69,14 +72,14 @@ public class ShopManager : MonoBehaviour
 
     ShopItem GetRandomItem()
     {
-        bool isRelic = Random.value > 0.5f;
+        bool isRelic = Random.value > randomizeValue;
         var pool = isRelic ? relicPool : unitPool;
         return new ShopItem(pool[Random.Range(0, pool.Count)]);
     }
 
     void OnItemBought(ShopItem item)
     {
-        if (item.isSold || currentGold < item.cost) return;
+        if (item.isSold || currentGold < item.cost) { return; }
         currentGold -= item.cost;
         item.isSold = true;
         UpdateGoldUI();
