@@ -12,17 +12,12 @@ public class RewardSceneManager : MonoBehaviour
     public TextMeshProUGUI rewardDesc;
     public Button claimButton;
     public TextMeshProUGUI claimButtonText;
-
-    [Header("Dialogue")]
-    public Image portraitImage;
-    public TextMeshProUGUI dialogueText;
-    public float typingSpeed = 0.03f;
     public float fadeDuration = 0.5f;
 
-    [Header("Content")]
+    [Header("Dialogue System")]
+    public DialogueManager dialogueManager;
     [TextArea(2, 4)]
     public string[] dialogueLines;
-    private int currentLine = 0;
 
     [Header("Sample Content Pools")]
     public List<RewardItem> unitPool = new();
@@ -36,37 +31,20 @@ public class RewardSceneManager : MonoBehaviour
         claimButton.interactable = false;
         claimButtonText.text = "Claim";
 
-        // Optionally clear the UI first
-        dialogueText.text = "";
+        dialogueLines = new string[]
+        {
+            "Hey there, adventurer!",
+            "Here's something special for you.",
+            "Make good use of it!"
+        };
 
         LoadDummyData();
         GenerateReward();
         StartCoroutine(FadeInCanvasGroup(rewardIcon.canvasRenderer, fadeDuration));
-        StartCoroutine(TypeDialogueLine(dialogueLines[currentLine]));
-    }
-
-    IEnumerator TypeDialogueLine(string line)
-    {
-        dialogueText.text = "";
-        foreach (char c in line)
-        {
-            dialogueText.text += c;
-            yield return new WaitForSeconds(typingSpeed);
-        }
-
-        // Wait for input to proceed or allow claim
-        yield return new WaitForSeconds(0.5f);
-        currentLine++;
-
-        if (currentLine < dialogueLines.Length)
-        {
-            yield return new WaitForSeconds(0.5f);
-            StartCoroutine(TypeDialogueLine(dialogueLines[currentLine]));
-        }
-        else
+        dialogueManager.StartDialogue(dialogueLines, () =>
         {
             claimButton.interactable = true;
-        }
+        });
     }
 
     IEnumerator FadeInCanvasGroup(CanvasRenderer renderer, float duration)
