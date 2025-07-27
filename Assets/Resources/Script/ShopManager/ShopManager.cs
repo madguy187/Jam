@@ -39,10 +39,10 @@ public class ShopManager : MonoBehaviour
         Sprite dummyIcon3 = Resources.Load<Sprite>("Sprites/game-icons.net/mounted-knight");
         Sprite dummyIcon4 = Resources.Load<Sprite>("Sprites/game-icons.net/orc-head");
 
-        relicPool.Add(new ShopItem("Relic of Strength", "So strong", ItemType.Relic, 30, dummyIcon1));
-        relicPool.Add(new ShopItem("Relic of Speed", "So speedy", ItemType.Relic, 25, dummyIcon2));
-        unitPool.Add(new ShopItem("Warrior", "A brave warrior", ItemType.Unit, 40, dummyIcon3));
-        unitPool.Add(new ShopItem("Archer", "A skilled archer", ItemType.Unit, 35, dummyIcon4));
+        relicPool.Add(new ShopItem("Relic of Strength", "So strong", ShopItemType.Relic, 30, dummyIcon1));
+        relicPool.Add(new ShopItem("Relic of Speed", "So speedy", ShopItemType.Relic, 25, dummyIcon2));
+        unitPool.Add(new ShopItem("Warrior", "A brave warrior", ShopItemType.Unit, 40, dummyIcon3));
+        unitPool.Add(new ShopItem("Archer", "A skilled archer", ShopItemType.Unit, 35, dummyIcon4));
     }
 
     void UpdateGoldUI()

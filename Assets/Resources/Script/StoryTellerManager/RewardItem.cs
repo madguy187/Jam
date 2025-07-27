@@ -1,18 +1,16 @@
 using UnityEngine;
 
-public enum ShopItemType { Relic, Unit }
-
 [System.Serializable]
-public class ShopItem
+public class RewardItem
 {
     public string name;
     public string description;
-    public ShopItemType type;
+    public RewardItemType type;
     public int cost;
     public Sprite icon;
     public bool isSold;
 
-    public ShopItem(string name, string description, ShopItemType type, int cost, Sprite icon)
+    public RewardItem(string name, string description, RewardItemType type, int cost, Sprite icon)
     {
         this.name = name;
         this.description = description;
@@ -23,7 +21,7 @@ public class ShopItem
     }
 
     // Copy constructor
-    public ShopItem(ShopItem original)
+    public RewardItem(RewardItem original)
     {
         name = original.name;
         description = original.description;
