@@ -88,14 +88,45 @@ public class RelicForgeSceneCreator
 
         CreateButton("MergeButton", topLeft.transform, new Vector2(120, 40), new Vector2(70, -20), "Merge");
         CreateButton("BreakButton", topLeft.transform, new Vector2(120, 40), new Vector2(230, -20), "Break");
-
+        
         // --- Center Forge Area ---
         GameObject center = CreatePanel("ForgeArea", canvas.transform,
             new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
             new Vector2(600, 200), Vector2.zero, new Color(1f, 1f, 1f, 0.1f));
+            
+        // Relic Slots
+        GameObject relicX = CreatePanel("RelicXSlot", center.transform,
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(1f, 0.5f),
+            new Vector2(80, 80), new Vector2(-170, 30), new Color(1f, 1f, 1f, 0.3f));
+        CreateTMPLabel("X", relicX.transform, 24);
 
-        CreateTMPLabel("Relic X + Relic Y = Relic Z", center.transform, 30);
+        GameObject relicY = CreatePanel("RelicYSlot", center.transform,
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f),
+            new Vector2(80, 80), new Vector2(0, 30), new Color(1f, 1f, 1f, 0.3f));
+        CreateTMPLabel("Y", relicY.transform, 24);
 
+        GameObject relicZ = CreatePanel("ResultSlot", center.transform,
+            new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), new Vector2(0f, 0.5f),
+            new Vector2(80, 80), new Vector2(170, 30), new Color(1f, 1f, 1f, 0.3f));
+        CreateTMPLabel("Z", relicZ.transform, 24);
+
+        // Plus sign
+        GameObject plusSign = CreateTMPLabel("+", center.transform, 36);
+        RectTransform plusRT = plusSign.GetComponent<RectTransform>();
+        plusRT.anchorMin = new Vector2(0.5f, 0.5f);
+        plusRT.anchorMax = new Vector2(0.5f, 0.5f);
+        plusRT.pivot = new Vector2(0.5f, 0.5f);
+        plusRT.anchoredPosition = new Vector2(-85, 30);
+
+        // Equals sign
+        GameObject equalsSign = CreateTMPLabel("=", center.transform, 36);
+        RectTransform equalsRT = equalsSign.GetComponent<RectTransform>();
+        equalsRT.anchorMin = new Vector2(0.5f, 0.5f);
+        equalsRT.anchorMax = new Vector2(0.5f, 0.5f);
+        equalsRT.pivot = new Vector2(0.5f, 0.5f);
+        equalsRT.anchoredPosition = new Vector2(85, 30);
+
+        // Forge button
         GameObject forgeBtn = CreateButton("ForgeButton", center.transform, new Vector2(200, 50), new Vector2(0, -60), "Forge");
 
         // --- Bottom Left NPC Sprite Placeholder ---
