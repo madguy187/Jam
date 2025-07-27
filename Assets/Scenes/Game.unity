@@ -2003,7 +2003,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _transPlayerPos: {fileID: 1631226683}
   _transEnemyPos: {fileID: 2105540111}
-  bShowDebug: 0
+  bShowDebug: 1
 --- !u!1 &1486369586
 GameObject:
   m_ObjectHideFlags: 0

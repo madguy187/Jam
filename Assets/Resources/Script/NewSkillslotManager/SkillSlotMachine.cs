@@ -17,12 +17,8 @@ public class SkillSlotMachine : MonoBehaviour
 
     [Header("Spin Cost Settings")]
     [SerializeField] private int baseSpinCost = 2;
-
     private int spinsThisTurn = 0;
-
-    // Persistent 3×3 grid reused each spin for MatchDetector
     private SlotGrid detectorGrid;
-
     private readonly List<SkillSlotGrid> columns = new List<SkillSlotGrid>();
     private SpinResult lastSpinResult;
 
@@ -33,6 +29,23 @@ public class SkillSlotMachine : MonoBehaviour
     // Turn or Combat thinGS
     private bool isEnemyTurn = false;
     public static bool IsEnemyTurnStatic => instance != null && instance.isEnemyTurn;
+
+    public enum SpinMode
+    {
+        // rolls ONLY – NO combat
+        PreviewOnly,       
+        // player rolls, immediate player-side combat 
+        PlayerCombat,       
+        // player rolls + combat, then enemy auto-rolls + combat
+        PlayerAndEnemy      
+    }
+
+    [SerializeField] public SpinMode spinMode = SpinMode.PlayerAndEnemy;
+
+    [Header("Individual Roll Settings")]
+    [SerializeField] private bool previewSpin;
+    [SerializeField] private bool playerCombatSpin;
+    [SerializeField] private bool fullCombatSpin;
 
 
     private void Awake()
@@ -50,6 +63,30 @@ public class SkillSlotMachine : MonoBehaviour
         InitColumns();
         InitUI();
         InitState();
+    }
+
+    private void Update()
+    {
+        if (previewSpin)
+        {
+            previewSpin = false;
+            spinMode = SpinMode.PreviewOnly;
+            Spin();
+        }
+
+        if (playerCombatSpin)
+        {
+            playerCombatSpin = false;
+            spinMode = SpinMode.PlayerCombat;
+            Spin();
+        }
+
+        if (fullCombatSpin)
+        {
+            fullCombatSpin = false;
+            spinMode = SpinMode.PlayerAndEnemy;
+            Spin();
+        }
     }
 
     private void InitColumns()
@@ -108,7 +145,8 @@ public class SkillSlotMachine : MonoBehaviour
             }
         }
 
-        spinsThisTurn++;
+        if (spinMode == SpinMode.PreviewOnly) { cost = 0; }  
+        if (spinMode != SpinMode.PreviewOnly) { spinsThisTurn++; }
 
         // Disable buttons during spin
         SetButtonsInteractable(false);
@@ -167,6 +205,13 @@ public class SkillSlotMachine : MonoBehaviour
         Debug.Log("[SkillSlotMachine] Spin complete – symbols: " + string.Join(",", symbols));
 
         ProcessSpinResults(symbols);
+
+    }
+
+    // Helper that executes player-side combat using existing logic
+    private void RunPlayerCombat()
+    {
+        ProcessPlayerTurnCombat();
     }
 
     // Enemy/preset spin support
@@ -272,10 +317,24 @@ public class SkillSlotMachine : MonoBehaviour
             Debug.Log("=====================");
         }
 
-        // Re-enable buttons when player spin completed
-        if (!isEnemyTurn)
+        switch (spinMode)
         {
-            SetButtonsInteractable(true);
+            // no combat, no gold
+            case SpinMode.PreviewOnly:
+                SetButtonsInteractable(true);      
+                return;
+
+            // player side only
+            case SpinMode.PlayerCombat:
+                RunPlayerCombat();                 
+                SetButtonsInteractable(true);
+                return;
+
+            // player roll -> attack -> enemy roll -> attack
+            case SpinMode.PlayerAndEnemy:
+                RunPlayerCombat();                 
+                EndPlayerTurn();                   
+                break;
         }
     }
 
@@ -427,5 +486,24 @@ public class SkillSlotMachine : MonoBehaviour
             }
         }
         return true;
+    }
+
+    // Public helpers
+    public void ForceSpinPreview()
+    {
+        spinMode = SpinMode.PreviewOnly;
+        Spin();
+    }
+
+    public void ForceSpinPlayerCombat()
+    {
+        spinMode = SpinMode.PlayerCombat;
+        Spin();
+    }
+
+    public void ForceSpinFullCombat()
+    {
+        spinMode = SpinMode.PlayerAndEnemy;
+        Spin();
     }
 } 
