@@ -16,14 +16,15 @@ public class ForgeManager : MonoBehaviour
     public int bagSize = 100;  // Drop slot for bag items
 
     [Header("UI Panels")]
+    public TMP_Text goldText;
     [SerializeField] private GameObject forgeArea;
     [SerializeField] private GameObject breakArea;
     [SerializeField] private Sprite questionMarkSprite;
 
-    // [Header("Forge Panel")]
-    // [SerializeField] private Image relicSlot1;
-    // [SerializeField] private Image relicSlot2;
-    // [SerializeField] private Image resultSlot;
+    [Header("Dialogue System")]
+    public DialogueManager dialogueManager;
+    [TextArea(2, 4)]
+    private string[] dialogueLines;
 
     [Header("Buttons")]
     [SerializeField] private Button mergeButton;
@@ -51,6 +52,8 @@ public class ForgeManager : MonoBehaviour
     private RelicScriptableObject forgedResult;
     [SerializeField] private Transform resultSlotContainer;
 
+    private int currentGold = 100;
+
     private void Awake()
     {
         if (Instance == null) {
@@ -65,6 +68,12 @@ public class ForgeManager : MonoBehaviour
 
     private void Start()
     {
+        if (MockPlayerInventoryHolder.Instance == null) {
+            Global.DEBUG_PRINT("[ForgeManager::Start] MockPlayerInventoryHolder instance is null!");
+        } else {
+            currentGold = MockPlayerInventoryHolder.Instance.playerInventory.gold;
+        }
+        goldText.text = $"Gold: {currentGold}";
         mergeButton.onClick.AddListener(() => SetBreakMode(false));
         breakButton.onClick.AddListener(() => SetBreakMode(true));
         forgeButton.onClick.AddListener(DoForgeOrBreak);
@@ -76,6 +85,23 @@ public class ForgeManager : MonoBehaviour
 
         forgeButton.gameObject.SetActive(false);
         SetBreakMode(false); // default to merge mode
+
+        dialogueLines = new string[]
+        {
+            "Ho ho! You found some relics!",
+            "Click Merge at the top left to merge relics.",
+            "Click Break at the top left to break relics.",
+            "Each action uses gold so plan accordingly.",
+            "Either a relic or a question mark appears as the result.",
+            "Relic means your combination works, question mark means not.",
+            "Press the Forge or Break button below to add it to your bag!",
+            "Now, drag your relics from your bag on the right and into the slots and watch the magic happen!",
+        };
+
+        dialogueManager.StartDialogue(dialogueLines, () =>
+        {
+            // claimButton.interactable = true;
+        });
     }
 
     private void InitMergeUI()

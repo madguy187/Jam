@@ -56,7 +56,7 @@ public class RelicCombiner : MonoBehaviour
             breakMap[result] = (a, b); // Piggyback on the same map for breaking down relics
         }
 
-        // Basic combinations
+        // Advanced Relics (Self-Merges)
         AddComboAndBreak("IronShard", "IronShard", "SharpenedBlade");
         AddComboAndBreak("LightFeather", "LightFeather", "SkyDagger");
         AddComboAndBreak("HardenedShell", "HardenedShell", "ReflectiveCore");
@@ -65,7 +65,7 @@ public class RelicCombiner : MonoBehaviour
         AddComboAndBreak("PhantomInk", "PhantomInk", "TrueInvisibility");
         AddComboAndBreak("DemonClaw", "DemonClaw", "BloodrendClaw");
 
-        // 2-component combos
+        // Advanced Relics Mixed-Merges
         AddComboAndBreak("IronShard", "LightFeather", "Executioner’sEdge");
         AddComboAndBreak("IronShard", "HardenedShell", "Warplate");
         AddComboAndBreak("IronShard", "BlessedCharm", "VampiricBrand");
@@ -81,7 +81,7 @@ public class RelicCombiner : MonoBehaviour
         AddComboAndBreak("MagicCore", "PhantomInk", "NullField");
         AddComboAndBreak("BlessedCharm", "PhantomInk", "SoulCloak");
 
-        // Advanced 2nd-tier
+        // Legendary Relics
         AddComboAndBreak("Executioner’sEdge", "BrutalSaber", "DaggerofJudgment");
         AddComboAndBreak("GreaterBlessing", "SoulCloak", "DivineHalo");
         AddComboAndBreak("Warplate", "SteelFrame", "TitanArmor");
