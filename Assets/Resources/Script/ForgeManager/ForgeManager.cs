@@ -34,7 +34,7 @@ public class ForgeManager : MonoBehaviour
     public RelicCombiner relicCombiner;
 
     [Header("Test Relics")]
-    public List<RelicScriptableObject> testRelics;
+    [SerializeField] public List<RelicScriptableObject> playerRelics;
 
     private Image relicSlot1;
     private Image relicSlot2;
@@ -53,6 +53,7 @@ public class ForgeManager : MonoBehaviour
     [SerializeField] private Transform resultSlotContainer;
 
     private int currentGold = 100;
+    private ItemTracker tracker;
 
     private void Awake()
     {
@@ -73,7 +74,12 @@ public class ForgeManager : MonoBehaviour
         } else {
             currentGold = MockPlayerInventoryHolder.Instance.playerInventory.gold;
         }
-        goldText.text = $"Gold: {currentGold}";
+        if (ItemTracker.Instance == null) {
+            Global.DEBUG_PRINT("[ForgeManager::Start] ItemTracker instance is null!");
+        } else {
+            tracker = ItemTracker.Instance;
+        }
+        RefreshGoldUI();
         mergeButton.onClick.AddListener(() => SetBreakMode(false));
         breakButton.onClick.AddListener(() => SetBreakMode(true));
         forgeButton.onClick.AddListener(DoForgeOrBreak);
@@ -81,7 +87,20 @@ public class ForgeManager : MonoBehaviour
 
         ClearBagItemsOnly();
         GenerateFixedBagSlots(bagSize);
-        PopulateBagItems(testRelics);
+
+        if (MockPlayerInventoryHolder.Instance != null)
+        {
+            List<RelicScriptableObject> realRelics = new List<RelicScriptableObject>();
+            foreach (MockInventoryItem item in MockPlayerInventoryHolder.Instance.playerInventory.bagItems)
+            {
+                if (item.itemType == MockItemType.Relic && item.relicData != null)
+                {
+                    realRelics.Add(item.relicData);
+                }
+            }
+            playerRelics = realRelics;
+        }
+        PopulateBagItems(playerRelics);
 
         forgeButton.gameObject.SetActive(false);
         SetBreakMode(false); // default to merge mode
@@ -100,8 +119,22 @@ public class ForgeManager : MonoBehaviour
 
         dialogueManager.StartDialogue(dialogueLines, () =>
         {
-            // claimButton.interactable = true;
+            // claimButton.interactable = true; // lazy to disable interaction for now
         });
+    }
+
+    void RefreshGoldUI()
+    {
+        goldText.text = $"Gold: {currentGold}";
+    }
+
+    void UpdatePlayerGold()
+    {
+        if (MockPlayerInventoryHolder.Instance == null) {
+            Global.DEBUG_PRINT("[ForgeManager::UpdatePlayerGold] MockPlayerInventoryHolder instance is null!");
+        } else {
+            MockPlayerInventoryHolder.Instance.playerInventory.gold = currentGold;
+        }
     }
 
     private void InitMergeUI()
@@ -232,6 +265,9 @@ public class ForgeManager : MonoBehaviour
 
         selectedRelic1 = null;
         selectedRelic2 = null;
+
+        breakRelicButton.gameObject.SetActive(false);
+        forgeButton.gameObject.SetActive(false);
     }
 
     private void SetQuestionMark(Image slot)
@@ -271,18 +307,23 @@ public class ForgeManager : MonoBehaviour
                 if (relicCombiner.TryCombine(selectedRelic1, selectedRelic2, out var result))
                 {
                     InstantiateResultRelic(result, resultSlotContainer);
+
+                    int cost = relicCombiner.GetCombineCost(selectedRelic1, selectedRelic2);
+                    forgeButton.GetComponentInChildren<TMP_Text>().text = $"{cost} Gold to Forge";
                     forgeButton.gameObject.SetActive(true);
                 }
                 else
                 {
                     SetQuestionMark(resultSlot);
                     forgeButton.gameObject.SetActive(false);
+                    forgeButton.GetComponentInChildren<TMP_Text>().text = "Forge";
                 }
             }
             else
             {
                 SetQuestionMark(resultSlot);
                 forgeButton.gameObject.SetActive(false);
+                forgeButton.GetComponentInChildren<TMP_Text>().text = "Forge";
             }
         }
         else
@@ -294,6 +335,9 @@ public class ForgeManager : MonoBehaviour
                 {
                     InstantiateResultRelic(part1, breakResult1Slot.transform);
                     InstantiateResultRelic(part2, breakResult2Slot.transform);
+
+                    int breakCost = relicCombiner.GetBreakCost(selectedRelic1);
+                    breakRelicButton.GetComponentInChildren<TMP_Text>().text = $"{breakCost} Gold to Break";
                     breakRelicButton.gameObject.SetActive(true);
                 }
                 else
@@ -301,6 +345,7 @@ public class ForgeManager : MonoBehaviour
                     SetQuestionMark(breakResult1Slot);
                     SetQuestionMark(breakResult2Slot);
                     breakRelicButton.gameObject.SetActive(false);
+                    breakRelicButton.GetComponentInChildren<TMP_Text>().text = "Break";
                 }
             }
             else
@@ -308,6 +353,7 @@ public class ForgeManager : MonoBehaviour
                 SetQuestionMark(breakResult1Slot);
                 SetQuestionMark(breakResult2Slot);
                 breakRelicButton.gameObject.SetActive(false);
+                breakRelicButton.GetComponentInChildren<TMP_Text>().text = "Break";
             }
         }
     }
@@ -355,7 +401,15 @@ public class ForgeManager : MonoBehaviour
             {
                 if (relicCombiner.TryCombine(selectedRelic1, selectedRelic2, out var forgedResult))
                 {
-                    testRelics.Add(forgedResult);
+                    int cost = relicCombiner.GetCombineCost(selectedRelic1, selectedRelic2);
+                    currentGold -= cost;
+                    UpdatePlayerGold();
+                    RefreshGoldUI();
+
+                    playerRelics.Add(forgedResult);
+                    if (tracker != null) {
+                        tracker.AddItem(TrackerType.BagContainer, MockItemType.Relic, new MockInventoryItem(forgedResult));
+                    }
 
                     // Remove relic GameObjects from forge slots, also remove relic data from list
                     RemoveRelicFromSlot(relicSlot1, selectedRelic1);
@@ -367,7 +421,8 @@ public class ForgeManager : MonoBehaviour
                     ClearResultSlot();
 
                     ClearBagItemsOnly();
-                    PopulateBagItems(testRelics);
+                    PopulateBagItems(playerRelics);
+                    forgeButton.gameObject.SetActive(false);
                 }
                 else
                 {
@@ -386,9 +441,19 @@ public class ForgeManager : MonoBehaviour
             {
                 if (relicCombiner.TryBreak(selectedRelic1, out var part1, out var part2))
                 {
-                    testRelics.Remove(selectedRelic1);
-                    testRelics.Add(part1);
-                    testRelics.Add(part2);
+                    int cost = relicCombiner.GetBreakCost(selectedRelic1);
+                    currentGold -= cost;
+                    UpdatePlayerGold();
+                    RefreshGoldUI();
+
+                    playerRelics.Remove(selectedRelic1);
+                    playerRelics.Add(part1);
+                    playerRelics.Add(part2);
+                    if (tracker != null) {
+                        tracker.AddItem(TrackerType.BagContainer, MockItemType.Relic, new MockInventoryItem(part1));
+                        tracker.AddItem(TrackerType.BagContainer, MockItemType.Relic, new MockInventoryItem(part2));
+                        tracker.RemoveItem(TrackerType.BagContainer, MockItemType.Relic, new MockInventoryItem(selectedRelic1));
+                    }
 
                     if (breakInputSlot.transform.childCount > 0)
                         Destroy(breakInputSlot.transform.GetChild(0).gameObject);
@@ -397,7 +462,8 @@ public class ForgeManager : MonoBehaviour
 
                     ClearResultSlot();
                     ClearBagItemsOnly();
-                    PopulateBagItems(testRelics);
+                    PopulateBagItems(playerRelics);
+                    breakRelicButton.gameObject.SetActive(false);
                 }
                 else
                 {
@@ -419,7 +485,10 @@ public class ForgeManager : MonoBehaviour
             var draggable = go.GetComponent<DraggableRelic>();
             if (draggable != null && draggable.relicData == relic)
             {
-                testRelics.Remove(relic);
+                playerRelics.Remove(relic);
+                if (tracker != null) {
+                    tracker.RemoveItem(TrackerType.BagContainer, MockItemType.Relic, new MockInventoryItem(relic));
+                }
                 Destroy(go);
             }
         }

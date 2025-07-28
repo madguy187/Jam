@@ -10,6 +10,7 @@ namespace Map
         Shop,
         MajorBoss,
         Necromancer,
+        Blacksmith,
     }
 }
 
