@@ -23,9 +23,10 @@ MonoBehaviour:
   res: 1
   critRate: 5
   critMulti: 125
-  singleMatchDescription: 
-  horizontalMatchDescription: 
-  diagonalMatchDescription: 
-  zigzagMatchDescription: 
-  xShapeMatchDescription: 
-  fullGridMatchDescription: 
+  singleMatchDescription: Shield + 3
+  horizontalMatchDescription: Heal lowest-HP ally for 4
+  diagonalMatchDescription: Gain Taunt (forces targeting for 3 turn), Enemy attacking
+    the paladin will recieve 20% of their damage back.
+  zigzagMatchDescription: ' Shield + 10'
+  xShapeMatchDescription: All units in team gain +2 Shield
+  fullGridMatchDescription: All Holy units gain Res + 2 this round

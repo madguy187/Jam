@@ -1,6 +1,6 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class UIRevive : MonoBehaviour {
@@ -8,7 +8,8 @@ public class UIRevive : MonoBehaviour {
 
     [SerializeField] GameObject prefabUnitSlot = null;
     [SerializeField] UnitObject _unit = null;
-    [SerializeField] Button _button = null;
+    [SerializeField] Button _buttonRevive = null;
+    [SerializeField] Button _buttonReturn = null;
 
     void Awake() {
         if (instance != null) {
@@ -17,10 +18,12 @@ public class UIRevive : MonoBehaviour {
         instance = this;
         //Instantiate(prefabUnitSlot, transform);
 
-        _button.onClick.AddListener(ReviveUnit);
+        _buttonRevive.onClick.AddListener(ReviveUnit);
+        _buttonReturn.onClick.AddListener(ChangeScene);
     }
 
     void Start() {
+        UnitSettingLayout.instance.OpenLayout();
         Action<MockItemType, MockInventoryItem> onAddAction = (MockItemType itemType, MockInventoryItem item) => {
             _unit = item.unitData;
         };
@@ -32,12 +35,31 @@ public class UIRevive : MonoBehaviour {
         ItemTracker.Instance.AddOnRemove(TrackerType.Revive, onRemoveAction);
     }
 
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.Alpha1)) {
+            Debug.Log("enter");
+            UnitSettingLayout.instance.OpenLayout();
+        }
+    }
+
+    void ChangeScene() {
+        UIFade.instance.FadeOut(2.0f);
+        UIFade.instance.SetOnFadeFinish(ChangeSceneFunc);
+    }
+
+    void ChangeSceneFunc() {
+        SceneManager.LoadScene("Game_Map");
+        UIFade.instance.FadeIn(2.0f);
+    }
+
     public void ReviveUnit() {
         if (_unit == null) {
+            UIPopUpManager.instance.CreatePopUp("Put unit in slot");
             return;
         }
 
         if (!_unit.IsDead()) {
+            UIPopUpManager.instance.CreatePopUp("Unit is not dead");
             return;
         }
 
@@ -47,6 +69,7 @@ public class UIRevive : MonoBehaviour {
         }
 
         if (!GoldManager.instance.HasEnoughGold(cost)) {
+            UIPopUpManager.instance.CreatePopUp("Not enough gold");
             return;
         }
 

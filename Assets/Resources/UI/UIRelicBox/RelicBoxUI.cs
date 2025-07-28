@@ -63,6 +63,14 @@ public class RelicBoxUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         BuildTooltipText(relic);
     }
 
+    public void SetupRelicSO(RelicScriptableObject so)
+    {
+        if (so == null) return;
+        
+        icon.sprite = so.GetRelicSprite();
+        tooltipText = so.GetRelicName() + "\n" + so.GetRelicDescription();
+    }
+
     private void BuildTooltipText(RelicConfig.RelicData relic)
     {
         tooltipBuilder.Clear();  

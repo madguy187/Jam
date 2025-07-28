@@ -79,4 +79,22 @@ public static class RenderUtilities
             _SetLayerRecursively(child.gameObject, newLayer);
         }
     }
+
+    /// returns a Sprite of the unit's head/UnitRoot for UI 
+    public static Sprite RenderUnitHeadSprite(UnitObject unit, float scaleMultiplier = 1.25f)
+    {
+        if (unit == null) return null;
+        Transform root = unit.transform.Find("UnitRoot");
+        GameObject target = root != null ? root.gameObject : unit.gameObject;
+        var (rt, camObj) = RenderUnitToTexture(target, scaleMultiplier);
+        if (rt == null)
+        {
+            if (camObj != null) Object.Destroy(camObj);
+            return null;
+        }
+        Sprite sprite = ConvertRenderTextureToSprite(rt);
+        Object.Destroy(camObj);
+        Object.Destroy(rt);
+        return sprite;
+    }
 }

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: HardenedShell
   m_EditorClassIdentifier: 
   strRelicName: Hardened Shell
-  strRelicDescription: This is a relic description
+  strRelicDescription: 'RES +2 '
   relicCost: 0
   spriteRelic: {fileID: 21300000, guid: cca135a9c83c74e40a8fd94e124c09a2, type: 3}
   listEffect:

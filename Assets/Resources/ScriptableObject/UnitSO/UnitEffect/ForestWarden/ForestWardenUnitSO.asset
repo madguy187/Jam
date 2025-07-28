@@ -23,9 +23,9 @@ MonoBehaviour:
   res: 3
   critRate: 5
   critMulti: 125
-  singleMatchDescription: 
-  horizontalMatchDescription: 
-  diagonalMatchDescription: 
-  zigzagMatchDescription: 
-  xShapeMatchDescription: 
-  fullGridMatchDescription: 
+  singleMatchDescription: " Randomly Buff 1 ally\u2019s RES +2"
+  horizontalMatchDescription: Heal all units for 5 HP
+  diagonalMatchDescription: All units gain +5% Crit Rate
+  zigzagMatchDescription: All units gain + 10% Crit Damage , +5% Crit Rate
+  xShapeMatchDescription: Heal a random damage unit for 2HP / round for 3 rounds
+  fullGridMatchDescription: All Elf units +15% Crit Rate + 15% Crit Damage

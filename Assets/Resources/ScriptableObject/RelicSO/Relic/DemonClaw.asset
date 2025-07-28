@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DemonClaw
   m_EditorClassIdentifier: 
   strRelicName: Demon Claw
-  strRelicDescription: This is a relic description
+  strRelicDescription: Crit Damage + 10
   relicCost: 0
   spriteRelic: {fileID: 21300000, guid: 5f56e5a89303678469d021632482a8db, type: 3}
   listEffect:

@@ -27,13 +27,28 @@ public class ResourceManager : MonoBehaviour {
 
         instance = this;
 
-        foreach (Object obj in Resources.LoadAll("ScriptableObject/UnitSO/Unit", typeof(GameObject)).ToList()) {
+        foreach (Object obj in Resources.LoadAll("ScriptableObject/UnitSO/Unit", typeof(GameObject)).ToList())
+        {
+            if (obj == null) continue;
+            if (obj.name.Equals("SoulPiercer", System.StringComparison.OrdinalIgnoreCase))
+            {
+                // Skip deprecated prefab
+                continue;
+            }
+
             GameObject prefabUnit = (GameObject)obj;
             _mapUnitSO.Add(obj.name, prefabUnit);
         }
         Global.DEBUG_PRINT("[Resources] Loaded Units: " + _mapUnitSO.Count());
 
-        foreach (Object obj in Resources.LoadAll("ScriptableObject/UnitSO/Mob", typeof(GameObject)).ToList()) {
+        foreach (Object obj in Resources.LoadAll("ScriptableObject/UnitSO/Mob", typeof(GameObject)).ToList())
+        {
+            if (obj == null) continue;
+            if (obj.name.Equals("SoulPiercer", System.StringComparison.OrdinalIgnoreCase))
+            {
+                continue; // deprecated
+            }
+
             GameObject prefabUnit = (GameObject)obj;
             _mapMobSO.Add(obj.name, prefabUnit);
 
@@ -157,5 +172,10 @@ public class ResourceManager : MonoBehaviour {
         }
 
         textComp.Init(pos, lifetime, text);
+    }
+
+    public List<GameObject> GetAllUnitPrefabs()
+    {
+        return _mapUnitSO.Values.ToList();
     }
 }
