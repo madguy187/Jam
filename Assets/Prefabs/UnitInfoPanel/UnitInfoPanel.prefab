@@ -2529,7 +2529,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.7764706, g: 0.15686275, b: 0.15686275, a: 1}
+  m_Color: {r: 0.7058824, g: 0.49803922, b: 0.09803922, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2963,6 +2963,7 @@ MonoBehaviour:
   - {fileID: 4297791676628591425}
   - {fileID: 5436796370035382334}
   relicConfig: {fileID: 11400000, guid: f6bda3352b93647c0ade2060d4f8d2d4, type: 2}
+  passiveText: {fileID: 0}
 --- !u!1 &7964059843142234997
 GameObject:
   m_ObjectHideFlags: 0

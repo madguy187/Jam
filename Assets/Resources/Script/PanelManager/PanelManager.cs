@@ -23,6 +23,9 @@ public class PanelManager : MonoBehaviour
     [SerializeField] private RelicBoxUI[] relicBoxes;
     [SerializeField] private RelicConfig relicConfig;
 
+    [Header("Passive UI")]
+    [SerializeField] private TextMeshProUGUI passiveText;  
+
     private Dictionary<string, RelicBoxUI> relicBoxMap;
     private Dictionary<RelicTier, RelicConfig.RelicData[]> relicsByTier;
     private bool relicsInitialized;
@@ -126,6 +129,11 @@ public class PanelManager : MonoBehaviour
                 // Update stats for the currently selected unit
                 UpdateUnitStats();
                 UpdateRelicBoxes();
+
+                if (passiveText != null && currentUnit != null)
+                {
+                    passiveText.text = BuildPassiveDescription(currentUnit);
+                }
             }
         }
     }
@@ -266,5 +274,32 @@ public class PanelManager : MonoBehaviour
         {
             instance = null;
         }
+    }
+
+    static string BuildPassiveDescription(UnitObject u)
+    {
+        if (u == null) return "—";
+        EffectList list = u.GetRelicEffectList();
+        if (list == null || !list.IsValid()) return "—";
+
+        var sb = new System.Text.StringBuilder(64);
+        foreach (EffectScriptableObject e in list)
+        {
+            if (e == null) continue;
+            switch (e.GetEffectType())
+            {
+                case EffectType.EFFECT_STAT_INCREASE_ATK:
+                    sb.Append($"+{e.GetEffectVal()} ATK  ");
+                    break;
+                case EffectType.EFFECT_BLEED:
+                    sb.Append("Bleeds attacker  ");
+                    break;
+                default:
+                    sb.Append(e.GetTypeName()).Append(' ');
+                    break;
+            }
+        }
+        string result = sb.ToString().Trim();
+        return string.IsNullOrEmpty(result) ? "—" : result;
     }
 } 
