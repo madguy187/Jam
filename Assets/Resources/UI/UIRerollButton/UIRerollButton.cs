@@ -35,7 +35,7 @@ public class UIRerollButton : MonoBehaviour
     
     private void OnClick()
     {
-        SkillSlotMachine.instance.Spin();
+        SkillSlotMachine.instance.TriggerPreviewSpin();
     }
     
     public void TriggerRoll()

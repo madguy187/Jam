@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5582afcca3112d4db68ad91c7708617, type: 3}
   m_Name: BrutalSaber
   m_EditorClassIdentifier: 
-  strRelicName: 
-  strRelicDescription: This is a relic description
+  strRelicName: Brutal Saber
+  strRelicDescription: Atk +2, Crit Damage +15
   relicCost: 0
   spriteRelic: {fileID: 21300000, guid: a1aea7c48cb5e164ebd5f9669ffb205f, type: 3}
   listEffect:

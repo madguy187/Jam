@@ -23,6 +23,9 @@ public class PanelManager : MonoBehaviour
     [SerializeField] private RelicBoxUI[] relicBoxes;
     [SerializeField] private RelicConfig relicConfig;
 
+    [Header("Passive UI")]
+    [SerializeField] private TextMeshProUGUI passiveText;  
+
     private Dictionary<string, RelicBoxUI> relicBoxMap;
     private Dictionary<RelicTier, RelicConfig.RelicData[]> relicsByTier;
     private bool relicsInitialized;
@@ -125,6 +128,12 @@ public class PanelManager : MonoBehaviour
             {
                 // Update stats for the currently selected unit
                 UpdateUnitStats();
+                UpdateRelicBoxes();
+
+                if (passiveText != null && currentUnit != null)
+                {
+                    passiveText.text = BuildPassiveDescription(currentUnit);
+                }
             }
         }
     }
@@ -145,26 +154,27 @@ public class PanelManager : MonoBehaviour
 
     private void UpdateRelicBoxes()
     {
-        if (!relicsInitialized) return;
+        if (relicBoxes == null || relicBoxes.Length == 0) return;
 
-        if (relicsByTier.TryGetValue(RelicTier.Basic, out RelicConfig.RelicData[] basicRelics))
+        // Hide all first
+        foreach (var rb in relicBoxes)
         {
-            foreach (var relic in basicRelics)
+            if (rb != null)
             {
-                if (relicBoxMap.TryGetValue(relic.name, out RelicBoxUI relicBox))
-                {
-                    relicBox.SetupRelic(relic);
-                    relicBox.gameObject.SetActive(true); 
-                }
+                rb.SetupRelicSO(null); 
+                rb.gameObject.SetActive(false);
             }
         }
 
-        foreach (var relicBox in relicBoxes)
+        if (currentUnit == null) return;
+
+        List<RelicScriptableObject> relicList = currentUnit.GetRelic();
+        for (int i = 0; i < relicBoxes.Length && i < relicList.Count; i++)
         {
-            if (relicBox != null && !relicBox.gameObject.activeSelf)
-            {
-                relicBox.gameObject.SetActive(true);
-            }
+            RelicBoxUI box = relicBoxes[i];
+            if (box == null) continue;
+            box.SetupRelicSO(relicList[i]);
+            box.gameObject.SetActive(true);
         }
     }
 
@@ -180,10 +190,18 @@ public class PanelManager : MonoBehaviour
         
         if (unitIconImage != null)
         {
-            SpriteRenderer spriteRenderer = unit.GetComponent<SpriteRenderer>();
-            if (spriteRenderer != null && spriteRenderer.sprite != null)
+            Sprite iconSprite = RenderUtilities.RenderUnitHeadSprite(unit);
+            if (iconSprite != null)
             {
-                unitIconImage.sprite = spriteRenderer.sprite;
+                unitIconImage.sprite = iconSprite;
+            }
+            else
+            {
+                SpriteRenderer sr = unit.GetComponent<SpriteRenderer>();
+                if (sr != null && sr.sprite != null)
+                {
+                    unitIconImage.sprite = sr.sprite;
+                }
             }
         }
 
@@ -256,5 +274,32 @@ public class PanelManager : MonoBehaviour
         {
             instance = null;
         }
+    }
+
+    static string BuildPassiveDescription(UnitObject u)
+    {
+        if (u == null) return "—";
+        EffectList list = u.GetRelicEffectList();
+        if (list == null || !list.IsValid()) return "—";
+
+        var sb = new System.Text.StringBuilder(64);
+        foreach (EffectScriptableObject e in list)
+        {
+            if (e == null) continue;
+            switch (e.GetEffectType())
+            {
+                case EffectType.EFFECT_STAT_INCREASE_ATK:
+                    sb.Append($"+{e.GetEffectVal()} ATK  ");
+                    break;
+                case EffectType.EFFECT_BLEED:
+                    sb.Append("Bleeds attacker  ");
+                    break;
+                default:
+                    sb.Append(e.GetTypeName()).Append(' ');
+                    break;
+            }
+        }
+        string result = sb.ToString().Trim();
+        return string.IsNullOrEmpty(result) ? "—" : result;
     }
 } 

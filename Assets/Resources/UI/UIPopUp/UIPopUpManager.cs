@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIPopUpManager : MonoBehaviour {
     public static UIPopUpManager instance;
@@ -9,6 +10,10 @@ public class UIPopUpManager : MonoBehaviour {
     [SerializeField] GameObject prefabPopUp = null;
     [SerializeField] float fGap = 5.0f;
     [SerializeField] float fLifeTime = 3.0f;
+
+    [Header("Spacing")]
+     // height of one popup panel
+    [SerializeField] float popupHeight = 50f;
 
     float _fCurrentTime = 0.0f;
 
@@ -58,9 +63,17 @@ public class UIPopUpManager : MonoBehaviour {
         _listCurrentPopUp.Add(popUpComp);
     }
 
+    public void CreatePopUp(string text, Sprite icon)
+    {
+        GameObject obj = Instantiate(prefabPopUp, transform);
+        obj.transform.position = GetStartingPos(_listCurrentPopUp.Count);
+        UIPopUp pop = obj.GetComponent<UIPopUp>();
+        pop.Init(text, icon);
+        _listCurrentPopUp.Add(pop);
+    }
+
     public Vector3 GetStartingPos(int index) {
-        RectTransform rect = transDefault.GetComponent<RectTransform>();
-        float yOffset = rect.rect.height + fGap;
+        float yOffset = popupHeight + fGap;
         Vector3 pos = transDefault.position;
         pos.y -= yOffset * index;
 

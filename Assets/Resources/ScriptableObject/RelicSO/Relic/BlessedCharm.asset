@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: BlessedCharm
   m_EditorClassIdentifier: 
   strRelicName: Blessed Charm
-  strRelicDescription: This is a relic description
+  strRelicDescription: HP + 2
   relicCost: 0
   spriteRelic: {fileID: 21300000, guid: a1aea7c48cb5e164ebd5f9669ffb205f, type: 3}
   listEffect:

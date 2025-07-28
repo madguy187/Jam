@@ -17,12 +17,8 @@ public class SkillSlotMachine : MonoBehaviour
 
     [Header("Spin Cost Settings")]
     [SerializeField] private int baseSpinCost = 2;
-
     private int spinsThisTurn = 0;
-
-    // Persistent 3×3 grid reused each spin for MatchDetector
     private SlotGrid detectorGrid;
-
     private readonly List<SkillSlotGrid> columns = new List<SkillSlotGrid>();
     private SpinResult lastSpinResult;
 
@@ -34,6 +30,32 @@ public class SkillSlotMachine : MonoBehaviour
     private bool isEnemyTurn = false;
     public static bool IsEnemyTurnStatic => instance != null && instance.isEnemyTurn;
 
+    public enum SpinMode
+    {
+        // rolls ONLY – NO combat
+        PreviewOnly,       
+        // player rolls, immediate player-side combat 
+        PlayerCombat,       
+        // player rolls + combat, then enemy auto-rolls + combat
+        PlayerAndEnemy      
+    }
+
+    public enum AttackBehaviour 
+    { 
+        PlayerCombatOnly, PlayerAndEnemyCombat 
+    }
+
+
+    [SerializeField] public SpinMode spinMode = SpinMode.PlayerAndEnemy;
+    [Header("Individual Roll Settings")]
+    [SerializeField] private bool previewSpin;
+    [SerializeField] private bool playerCombatSpin;
+    [SerializeField] private bool fullCombatSpin;
+    [SerializeField] private AttackBehaviour behaviour = AttackBehaviour.PlayerAndEnemyCombat;
+
+    [Header("Enemy Spin Settings")]
+    // If false, enemy dont spin visually, results processed in background
+    [SerializeField] private bool enemyVisualSpin = false; 
 
     private void Awake()
     {
@@ -50,6 +72,30 @@ public class SkillSlotMachine : MonoBehaviour
         InitColumns();
         InitUI();
         InitState();
+    }
+
+    private void Update()
+    {
+        if (previewSpin)
+        {
+            previewSpin = false;
+            spinMode = SpinMode.PreviewOnly;
+            Spin();
+        }
+
+        if (playerCombatSpin)
+        {
+            playerCombatSpin = false;
+            spinMode = SpinMode.PlayerCombat;
+            Spin();
+        }
+
+        if (fullCombatSpin)
+        {
+            fullCombatSpin = false;
+            spinMode = SpinMode.PlayerAndEnemy;
+            Spin();
+        }
     }
 
     private void InitColumns()
@@ -108,6 +154,7 @@ public class SkillSlotMachine : MonoBehaviour
             }
         }
 
+        // Every spin (including previews) counts toward escalating cost
         spinsThisTurn++;
 
         // Disable buttons during spin
@@ -167,6 +214,13 @@ public class SkillSlotMachine : MonoBehaviour
         Debug.Log("[SkillSlotMachine] Spin complete – symbols: " + string.Join(",", symbols));
 
         ProcessSpinResults(symbols);
+
+    }
+
+    // Helper that executes player-side combat using existing logic
+    private void RunPlayerCombat()
+    {
+        ProcessPlayerTurnCombat();
     }
 
     // Enemy/preset spin support
@@ -272,10 +326,24 @@ public class SkillSlotMachine : MonoBehaviour
             Debug.Log("=====================");
         }
 
-        // Re-enable buttons when player spin completed
-        if (!isEnemyTurn)
+        switch (spinMode)
         {
-            SetButtonsInteractable(true);
+            // no combat, no gold
+            case SpinMode.PreviewOnly:
+                SetButtonsInteractable(true);      
+                return;
+
+            // player side only
+            case SpinMode.PlayerCombat:
+                RunPlayerCombat();                 
+                SetButtonsInteractable(true);
+                return;
+
+            // player roll -> attack -> enemy roll -> attack
+            case SpinMode.PlayerAndEnemy:
+                RunPlayerCombat();                 
+                EndPlayerTurn();                   
+                break;
         }
     }
 
@@ -370,7 +438,53 @@ public class SkillSlotMachine : MonoBehaviour
         Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
         SymbolType[] symbols = SymbolGenerator.instance.GenerateSymbolsForDeck(enemyDeck);
 
-        yield return SpinWithPresetSymbols(symbols);
+        SpinMode previousMode = spinMode;
+        // enemy spin should not trigger player combat
+        spinMode = SpinMode.PreviewOnly;
+
+        if (enemyVisualSpin)
+        {
+            // run visual spin with preset symbols
+            yield return SpinWithPresetSymbols(symbols);
+        }
+        else
+        {
+            //  process results immediately without visual spin
+            ProcessSpinResults(symbols);
+        }
+
+        // restore original mode for subsequent player actions
+        spinMode = previousMode;
+
+        // Show popup summarising enemy roll 
+        if (UIPopUpManager.instance != null && lastSpinResult != null)
+        {
+            List<Match> enemyMatches = lastSpinResult.GetAllMatches();
+            foreach (Match m in enemyMatches)
+            {
+                UnitObject matchUnit = null;
+                for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
+                {
+                    UnitObject u = enemyDeck.GetUnitObject(i);
+                    if (u != null && u.unitSO != null && u.unitSO.eUnitArchetype == m.GetArchetype())
+                    {
+                        matchUnit = u; break;
+                    }
+                }
+
+                Sprite iconSprite = null;
+                if (matchUnit != null)
+                {
+                    iconSprite = RenderUtilities.RenderUnitHeadSprite(matchUnit);
+                }
+
+                string popupText = $"{m.GetMatchType()} {m.GetArchetype()}";
+                if (iconSprite != null)
+                    UIPopUpManager.instance.CreatePopUp(popupText, iconSprite);
+                else
+                    UIPopUpManager.instance.CreatePopUp(popupText);
+            }
+        }
 
         ProcessEnemyTurnCombat();
 
@@ -427,5 +541,86 @@ public class SkillSlotMachine : MonoBehaviour
             }
         }
         return true;
+    }
+
+    // Public helpers
+    public void ForceSpinPreview()
+    {
+        spinMode = SpinMode.PreviewOnly;
+        Spin();
+    }
+
+    public void ForceSpinPlayerCombat()
+    {
+        spinMode = SpinMode.PlayerCombat;
+        Spin();
+    }
+
+    public void ForceSpinFullCombat()
+    {
+        spinMode = SpinMode.PlayerAndEnemy;
+        Spin();
+    }
+
+    // ---------------- Public API For spinning ----------------
+
+    public void TriggerSpinMode(SpinMode mode)
+    {
+        spinMode = mode;
+        Spin();
+    }
+
+    // player roll + combat + enemy counter-roll
+    public void TriggerFullCombatSpin()
+    {
+        TriggerSpinMode(SpinMode.PlayerAndEnemy);
+    }
+
+    // Preview spin – rolls visuals only, no combat logic
+    public void TriggerPreviewSpin()
+    {
+        TriggerSpinMode(SpinMode.PreviewOnly);
+    }
+
+    // Player-only combat spin – player rolls and resolves combat, Enemy does not battle
+    public void TriggerPlayerCombatSpin()
+    {
+        TriggerSpinMode(SpinMode.PlayerCombat);
+    }
+
+    // ---------------- Combat-only helpers ----------------
+
+    // Execute combat without performing another spin.
+    // If enemyRetaliates is true, enemy will roll once and attack back
+    public void ExecuteCombat(bool enemyRetaliates)
+    {
+        if (IsRolling())
+        {
+            Debug.LogWarning("[SkillSlotMachine] Cannot execute combat while reels are still spinning");
+            return;
+        }
+
+        // Player side combat
+        RunPlayerCombat();
+
+        if (enemyRetaliates == false)
+        {
+            SetButtonsInteractable(true);
+            // Player-only combat ends here
+            return; 
+        }
+
+        // uses existing EndPlayerTurn which handles enemy roll + combat
+        EndPlayerTurn();
+    }
+
+    public void ExecutePlayerCombatOnly()
+    {
+        ExecuteCombat(false);
+    }
+
+    public void ExecuteFullCombat()
+    {
+        ExecuteCombat(true);
     }
 } 

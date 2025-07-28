@@ -1,10 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum AttackBehaviour { PlayerCombatOnly, PlayerAndEnemy }
+
 [RequireComponent(typeof(Button))]
 public class UIAttack : MonoBehaviour
 {
     private Button button;
+    [SerializeField] private AttackBehaviour behaviour = AttackBehaviour.PlayerAndEnemy;
 
     private void Awake()
     {
@@ -22,7 +25,15 @@ public class UIAttack : MonoBehaviour
 
     private void OnAttackClicked()
     {
-        SkillSlotMachine.instance.EndPlayerTurn();
+        switch (behaviour)
+        {
+            case AttackBehaviour.PlayerCombatOnly:
+                SkillSlotMachine.instance.ExecutePlayerCombatOnly();
+                break;
+            case AttackBehaviour.PlayerAndEnemy:
+                SkillSlotMachine.instance.ExecuteFullCombat();
+                break;
+        }
     }
 
     public void SetInteractable(bool interactable)
