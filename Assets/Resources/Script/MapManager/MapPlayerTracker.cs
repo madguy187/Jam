@@ -104,6 +104,10 @@ namespace Map
                     mapManager.SaveMap();
                     SceneManager.LoadScene("Game_Shop");
                     break;
+                case NodeType.Blacksmith:
+                    mapManager.SaveMap();
+                    SceneManager.LoadScene("Game_Blacksmith");
+                    break;
                 case NodeType.MiniBoss:
                     mapManager.SaveMap();
                     EnemyManager.instance.nodeType = mapNode.Node.nodeType;

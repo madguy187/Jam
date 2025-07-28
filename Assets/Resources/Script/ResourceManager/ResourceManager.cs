@@ -9,6 +9,8 @@ public class ResourceManager : MonoBehaviour {
     Dictionary<string, RelicScriptableObject> _mapRelicSO = new Dictionary<string, RelicScriptableObject>();
     Dictionary<EffectType, EffectDetailScriptableObject> _mapEffectDetailSO = new Dictionary<EffectType, EffectDetailScriptableObject>();
 
+    public IReadOnlyDictionary<string, RelicScriptableObject> RelicSOMap => _mapRelicSO;
+
     Dictionary<string, GameObject> _mapMobSO = new Dictionary<string, GameObject>();
     Dictionary<string, eUnitTier> _mapMobTier = new Dictionary<string, eUnitTier>();
 
