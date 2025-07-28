@@ -125,6 +125,7 @@ public class PanelManager : MonoBehaviour
             {
                 // Update stats for the currently selected unit
                 UpdateUnitStats();
+                UpdateRelicBoxes();
             }
         }
     }
