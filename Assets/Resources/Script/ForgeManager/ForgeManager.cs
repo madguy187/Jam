@@ -12,17 +12,22 @@ public class ForgeManager : MonoBehaviour
     [Header("Bag Panel")]
     [SerializeField] private Transform bagContainer;         // GridLayoutGroup parent for bag
     [SerializeField] private GameObject bagSlotPrefab;       // UI prefab that displays a relic
-    [SerializeField] private GameObject relicItemPrefab;       // UI prefab that displays a relic
+    [SerializeField] private GameObject relicItemPrefab;     // UI prefab that displays a relic
+    public int bagSize = 100;  // Drop slot for bag items
 
-    [Header("Forge Panel")]
-    [SerializeField] private Image relicSlot1;
-    [SerializeField] private Image relicSlot2;
-    [SerializeField] private Image resultSlot;
+    [Header("UI Panels")]
+    [SerializeField] private GameObject forgeArea;
+    [SerializeField] private GameObject breakArea;
+    [SerializeField] private Sprite questionMarkSprite;
+
+    // [Header("Forge Panel")]
+    // [SerializeField] private Image relicSlot1;
+    // [SerializeField] private Image relicSlot2;
+    // [SerializeField] private Image resultSlot;
 
     [Header("Buttons")]
     [SerializeField] private Button mergeButton;
     [SerializeField] private Button breakButton;
-    [SerializeField] private Button forgeButton;
 
     [Header("Combiner")]
     public RelicCombiner relicCombiner;
@@ -30,6 +35,17 @@ public class ForgeManager : MonoBehaviour
     [Header("Test Relics")]
     public List<RelicScriptableObject> testRelics;
 
+    private Image relicSlot1;
+    private Image relicSlot2;
+    private Image resultSlot;
+    private Button forgeButton;
+
+    private Image breakInputSlot;
+    private Image breakResult1Slot;
+    private Image breakResult2Slot;
+    private Button breakRelicButton;
+
+    private bool isBreakMode = false;
     private RelicScriptableObject selectedRelic1;
     private RelicScriptableObject selectedRelic2;
     private RelicScriptableObject forgedResult;
@@ -42,66 +58,61 @@ public class ForgeManager : MonoBehaviour
         } else {
             Destroy(gameObject);
         }
+
+        InitMergeUI();
+        InitBreakUI();
     }
 
     private void Start()
     {
-        mergeButton.onClick.AddListener(() => Debug.Log("Merge Mode Selected")); // Placeholder for toggle logic
-        breakButton.onClick.AddListener(() => Debug.Log("Break Mode Selected"));
-        forgeButton.onClick.AddListener(DoForge);
+        mergeButton.onClick.AddListener(() => SetBreakMode(false));
+        breakButton.onClick.AddListener(() => SetBreakMode(true));
+        forgeButton.onClick.AddListener(DoForgeOrBreak);
+        breakRelicButton.onClick.AddListener(DoForgeOrBreak);
+
         ClearBagItemsOnly();
-        GenerateFixedBagSlots(12);
+        GenerateFixedBagSlots(bagSize);
         PopulateBagItems(testRelics);
+
         forgeButton.gameObject.SetActive(false);
+        SetBreakMode(false); // default to merge mode
     }
 
-    // =============================
-    // Bag Panel Setup
-    // =============================
-
-    public void ClearBagItemsOnly()
+    private void InitMergeUI()
     {
-        foreach (Transform slot in bagContainer) {
-            foreach (Transform child in slot) {
-                Destroy(child.gameObject); // Remove the item inside the slot
-            }
+        if (forgeArea == null)
+        {
+            Debug.LogError("ForgeArea not assigned in ForgeManager!");
+            return;
+        }
+
+        relicSlot1 = forgeArea.transform.Find("RelicSlot1")?.GetComponent<Image>();
+        relicSlot2 = forgeArea.transform.Find("RelicSlot2")?.GetComponent<Image>();
+        resultSlot = forgeArea.transform.Find("ResultSlot")?.GetComponent<Image>();
+        forgeButton = forgeArea.transform.Find("ForgeButton")?.GetComponent<Button>();
+
+        if (relicSlot1 == null || relicSlot2 == null || resultSlot == null)
+        {
+            Debug.LogError("One or more forge slots are missing under ForgeArea!");
         }
     }
 
-    public void GenerateFixedBagSlots(int count)
+    private void InitBreakUI()
     {
-        // Clear old slots
-        foreach (Transform child in bagContainer) {
-            Destroy(child.gameObject);
+        if (breakArea == null)
+        {
+            Debug.LogError("BreakArea not assigned in ForgeManager!");
+            return;
         }
-        // Create empty slots
-        for (int i = 0; i < count; i++) {
-            Instantiate(bagSlotPrefab, bagContainer);
-            bagContainer.GetChild(i).gameObject.AddComponent<ForgeBagDropSlot>();
-        }
-    }
+        
+        breakInputSlot = breakArea.transform.Find("RelicSlot")?.GetComponent<Image>();
+        breakResult1Slot = breakArea.transform.Find("ResultSlot1")?.GetComponent<Image>();
+        breakResult2Slot = breakArea.transform.Find("ResultSlot2")?.GetComponent<Image>();
+        breakRelicButton = breakArea.transform.Find("BreakButton")?.GetComponent<Button>();
 
-    public void PopulateBagItems(List<RelicScriptableObject> relics)
-    {
-        for (int i = 0; i < relics.Count && i < bagContainer.childCount; i++) {
-            var slot = bagContainer.GetChild(i);
-            var relicData = relics[i];
-            if (relicData == null) { continue; }
-            GameObject relicGO = Instantiate(relicItemPrefab, slot);
-
-            var image = relicGO.transform.Find("RelicImage").GetComponent<Image>();
-            var label = relicGO.transform.Find("RelicNameText").GetComponent<TMP_Text>();
-            var btn = relicGO.GetComponent<Button>();
-            image.sprite = relicData.GetRelicSprite();
-            label.text = relicData.GetRelicName();
-            relicGO.GetComponent<DraggableRelic>().relicData = relicData;
-    
-            // Optional: stretch to fit
-            RectTransform rt = relicGO.GetComponent<RectTransform>();
-            rt.anchorMin = Vector2.zero;
-            rt.anchorMax = Vector2.one;
-            rt.offsetMin = Vector2.zero;
-            rt.offsetMax = Vector2.zero;
+        if (breakInputSlot == null || breakResult1Slot == null || breakResult2Slot == null)
+        {
+            Debug.LogError("One or more break slots are missing under BreakArea!");
         }
     }
 
@@ -130,127 +141,334 @@ public class ForgeManager : MonoBehaviour
     }
 
     // =============================
+    // Bag Panel Setup
+    // =============================
+    public void ClearBagItemsOnly()
+    {
+        foreach (Transform slot in bagContainer) {
+            foreach (Transform child in slot) {
+                Destroy(child.gameObject); // Remove the item inside the slot
+            }
+        }
+    }
+
+    public void GenerateFixedBagSlots(int count)
+    {
+        foreach (Transform child in bagContainer) {
+            Destroy(child.gameObject);
+        }
+        for (int i = 0; i < count; i++) {
+            Instantiate(bagSlotPrefab, bagContainer);
+            bagContainer.GetChild(i).gameObject.AddComponent<ForgeBagDropSlot>();
+        }
+    }
+
+    public void PopulateBagItems(List<RelicScriptableObject> relics)
+    {
+        for (int i = 0; i < relics.Count && i < bagContainer.childCount; i++) {
+            var slot = bagContainer.GetChild(i);
+            var relicData = relics[i];
+            if (relicData == null) { continue; }
+            GameObject relicGO = Instantiate(relicItemPrefab, slot);
+
+            var image = relicGO.transform.Find("RelicImage").GetComponent<Image>();
+            var label = relicGO.transform.Find("RelicNameText").GetComponent<TMP_Text>();
+            image.sprite = relicData.GetRelicSprite();
+            label.text = relicData.GetRelicName();
+            relicGO.GetComponent<DraggableRelic>().relicData = relicData;
+
+            RectTransform rt = relicGO.GetComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+        }
+    }
+
+    // =============================
+    // Mode toggle
+    // =============================
+    private void SetBreakMode(bool enabled)
+    {
+        isBreakMode = enabled;
+
+        // Toggle UI panel visibility
+        forgeArea.SetActive(!enabled);
+        breakArea.SetActive(enabled);
+
+        // Toggle button interactables
+        mergeButton.interactable = isBreakMode;
+        breakButton.interactable = !isBreakMode;
+
+        // Clear UI state
+        ReturnAllSlotItemsToBag();
+        ClearResultSlot();
+
+        selectedRelic1 = null;
+        selectedRelic2 = null;
+    }
+
+    private void SetQuestionMark(Image slot)
+    {
+        if (slot == null) return;
+
+        foreach (Transform child in slot.transform)
+            Destroy(child.gameObject);
+
+        GameObject relicGO = Instantiate(relicItemPrefab, slot.transform);
+
+        var image = relicGO.transform.Find("RelicImage").GetComponent<Image>();
+        var label = relicGO.transform.Find("RelicNameText").GetComponent<TMP_Text>();
+
+        image.sprite = questionMarkSprite;
+        label.text = "?";
+
+        RectTransform rt = relicGO.GetComponent<RectTransform>();
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = Vector2.zero;
+        rt.offsetMax = Vector2.zero;
+    }
+
+    // =============================
     // Forge Logic
     // =============================
     private void TryUpdateForgeResult()
     {
-        // Clear any previous forged relic UI in the result slot container first
-        foreach (Transform child in resultSlotContainer)
-        {
-            Destroy(child.gameObject);
-        }
+        ClearResultSlot();
 
-        if (selectedRelic1 != null && selectedRelic2 != null)
+        if (!isBreakMode)
         {
-            RelicScriptableObject result;
-            if (relicCombiner.TryCombine(selectedRelic1, selectedRelic2, out result))
+            // Merge mode
+            if (selectedRelic1 != null && selectedRelic2 != null)
             {
-                // Instantiate the forged relic prefab inside the result slot container
-                GameObject forgedRelicGO = Instantiate(relicItemPrefab, resultSlotContainer);
-
-                var image = forgedRelicGO.transform.Find("RelicImage").GetComponent<Image>();
-                var label = forgedRelicGO.transform.Find("RelicNameText").GetComponent<TMP_Text>();
-                image.sprite = result.GetRelicSprite();
-                label.text = result.GetRelicName();
-
-                // Stretch to fit container
-                RectTransform rt = forgedRelicGO.GetComponent<RectTransform>();
-                rt.anchorMin = Vector2.zero;
-                rt.anchorMax = Vector2.one;
-                rt.offsetMin = Vector2.zero;
-                rt.offsetMax = Vector2.zero;
-
-                forgeButton.gameObject.SetActive(true);
-                Global.DEBUG_PRINT($"[ForgeManager::TryUpdateForgeResult] Forge Result: {result.GetRelicName()}");
-            }
-        } else {
-            forgeButton.gameObject.SetActive(false);
-            Global.DEBUG_PRINT("[ForgeManager::TryUpdateForgeResult] Not enough relics selected for forging.");
-        }
-    }
-
-    private void DoForge()
-    {
-        if (selectedRelic1 != null && selectedRelic2 != null)
-        {
-            if (relicCombiner.TryCombine(selectedRelic1, selectedRelic2, out var forgedResult))
-            {
-                Debug.Log($"Forged: {forgedResult.GetRelicName()}");
-
-                // Add forgedResult to testRelics list
-                testRelics.Add(forgedResult);
-
-                // Remove relic item GameObjects from the forge slots (destroy the children)
-                var go1 = relicSlot1.transform.GetChild(0).gameObject;
-                testRelics.Remove(go1.GetComponent<DraggableRelic>().relicData);
-                Destroy(go1);
-                var go2 = relicSlot2.transform.GetChild(0).gameObject;
-                testRelics.Remove(go2.GetComponent<DraggableRelic>().relicData);
-                Destroy(go2);
-
-                // Clear selected relic references
-                selectedRelic1 = null;
-                selectedRelic2 = null;
-
-                // Clear the result slot container children (destroy forged relic UI)
-                foreach (Transform child in resultSlotContainer)
+                if (relicCombiner.TryCombine(selectedRelic1, selectedRelic2, out var result))
                 {
-                    Destroy(child.gameObject);
+                    InstantiateResultRelic(result, resultSlotContainer);
+                    forgeButton.gameObject.SetActive(true);
                 }
-
-                // Clear forge slot images and hide them
-                // relicSlot1.sprite = null;
-                // relicSlot1.color = new Color(1, 1, 1, 0);
-                // relicSlot2.sprite = null;
-                // relicSlot2.color = new Color(1, 1, 1, 0);
-
-                // Refresh the bag display to show the new forged relic
-                ClearBagItemsOnly();
-                PopulateBagItems(testRelics);
+                else
+                {
+                    SetQuestionMark(resultSlot);
+                    forgeButton.gameObject.SetActive(false);
+                }
             }
             else
             {
-                Debug.Log("Invalid combination.");
+                SetQuestionMark(resultSlot);
+                forgeButton.gameObject.SetActive(false);
             }
         }
         else
         {
-            Debug.Log("Select two relics first.");
+            // Break mode
+            if (selectedRelic1 != null)
+            {
+                if (relicCombiner.TryBreak(selectedRelic1, out var part1, out var part2))
+                {
+                    InstantiateResultRelic(part1, breakResult1Slot.transform);
+                    InstantiateResultRelic(part2, breakResult2Slot.transform);
+                    breakRelicButton.gameObject.SetActive(true);
+                }
+                else
+                {
+                    SetQuestionMark(breakResult1Slot);
+                    SetQuestionMark(breakResult2Slot);
+                    breakRelicButton.gameObject.SetActive(false);
+                }
+            }
+            else
+            {
+                SetQuestionMark(breakResult1Slot);
+                SetQuestionMark(breakResult2Slot);
+                breakRelicButton.gameObject.SetActive(false);
+            }
         }
     }
 
-    public void ClearForgeSlots()
+
+    private void InstantiateResultRelic(RelicScriptableObject relic, Transform parent)
+    {
+        GameObject relicGO = Instantiate(relicItemPrefab, parent);
+        var image = relicGO.transform.Find("RelicImage").GetComponent<Image>();
+        var label = relicGO.transform.Find("RelicNameText").GetComponent<TMP_Text>();
+        image.sprite = relic.GetRelicSprite();
+        label.text = relic.GetRelicName();
+
+        RectTransform rt = relicGO.GetComponent<RectTransform>();
+        rt.anchorMin = Vector2.zero;
+        rt.anchorMax = Vector2.one;
+        rt.offsetMin = Vector2.zero;
+        rt.offsetMax = Vector2.zero;
+    }
+
+    private void ClearResultSlot()
+    {
+        foreach (Transform child in resultSlotContainer)
+            Destroy(child.gameObject);
+
+        if (breakResult1Slot != null)
+        {
+            foreach (Transform child in breakResult1Slot.transform)
+                Destroy(child.gameObject);
+        }
+
+        if (breakResult2Slot != null)
+        {
+            foreach (Transform child in breakResult2Slot.transform)
+                Destroy(child.gameObject);
+        }
+    }
+
+    private void DoForgeOrBreak()
+    {
+        if (!isBreakMode)
+        {
+            // Merge mode
+            if (selectedRelic1 != null && selectedRelic2 != null)
+            {
+                if (relicCombiner.TryCombine(selectedRelic1, selectedRelic2, out var forgedResult))
+                {
+                    testRelics.Add(forgedResult);
+
+                    // Remove relic GameObjects from forge slots, also remove relic data from list
+                    RemoveRelicFromSlot(relicSlot1, selectedRelic1);
+                    RemoveRelicFromSlot(relicSlot2, selectedRelic2);
+
+                    selectedRelic1 = null;
+                    selectedRelic2 = null;
+
+                    ClearResultSlot();
+
+                    ClearBagItemsOnly();
+                    PopulateBagItems(testRelics);
+                }
+                else
+                {
+                    Debug.Log("Invalid combination.");
+                }
+            }
+            else
+            {
+                Debug.Log("Select two relics first.");
+            }
+        }
+        else
+        {
+            // Break mode
+            if (selectedRelic1 != null)
+            {
+                if (relicCombiner.TryBreak(selectedRelic1, out var part1, out var part2))
+                {
+                    testRelics.Remove(selectedRelic1);
+                    testRelics.Add(part1);
+                    testRelics.Add(part2);
+
+                    if (breakInputSlot.transform.childCount > 0)
+                        Destroy(breakInputSlot.transform.GetChild(0).gameObject);
+
+                    selectedRelic1 = null;
+
+                    ClearResultSlot();
+                    ClearBagItemsOnly();
+                    PopulateBagItems(testRelics);
+                }
+                else
+                {
+                    Debug.Log("Cannot break this relic.");
+                }
+            }
+            else
+            {
+                Debug.Log("Select a relic to break first.");
+            }
+        }
+    }
+
+    private void RemoveRelicFromSlot(Image slotImage, RelicScriptableObject relic)
+    {
+        if (slotImage.transform.childCount > 0)
+        {
+            var go = slotImage.transform.GetChild(0).gameObject;
+            var draggable = go.GetComponent<DraggableRelic>();
+            if (draggable != null && draggable.relicData == relic)
+            {
+                testRelics.Remove(relic);
+                Destroy(go);
+            }
+        }
+    }
+
+    private void ClearAllForgeAndBreakSlots()
     {
         selectedRelic1 = null;
         selectedRelic2 = null;
-        // relicSlot1.sprite = null;
-        // relicSlot2.sprite = null;
-        // relicSlot1.color = new Color(1, 1, 1, 0);
-        // relicSlot2.color = new Color(1, 1, 1, 0);
-        // resultSlot.sprite = null;
-        // resultSlot.color = new Color(1, 1, 1, 0);
+
+        void ClearSlot(Image slot)
+        {
+            if (slot == null) return;
+            foreach (Transform child in slot.transform)
+            {
+                Destroy(child.gameObject);
+            }
+        }
+
+        ClearSlot(relicSlot1);
+        ClearSlot(relicSlot2);
+        ClearSlot(breakInputSlot);
+    }
+
+    private void ReturnAllSlotItemsToBag()
+    {
+        // Local function – try to move the child (if any) of a slot back to bag
+        void MoveChildToBag(Image slot)
+        {
+            if (slot == null) { return; }
+            if (slot.transform.childCount == 0) return;
+
+            var go = slot.transform.GetChild(0).gameObject;
+            SnapToFirstAvailableSlot(go);
+        }
+
+        // Merge‑area slots
+        MoveChildToBag(relicSlot1);
+        MoveChildToBag(relicSlot2);
+
+        // Break‑area slots
+        MoveChildToBag(breakInputSlot);
     }
 
     // =============================
-    // Drag-Drop Slot Assignment (Snap UI to slot)
+    // Drag-Drop Slot Assignment
     // =============================
     public void AssignRelicToSlot(RelicScriptableObject relic, ForgeSlotID slot, GameObject draggedObject)
     {
-        if (slot == ForgeSlotID.Slot1)
+        if (isBreakMode)
         {
             selectedRelic1 = relic;
-            // Move the dragged object into the slot
-            draggedObject.transform.SetParent(relicSlot1.transform);
+
+            // Clear break input slot if already occupied
+            foreach (Transform child in breakInputSlot.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            draggedObject.transform.SetParent(breakInputSlot.transform);
         }
-        else if (slot == ForgeSlotID.Slot2)
+        else
         {
-            selectedRelic2 = relic;
-            // Move the dragged object into the slot
-            draggedObject.transform.SetParent(relicSlot2.transform);
+            if (slot == ForgeSlotID.Slot1)
+            {
+                selectedRelic1 = relic;
+                draggedObject.transform.SetParent(relicSlot1.transform);
+            }
+            else if (slot == ForgeSlotID.Slot2)
+            {
+                selectedRelic2 = relic;
+                draggedObject.transform.SetParent(relicSlot2.transform);
+            }
         }
 
         draggedObject.transform.localPosition = Vector3.zero;
-        // Stretch to fit
         RectTransform rt = draggedObject.GetComponent<RectTransform>();
         rt.anchorMin = Vector2.zero;
         rt.anchorMax = Vector2.one;
@@ -258,12 +476,14 @@ public class ForgeManager : MonoBehaviour
         rt.offsetMax = Vector2.zero;
 
         Transform originalSlot = draggedObject.GetComponent<DraggableRelic>()?.OriginalSlot;
-        if (originalSlot != null && originalSlot.childCount > 0) {
-            Destroy(originalSlot.GetChild(0).gameObject); // only destroys the item
+        if (originalSlot != null && originalSlot.childCount > 0)
+        {
+            Destroy(originalSlot.GetChild(0).gameObject);
         }
 
         TryUpdateForgeResult();
     }
+
 
     public void RemoveRelicFromForge(RelicScriptableObject relic)
     {
@@ -288,4 +508,6 @@ public class ForgeManager : MonoBehaviour
 
         TryUpdateForgeResult();
     }
+
+    public bool IsBreakMode => isBreakMode;
 }

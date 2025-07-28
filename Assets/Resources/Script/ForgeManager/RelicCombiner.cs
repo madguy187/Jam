@@ -4,6 +4,7 @@ using UnityEngine;
 public class RelicCombiner : MonoBehaviour
 {
     private Dictionary<(RelicScriptableObject, RelicScriptableObject), RelicScriptableObject> combinationMap;
+    private Dictionary<RelicScriptableObject, (RelicScriptableObject part1, RelicScriptableObject part2)> breakMap;
 
     [SerializeField] private IReadOnlyDictionary<string, RelicScriptableObject> referenceRelics;
 
@@ -21,13 +22,14 @@ public class RelicCombiner : MonoBehaviour
     void BuildCombinationMap()
     {
         combinationMap = new Dictionary<(RelicScriptableObject, RelicScriptableObject), RelicScriptableObject>(new RelicPairComparer());
+        breakMap = new Dictionary<RelicScriptableObject, (RelicScriptableObject part1, RelicScriptableObject part2)>();
 
         // foreach (var key in referenceRelics.Keys)
         // {
         //     Debug.Log("Loaded relic: " + key);
         // }
 
-        void AddCombo(string nameA, string nameB, string resultName)
+        void AddComboAndBreak(string nameA, string nameB, string resultName)
         {
             if (!referenceRelics.ContainsKey(nameA))
             {
@@ -51,44 +53,45 @@ public class RelicCombiner : MonoBehaviour
 
             combinationMap[(a, b)] = result;
             combinationMap[(b, a)] = result;
+            breakMap[result] = (a, b); // Piggyback on the same map for breaking down relics
         }
 
         // Basic combinations
-        AddCombo("IronShard", "IronShard", "SharpenedBlade");
-        AddCombo("LightFeather", "LightFeather", "SkyDagger");
-        AddCombo("HardenedShell", "HardenedShell", "ReflectiveCore");
-        AddCombo("MagicCore", "MagicCore", "ReinforcedBattery");
-        AddCombo("BlessedCharm", "BlessedCharm", "GreaterBlessing");
-        AddCombo("PhantomInk", "PhantomInk", "TrueInvisibility");
-        AddCombo("DemonClaw", "DemonClaw", "BloodrendClaw");
+        AddComboAndBreak("IronShard", "IronShard", "SharpenedBlade");
+        AddComboAndBreak("LightFeather", "LightFeather", "SkyDagger");
+        AddComboAndBreak("HardenedShell", "HardenedShell", "ReflectiveCore");
+        AddComboAndBreak("MagicCore", "MagicCore", "ReinforcedBattery");
+        AddComboAndBreak("BlessedCharm", "BlessedCharm", "GreaterBlessing");
+        AddComboAndBreak("PhantomInk", "PhantomInk", "TrueInvisibility");
+        AddComboAndBreak("DemonClaw", "DemonClaw", "BloodrendClaw");
 
         // 2-component combos
-        AddCombo("IronShard", "LightFeather", "Executioner’sEdge");
-        AddCombo("IronShard", "HardenedShell", "Warplate");
-        AddCombo("IronShard", "BlessedCharm", "VampiricBrand");
-        AddCombo("IronShard", "MagicCore", "AssassinSigil");
-        AddCombo("IronShard", "DemonClaw", "BrutalSaber");
-        AddCombo("LightFeather", "BlessedCharm", "BlessedFang");
-        AddCombo("LightFeather", "PhantomInk", "ShadowWings");
-        AddCombo("LightFeather", "MagicCore", "PredatorFocus");
-        AddCombo("HardenedShell", "MagicCore", "SteelFrame");
-        AddCombo("HardenedShell", "PhantomInk", "IronVeil");
-        AddCombo("HardenedShell", "DemonClaw", "CrimsonPlating");
-        AddCombo("MagicCore", "BlessedCharm", "ProtectivePulse");
-        AddCombo("MagicCore", "PhantomInk", "NullField");
-        AddCombo("BlessedCharm", "PhantomInk", "SoulCloak");
+        AddComboAndBreak("IronShard", "LightFeather", "Executioner’sEdge");
+        AddComboAndBreak("IronShard", "HardenedShell", "Warplate");
+        AddComboAndBreak("IronShard", "BlessedCharm", "VampiricBrand");
+        AddComboAndBreak("IronShard", "MagicCore", "AssassinSigil");
+        AddComboAndBreak("IronShard", "DemonClaw", "BrutalSaber");
+        AddComboAndBreak("LightFeather", "BlessedCharm", "BlessedFang");
+        AddComboAndBreak("LightFeather", "PhantomInk", "ShadowWings");
+        AddComboAndBreak("LightFeather", "MagicCore", "PredatorFocus");
+        AddComboAndBreak("HardenedShell", "MagicCore", "SteelFrame");
+        AddComboAndBreak("HardenedShell", "PhantomInk", "IronVeil");
+        AddComboAndBreak("HardenedShell", "DemonClaw", "CrimsonPlating");
+        AddComboAndBreak("MagicCore", "BlessedCharm", "ProtectivePulse");
+        AddComboAndBreak("MagicCore", "PhantomInk", "NullField");
+        AddComboAndBreak("BlessedCharm", "PhantomInk", "SoulCloak");
 
         // Advanced 2nd-tier
-        AddCombo("Executioner’sEdge", "BrutalSaber", "DaggerofJudgment");
-        AddCombo("GreaterBlessing", "SoulCloak", "DivineHalo");
-        AddCombo("Warplate", "SteelFrame", "TitanArmor");
-        AddCombo("OverclockGauntlet", "SharpenedBlade", "StormPike");
-        AddCombo("ProtectivePulse", "ReinforcedBattery", "SanctifiedCore");
-        AddCombo("BlessedFang", "Executioner’sEdge", "Executioner’sBrand");
-        AddCombo("PredatorFocus", "VampiricBrand", "BloodruneClaws");
-        AddCombo("IronVeil", "ReflectiveCore", "CrimsonFortress");
-        AddCombo("SkyDagger", "SteelFrame", "SkyhammerCannon");
-        AddCombo("NullField", "GreaterBlessing", "BlessedCircuit");
+        AddComboAndBreak("Executioner’sEdge", "BrutalSaber", "DaggerofJudgment");
+        AddComboAndBreak("GreaterBlessing", "SoulCloak", "DivineHalo");
+        AddComboAndBreak("Warplate", "SteelFrame", "TitanArmor");
+        AddComboAndBreak("OverclockGauntlet", "SharpenedBlade", "StormPike");
+        AddComboAndBreak("ProtectivePulse", "ReinforcedBattery", "SanctifiedCore");
+        AddComboAndBreak("BlessedFang", "Executioner’sEdge", "Executioner’sBrand");
+        AddComboAndBreak("PredatorFocus", "VampiricBrand", "BloodruneClaws");
+        AddComboAndBreak("IronVeil", "ReflectiveCore", "CrimsonFortress");
+        AddComboAndBreak("SkyDagger", "SteelFrame", "SkyhammerCannon");
+        AddComboAndBreak("NullField", "GreaterBlessing", "BlessedCircuit");
     }
 
     public bool TryCombine(RelicScriptableObject a, RelicScriptableObject b, out RelicScriptableObject result)
@@ -115,5 +118,18 @@ public class RelicCombiner : MonoBehaviour
             int h2 = pair.Item2.GetInstanceID();
             return h1 ^ h2;
         }
+    }
+
+    public bool TryBreak(RelicScriptableObject relicToBreak, out RelicScriptableObject part1, out RelicScriptableObject part2)
+    {
+        if (breakMap != null && breakMap.TryGetValue(relicToBreak, out var parts))
+        {
+            part1 = parts.part1;
+            part2 = parts.part2;
+            return true;
+        }
+        part1 = null;
+        part2 = null;
+        return false;
     }
 }
