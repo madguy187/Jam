@@ -150,8 +150,8 @@ public class SkillSlotMachine : MonoBehaviour
             }
         }
 
-        if (spinMode == SpinMode.PreviewOnly) { cost = 0; }  
-        if (spinMode != SpinMode.PreviewOnly) { spinsThisTurn++; }
+        // Every spin (including previews) counts toward escalating cost
+        spinsThisTurn++;
 
         // Disable buttons during spin
         SetButtonsInteractable(false);
