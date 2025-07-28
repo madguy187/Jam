@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class UIPopUpManager : MonoBehaviour {
     public static UIPopUpManager instance;
 
-    [SerializeField] Transform transDefault = null;
+    [SerializeField] RectTransform transDefault = null;
     [SerializeField] GameObject prefabPopUp = null;
     [SerializeField] float fGap = 5.0f;
     [SerializeField] float fLifeTime = 3.0f;
@@ -40,6 +40,9 @@ public class UIPopUpManager : MonoBehaviour {
     }
 
     public void Update() {
+        if (Input.GetKeyDown(KeyCode.Q)) {
+            CreatePopUp("test");
+        }
         if (_listCurrentPopUp.Count <= 0) {
             return;
         }
@@ -57,24 +60,23 @@ public class UIPopUpManager : MonoBehaviour {
 
     public void CreatePopUp(string text) {
         GameObject obj = Instantiate(prefabPopUp, transform);
-        obj.transform.position = GetStartingPos(_listCurrentPopUp.Count);
         UIPopUp popUpComp = obj.GetComponent<UIPopUp>();
-        popUpComp.Init(text);
+        popUpComp.Init(GetStartingPos(_listCurrentPopUp.Count), text);
         _listCurrentPopUp.Add(popUpComp);
     }
 
     public void CreatePopUp(string text, Sprite icon)
     {
         GameObject obj = Instantiate(prefabPopUp, transform);
-        obj.transform.position = GetStartingPos(_listCurrentPopUp.Count);
         UIPopUp pop = obj.GetComponent<UIPopUp>();
-        pop.Init(text, icon);
+        pop.Init(GetStartingPos(_listCurrentPopUp.Count), text, icon);
         _listCurrentPopUp.Add(pop);
     }
 
     public Vector3 GetStartingPos(int index) {
         float yOffset = popupHeight + fGap;
-        Vector3 pos = transDefault.position;
+        Vector3 pos = transDefault.anchoredPosition;
+        Debug.Log(pos);
         pos.y -= yOffset * index;
 
         return pos;

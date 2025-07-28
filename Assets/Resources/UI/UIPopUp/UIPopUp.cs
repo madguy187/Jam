@@ -7,8 +7,9 @@ public class UIPopUp : MonoBehaviour {
     [SerializeField] TMP_Text objText = null;
     [SerializeField] float fMoveTime = 1.0f;
     [SerializeField] Image imgIcon = null;
+    [SerializeField] Animator anim = null;
+    [SerializeField] RectTransform objPanel = null;
 
-    Animator anim = null;
     bool bPrepToDestroy = false;
 
     float fGoalY = 0.0f;
@@ -17,13 +18,11 @@ public class UIPopUp : MonoBehaviour {
     float fCurrentTime = 0.0f;
     float fCurrentValue = 0.0f;
 
-    void Start() {
-        anim = GetComponent<Animator>();
-    }
+    public void Init(Vector3 vecStartingPos, string text, Sprite icon = null) {
+        objPanel.anchoredPosition = vecStartingPos;
 
-    public void Init(string text, Sprite icon = null) {
-        fStartY = transform.position.y;
-        fGoalY = transform.position.y;
+        fStartY = objPanel.anchoredPosition.y;
+        fGoalY = objPanel.anchoredPosition.y;
         objText.text = text;
 
         if (imgIcon != null) {
@@ -37,7 +36,7 @@ public class UIPopUp : MonoBehaviour {
     }
 
     public void SetGoalY(float y) {
-        fStartY = transform.position.y;
+        fStartY = objPanel.anchoredPosition.y;
         fGoalY = y;
     }
 
@@ -55,10 +54,10 @@ public class UIPopUp : MonoBehaviour {
         float t = Mathf.Clamp01(fCurrentTime / fMoveTime);
         fCurrentValue = Mathf.Lerp(fStartY, fGoalY, t);
 
-        Vector3 pos = transform.position;
+        Vector3 pos = objPanel.anchoredPosition;
         pos.y = fCurrentValue;
 
-        transform.position = pos;
+        objPanel.anchoredPosition = pos;
     }
 
     void UpdatePopUpBehavior() {
