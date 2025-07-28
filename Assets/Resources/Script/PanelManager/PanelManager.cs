@@ -145,26 +145,21 @@ public class PanelManager : MonoBehaviour
 
     private void UpdateRelicBoxes()
     {
-        if (!relicsInitialized) return;
+        if (relicBoxes == null || relicBoxes.Length == 0) return;
 
-        if (relicsByTier.TryGetValue(RelicTier.Basic, out RelicConfig.RelicData[] basicRelics))
-        {
-            foreach (var relic in basicRelics)
-            {
-                if (relicBoxMap.TryGetValue(relic.name, out RelicBoxUI relicBox))
-                {
-                    relicBox.SetupRelic(relic);
-                    relicBox.gameObject.SetActive(true); 
-                }
-            }
-        }
+        // Hide all first
+        foreach (var rb in relicBoxes)
+            if (rb != null) rb.gameObject.SetActive(false);
 
-        foreach (var relicBox in relicBoxes)
+        if (currentUnit == null) return;
+
+        List<RelicScriptableObject> relicList = currentUnit.GetRelic();
+        for (int i = 0; i < relicBoxes.Length && i < relicList.Count; i++)
         {
-            if (relicBox != null && !relicBox.gameObject.activeSelf)
-            {
-                relicBox.gameObject.SetActive(true);
-            }
+            RelicBoxUI box = relicBoxes[i];
+            if (box == null) continue;
+            box.SetupRelicSO(relicList[i]);
+            box.gameObject.SetActive(true);
         }
     }
 
@@ -180,7 +175,7 @@ public class PanelManager : MonoBehaviour
         
         if (unitIconImage != null)
         {
-            Sprite iconSprite = GetUnitIconSprite(unit);
+            Sprite iconSprite = RenderUtilities.RenderUnitHeadSprite(unit);
             if (iconSprite != null)
             {
                 unitIconImage.sprite = iconSprite;
@@ -264,26 +259,5 @@ public class PanelManager : MonoBehaviour
         {
             instance = null;
         }
-    }
-
-    private Sprite GetUnitIconSprite(UnitObject unit)
-    {
-        if (unit == null) return null;
-
-        Transform root = unit.transform.Find("UnitRoot");
-        GameObject target = root != null ? root.gameObject : unit.gameObject;
-
-        var (rt, camObj) = RenderUtilities.RenderUnitToTexture(target, 1.25f);
-        if (rt == null)
-        {
-            if (camObj != null) Destroy(camObj);
-            return null;
-        }
-
-        Sprite sprite = RenderUtilities.ConvertRenderTextureToSprite(rt);
-
-        Destroy(camObj);
-        Destroy(rt);
-        return sprite;
     }
 } 

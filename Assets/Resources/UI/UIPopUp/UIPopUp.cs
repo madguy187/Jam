@@ -1,10 +1,12 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIPopUp : MonoBehaviour {
 
     [SerializeField] TMP_Text objText = null;
     [SerializeField] float fMoveTime = 1.0f;
+    [SerializeField] Image imgIcon = null;
 
     Animator anim = null;
     bool bPrepToDestroy = false;
@@ -19,10 +21,19 @@ public class UIPopUp : MonoBehaviour {
         anim = GetComponent<Animator>();
     }
 
-    public void Init(string text) {
+    public void Init(string text, Sprite icon = null) {
         fStartY = transform.position.y;
         fGoalY = transform.position.y;
         objText.text = text;
+
+        if (imgIcon != null) {
+            if (icon != null) {
+                imgIcon.enabled = true;
+                imgIcon.sprite = icon;
+            } else {
+                imgIcon.enabled = false;
+            }
+        }
     }
 
     public void SetGoalY(float y) {

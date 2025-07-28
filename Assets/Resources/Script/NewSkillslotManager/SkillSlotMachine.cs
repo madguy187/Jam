@@ -53,6 +53,10 @@ public class SkillSlotMachine : MonoBehaviour
     [SerializeField] private bool fullCombatSpin;
     [SerializeField] private AttackBehaviour behaviour = AttackBehaviour.PlayerAndEnemyCombat;
 
+    [Header("Enemy Spin Settings")]
+    // If false, enemy dont spin visually, results processed in background
+    [SerializeField] private bool enemyVisualSpin = false; 
+
     private void Awake()
     {
         if (instance == null)
@@ -436,12 +440,51 @@ public class SkillSlotMachine : MonoBehaviour
 
         SpinMode previousMode = spinMode;
         // enemy spin should not trigger player combat
-        spinMode = SpinMode.PreviewOnly;  
+        spinMode = SpinMode.PreviewOnly;
 
-        yield return SpinWithPresetSymbols(symbols);
+        if (enemyVisualSpin)
+        {
+            // run visual spin with preset symbols
+            yield return SpinWithPresetSymbols(symbols);
+        }
+        else
+        {
+            //  process results immediately without visual spin
+            ProcessSpinResults(symbols);
+        }
 
         // restore original mode for subsequent player actions
         spinMode = previousMode;
+
+        // Show popup summarising enemy roll 
+        if (UIPopUpManager.instance != null && lastSpinResult != null)
+        {
+            List<Match> enemyMatches = lastSpinResult.GetAllMatches();
+            foreach (Match m in enemyMatches)
+            {
+                UnitObject matchUnit = null;
+                for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
+                {
+                    UnitObject u = enemyDeck.GetUnitObject(i);
+                    if (u != null && u.unitSO != null && u.unitSO.eUnitArchetype == m.GetArchetype())
+                    {
+                        matchUnit = u; break;
+                    }
+                }
+
+                Sprite iconSprite = null;
+                if (matchUnit != null)
+                {
+                    iconSprite = RenderUtilities.RenderUnitHeadSprite(matchUnit);
+                }
+
+                string popupText = $"{m.GetMatchType()} {m.GetArchetype()}";
+                if (iconSprite != null)
+                    UIPopUpManager.instance.CreatePopUp(popupText, iconSprite);
+                else
+                    UIPopUpManager.instance.CreatePopUp(popupText);
+            }
+        }
 
         ProcessEnemyTurnCombat();
 
