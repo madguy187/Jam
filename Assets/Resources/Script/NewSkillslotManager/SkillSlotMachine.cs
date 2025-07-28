@@ -40,13 +40,18 @@ public class SkillSlotMachine : MonoBehaviour
         PlayerAndEnemy      
     }
 
-    [SerializeField] public SpinMode spinMode = SpinMode.PlayerAndEnemy;
+    public enum AttackBehaviour 
+    { 
+        PlayerCombatOnly, PlayerAndEnemyCombat 
+    }
 
+
+    [SerializeField] public SpinMode spinMode = SpinMode.PlayerAndEnemy;
     [Header("Individual Roll Settings")]
     [SerializeField] private bool previewSpin;
     [SerializeField] private bool playerCombatSpin;
     [SerializeField] private bool fullCombatSpin;
-
+    [SerializeField] private AttackBehaviour behaviour = AttackBehaviour.PlayerAndEnemyCombat;
 
     private void Awake()
     {
@@ -429,7 +434,14 @@ public class SkillSlotMachine : MonoBehaviour
         Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
         SymbolType[] symbols = SymbolGenerator.instance.GenerateSymbolsForDeck(enemyDeck);
 
+        // Prevent recursive enemy turns: treat this spin as PLAYER_COMBAT (enemy-only)
+        SpinMode previousMode = spinMode;
+        spinMode = SpinMode.PlayerCombat;
+
         yield return SpinWithPresetSymbols(symbols);
+
+        // restore original mode for subsequent player actions
+        spinMode = previousMode;
 
         ProcessEnemyTurnCombat();
 
@@ -505,5 +517,67 @@ public class SkillSlotMachine : MonoBehaviour
     {
         spinMode = SpinMode.PlayerAndEnemy;
         Spin();
+    }
+
+    // ---------------- Public API For spinning ----------------
+
+    public void TriggerSpinMode(SpinMode mode)
+    {
+        spinMode = mode;
+        Spin();
+    }
+
+    // player roll + combat + enemy counter-roll
+    public void TriggerFullCombatSpin()
+    {
+        TriggerSpinMode(SpinMode.PlayerAndEnemy);
+    }
+
+    // Preview spin – rolls visuals only, no combat logic
+    public void TriggerPreviewSpin()
+    {
+        TriggerSpinMode(SpinMode.PreviewOnly);
+    }
+
+    // Player-only combat spin – player rolls and resolves combat, Enemy does not battle
+    public void TriggerPlayerCombatSpin()
+    {
+        TriggerSpinMode(SpinMode.PlayerCombat);
+    }
+
+    // ---------------- Combat-only helpers ----------------
+
+    // Execute combat without performing another spin.
+    // If enemyRetaliates is true, enemy will roll once and attack back
+    public void ExecuteCombat(bool enemyRetaliates)
+    {
+        if (IsRolling())
+        {
+            Debug.LogWarning("[SkillSlotMachine] Cannot execute combat while reels are still spinning");
+            return;
+        }
+
+        // Player side combat
+        RunPlayerCombat();
+
+        if (enemyRetaliates == false)
+        {
+            SetButtonsInteractable(true);
+            // Player-only combat ends here
+            return; 
+        }
+
+        // uses existing EndPlayerTurn which handles enemy roll + combat
+        EndPlayerTurn();
+    }
+
+    public void ExecutePlayerCombatOnly()
+    {
+        ExecuteCombat(false);
+    }
+
+    public void ExecuteFullCombat()
+    {
+        ExecuteCombat(true);
     }
 } 
