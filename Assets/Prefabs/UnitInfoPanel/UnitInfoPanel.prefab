@@ -2961,6 +2961,7 @@ MonoBehaviour:
   relicBoxes:
   - {fileID: 344687560019954376}
   - {fileID: 4297791676628591425}
+  - {fileID: 5436796370035382334}
   relicConfig: {fileID: 11400000, guid: f6bda3352b93647c0ade2060d4f8d2d4, type: 2}
 --- !u!1 &7964059843142234997
 GameObject:

@@ -150,7 +150,13 @@ public class PanelManager : MonoBehaviour
 
         // Hide all first
         foreach (var rb in relicBoxes)
-            if (rb != null) rb.gameObject.SetActive(false);
+        {
+            if (rb != null)
+            {
+                rb.SetupRelicSO(null); 
+                rb.gameObject.SetActive(false);
+            }
+        }
 
         if (currentUnit == null) return;
 
