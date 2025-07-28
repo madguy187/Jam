@@ -3,36 +3,44 @@ using UnityEngine.EventSystems;
 
 public class DraggableRelic : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public RelicScriptableObject data;
-    public ForgeManager forgeManager;
+    public RelicScriptableObject relicData;
 
-    public Transform originalParent;
-    private Vector2 offset;
+    private CanvasGroup canvasGroup;
+    private Transform originalParent;
+    private RectTransform rectTransform;
+
+    private void Awake()
+    {
+        canvasGroup = GetComponent<CanvasGroup>();
+        rectTransform = GetComponent<RectTransform>();
+    }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
         originalParent = transform.parent;
-        transform.SetParent(transform.root); // drag to top
-        offset = eventData.position - (Vector2)transform.position;
+        transform.SetParent(transform.root); // drag on top
+        canvasGroup.blocksRaycasts = false;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        transform.position = eventData.position - offset;
+        rectTransform.position = eventData.position;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        GameObject target = eventData.pointerEnter;
-        if (target != null && (target.name == "RelicXSlot" || target.name == "RelicYSlot"))
+        canvasGroup.blocksRaycasts = true;
+
+        if (transform.parent == transform.root)
         {
-            // forgeManager.AcceptDrop(data, target.transform);
-            Destroy(gameObject);
-        }
-        else
-        {
+            // Not dropped on a valid slot, return to original slot
             transform.SetParent(originalParent);
-            transform.localPosition = Vector3.zero;
+            rectTransform.localPosition = Vector3.zero;
         }
+    }
+
+    public Transform originalSlot
+    {
+        get { return originalParent; }
     }
 }

@@ -87,8 +87,10 @@ GameObject:
   - component: {fileID: 1282901287878366541}
   - component: {fileID: 1253020720675134078}
   - component: {fileID: 1659244635707958884}
+  - component: {fileID: 4333004787432563615}
+  - component: {fileID: 3660732496758091561}
   m_Layer: 0
-  m_Name: ForgeBagSlotPrefab
+  m_Name: ForgeRelicItemPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -113,7 +115,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -34.360046, y: 77.48654}
-  m_SizeDelta: {x: 160, y: 30}
+  m_SizeDelta: {x: 80, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1282901287878366541
 CanvasRenderer:
@@ -197,6 +199,31 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &4333004787432563615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3687713428111328508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac9fa643e667d0a40afa159b24371175, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  relicData: {fileID: 0}
+--- !u!225 &3660732496758091561
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3687713428111328508}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &8482019444371827411
 GameObject:
   m_ObjectHideFlags: 0
@@ -289,8 +316,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 14
-  m_fontSizeBase: 14
+  m_fontSize: 6
+  m_fontSizeBase: 6
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

@@ -22,10 +22,10 @@ public class RelicCombiner : MonoBehaviour
     {
         combinationMap = new Dictionary<(RelicScriptableObject, RelicScriptableObject), RelicScriptableObject>(new RelicPairComparer());
 
-        foreach (var key in referenceRelics.Keys)
-        {
-            Debug.Log("Loaded relic: " + key);
-        }
+        // foreach (var key in referenceRelics.Keys)
+        // {
+        //     Debug.Log("Loaded relic: " + key);
+        // }
 
         void AddCombo(string nameA, string nameB, string resultName)
         {
