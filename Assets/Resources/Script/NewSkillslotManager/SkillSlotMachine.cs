@@ -434,9 +434,9 @@ public class SkillSlotMachine : MonoBehaviour
         Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
         SymbolType[] symbols = SymbolGenerator.instance.GenerateSymbolsForDeck(enemyDeck);
 
-        // Prevent recursive enemy turns: treat this spin as PLAYER_COMBAT (enemy-only)
         SpinMode previousMode = spinMode;
-        spinMode = SpinMode.PlayerCombat;
+        // enemy spin should not trigger player combat
+        spinMode = SpinMode.PreviewOnly;  
 
         yield return SpinWithPresetSymbols(symbols);
 
