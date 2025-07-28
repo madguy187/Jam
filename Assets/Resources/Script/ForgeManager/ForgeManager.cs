@@ -52,6 +52,7 @@ public class ForgeManager : MonoBehaviour
         ClearBagItemsOnly();
         GenerateFixedBagSlots(12);
         PopulateBagItems(testRelics);
+        forgeButton.gameObject.SetActive(false);
     }
 
     // =============================
@@ -159,8 +160,12 @@ public class ForgeManager : MonoBehaviour
                 rt.offsetMin = Vector2.zero;
                 rt.offsetMax = Vector2.zero;
 
+                forgeButton.gameObject.SetActive(true);
                 Global.DEBUG_PRINT($"[ForgeManager::TryUpdateForgeResult] Forge Result: {result.GetRelicName()}");
             }
+        } else {
+            forgeButton.gameObject.SetActive(false);
+            Global.DEBUG_PRINT("[ForgeManager::TryUpdateForgeResult] Not enough relics selected for forging.");
         }
     }
 
