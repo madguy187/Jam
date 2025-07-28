@@ -9,6 +9,8 @@ public class DraggableRelic : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     private Transform originalParent;
     private RectTransform rectTransform;
 
+    public Transform OriginalSlot => originalParent;
+
     private void Awake()
     {
         canvasGroup = GetComponent<CanvasGroup>();
@@ -18,7 +20,7 @@ public class DraggableRelic : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     public void OnBeginDrag(PointerEventData eventData)
     {
         originalParent = transform.parent;
-        transform.SetParent(transform.root); // drag on top
+        transform.SetParent(transform.root); // bring to front for dragging
         canvasGroup.blocksRaycasts = false;
     }
 
@@ -31,16 +33,25 @@ public class DraggableRelic : MonoBehaviour, IBeginDragHandler, IDragHandler, IE
     {
         canvasGroup.blocksRaycasts = true;
 
+        // If not dropped onto a valid slot
         if (transform.parent == transform.root)
         {
-            // Not dropped on a valid slot, return to original slot
-            transform.SetParent(originalParent);
-            rectTransform.localPosition = Vector3.zero;
+            ReturnToOriginalSlot();
         }
     }
 
-    public Transform originalSlot
+    public void ReturnToOriginalSlot()
     {
-        get { return originalParent; }
+        transform.SetParent(originalParent);
+        StretchToFill();
+    }
+
+    public void StretchToFill()
+    {
+        rectTransform.anchorMin = Vector2.zero;
+        rectTransform.anchorMax = Vector2.one;
+        rectTransform.offsetMin = Vector2.zero;
+        rectTransform.offsetMax = Vector2.zero;
+        rectTransform.localPosition = Vector3.zero;
     }
 }

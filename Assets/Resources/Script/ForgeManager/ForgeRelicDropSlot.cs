@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class RelicDropSlot : MonoBehaviour, IDropHandler
+public class ForgeRelicDropSlot : MonoBehaviour, IDropHandler
 {
     public ForgeSlotID slotID;
 

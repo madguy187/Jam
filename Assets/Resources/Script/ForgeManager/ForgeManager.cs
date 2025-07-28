@@ -33,6 +33,7 @@ public class ForgeManager : MonoBehaviour
     private RelicScriptableObject selectedRelic1;
     private RelicScriptableObject selectedRelic2;
     private RelicScriptableObject forgedResult;
+    [SerializeField] private Transform resultSlotContainer;
 
     private void Awake()
     {
@@ -75,6 +76,7 @@ public class ForgeManager : MonoBehaviour
         // Create empty slots
         for (int i = 0; i < count; i++) {
             Instantiate(bagSlotPrefab, bagContainer);
+            bagContainer.GetChild(i).gameObject.AddComponent<ForgeBagDropSlot>();
         }
     }
 
@@ -102,20 +104,62 @@ public class ForgeManager : MonoBehaviour
         }
     }
 
+    public bool SnapToFirstAvailableSlot(GameObject draggedGO)
+    {
+        foreach (Transform slot in bagContainer)
+        {
+            if (slot.childCount == 0)
+            {
+                // Snap to this slot
+                draggedGO.transform.SetParent(slot, true);
+
+                // Stretch to fit
+                RectTransform rt = draggedGO.GetComponent<RectTransform>();
+                rt.anchorMin = Vector2.zero;
+                rt.anchorMax = Vector2.one;
+                rt.offsetMin = Vector2.zero;
+                rt.offsetMax = Vector2.zero;
+
+                return true;
+            }
+        }
+
+        Global.DEBUG_PRINT("[ForgeManager::SnapToFirstAvailableSlot] No empty slot found.");
+        return false;
+    }
+
     // =============================
     // Forge Logic
     // =============================
     private void TryUpdateForgeResult()
     {
-        if (selectedRelic1 != null && selectedRelic2 != null) {
+        // Clear any previous forged relic UI in the result slot container first
+        foreach (Transform child in resultSlotContainer)
+        {
+            Destroy(child.gameObject);
+        }
+
+        if (selectedRelic1 != null && selectedRelic2 != null)
+        {
             RelicScriptableObject result;
-            if (relicCombiner.TryCombine(selectedRelic1, selectedRelic2, out result)) {
-                resultSlot.sprite = result.GetRelicSprite();
-                resultSlot.color = Color.white;
+            if (relicCombiner.TryCombine(selectedRelic1, selectedRelic2, out result))
+            {
+                // Instantiate the forged relic prefab inside the result slot container
+                GameObject forgedRelicGO = Instantiate(relicItemPrefab, resultSlotContainer);
+
+                var image = forgedRelicGO.transform.Find("RelicImage").GetComponent<Image>();
+                var label = forgedRelicGO.transform.Find("RelicNameText").GetComponent<TMP_Text>();
+                image.sprite = result.GetRelicSprite();
+                label.text = result.GetRelicName();
+
+                // Stretch to fit container
+                RectTransform rt = forgedRelicGO.GetComponent<RectTransform>();
+                rt.anchorMin = Vector2.zero;
+                rt.anchorMax = Vector2.one;
+                rt.offsetMin = Vector2.zero;
+                rt.offsetMax = Vector2.zero;
+
                 Global.DEBUG_PRINT($"[ForgeManager::TryUpdateForgeResult] Forge Result: {result.GetRelicName()}");
-            } else {
-                resultSlot.sprite = null;
-                resultSlot.color = new Color(1, 1, 1, 0); // hide
             }
         }
     }
@@ -126,48 +170,42 @@ public class ForgeManager : MonoBehaviour
         {
             if (relicCombiner.TryCombine(selectedRelic1, selectedRelic2, out var forgedResult))
             {
-                resultSlot.sprite = forgedResult.GetRelicSprite();
-                resultSlot.color = Color.white;
                 Debug.Log($"Forged: {forgedResult.GetRelicName()}");
 
                 // Add forgedResult to testRelics list
                 testRelics.Add(forgedResult);
 
                 // Remove relic item GameObjects from the forge slots (destroy the children)
-                if (relicSlot1.transform.childCount > 0)
-                {
-                    var go = relicSlot1.transform.GetChild(0).gameObject;
-                    testRelics.Remove(go.GetComponent<DraggableRelic>().relicData);
-                    Destroy(go);
-                }
-                if (relicSlot2.transform.childCount > 0)
-                {
-                    var go = relicSlot2.transform.GetChild(0).gameObject;
-                    testRelics.Remove(go.GetComponent<DraggableRelic>().relicData);
-                    Destroy(go);
-                }
+                var go1 = relicSlot1.transform.GetChild(0).gameObject;
+                testRelics.Remove(go1.GetComponent<DraggableRelic>().relicData);
+                Destroy(go1);
+                var go2 = relicSlot2.transform.GetChild(0).gameObject;
+                testRelics.Remove(go2.GetComponent<DraggableRelic>().relicData);
+                Destroy(go2);
 
                 // Clear selected relic references
                 selectedRelic1 = null;
                 selectedRelic2 = null;
 
-                // Clear forge slot images and hide them
-                relicSlot1.sprite = null;
-                relicSlot1.color = new Color(1, 1, 1, 0);
-                relicSlot2.sprite = null;
-                relicSlot2.color = new Color(1, 1, 1, 0);
+                // Clear the result slot container children (destroy forged relic UI)
+                foreach (Transform child in resultSlotContainer)
+                {
+                    Destroy(child.gameObject);
+                }
 
-                // Clear result slot after a short delay or keep showing (optional)
-                // resultSlot.sprite = null;
-                // resultSlot.color = new Color(1, 1, 1, 0);
+                // Clear forge slot images and hide them
+                // relicSlot1.sprite = null;
+                // relicSlot1.color = new Color(1, 1, 1, 0);
+                // relicSlot2.sprite = null;
+                // relicSlot2.color = new Color(1, 1, 1, 0);
 
                 // Refresh the bag display to show the new forged relic
+                ClearBagItemsOnly();
                 PopulateBagItems(testRelics);
             }
             else
             {
                 Debug.Log("Invalid combination.");
-                resultSlot.color = new Color(1, 1, 1, 0);
             }
         }
         else
@@ -180,12 +218,12 @@ public class ForgeManager : MonoBehaviour
     {
         selectedRelic1 = null;
         selectedRelic2 = null;
-        relicSlot1.sprite = null;
-        relicSlot2.sprite = null;
-        relicSlot1.color = new Color(1, 1, 1, 0);
-        relicSlot2.color = new Color(1, 1, 1, 0);
-        resultSlot.sprite = null;
-        resultSlot.color = new Color(1, 1, 1, 0);
+        // relicSlot1.sprite = null;
+        // relicSlot2.sprite = null;
+        // relicSlot1.color = new Color(1, 1, 1, 0);
+        // relicSlot2.color = new Color(1, 1, 1, 0);
+        // resultSlot.sprite = null;
+        // resultSlot.color = new Color(1, 1, 1, 0);
     }
 
     // =============================
@@ -214,9 +252,34 @@ public class ForgeManager : MonoBehaviour
         rt.offsetMin = Vector2.zero;
         rt.offsetMax = Vector2.zero;
 
-        Transform originalSlot = draggedObject.GetComponent<DraggableRelic>()?.originalSlot;
-        if (originalSlot != null)
-            Destroy(originalSlot.gameObject);
+        Transform originalSlot = draggedObject.GetComponent<DraggableRelic>()?.OriginalSlot;
+        if (originalSlot != null && originalSlot.childCount > 0) {
+            Destroy(originalSlot.GetChild(0).gameObject); // only destroys the item
+        }
+
+        TryUpdateForgeResult();
+    }
+
+    public void RemoveRelicFromForge(RelicScriptableObject relic)
+    {
+        if (selectedRelic1 == relic)
+        {
+            selectedRelic1 = null;
+            if (relicSlot1.transform.childCount > 0)
+            {
+                var go = relicSlot1.transform.GetChild(0).gameObject;
+                Destroy(go);
+            }
+        }
+        else if (selectedRelic2 == relic)
+        {
+            selectedRelic2 = null;
+            if (relicSlot2.transform.childCount > 0)
+            {
+                var go = relicSlot2.transform.GetChild(0).gameObject;
+                Destroy(go);
+            }
+        }
 
         TryUpdateForgeResult();
     }
