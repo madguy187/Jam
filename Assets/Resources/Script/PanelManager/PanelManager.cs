@@ -180,10 +180,18 @@ public class PanelManager : MonoBehaviour
         
         if (unitIconImage != null)
         {
-            SpriteRenderer spriteRenderer = unit.GetComponent<SpriteRenderer>();
-            if (spriteRenderer != null && spriteRenderer.sprite != null)
+            Sprite iconSprite = GetUnitIconSprite(unit);
+            if (iconSprite != null)
             {
-                unitIconImage.sprite = spriteRenderer.sprite;
+                unitIconImage.sprite = iconSprite;
+            }
+            else
+            {
+                SpriteRenderer sr = unit.GetComponent<SpriteRenderer>();
+                if (sr != null && sr.sprite != null)
+                {
+                    unitIconImage.sprite = sr.sprite;
+                }
             }
         }
 
@@ -256,5 +264,26 @@ public class PanelManager : MonoBehaviour
         {
             instance = null;
         }
+    }
+
+    private Sprite GetUnitIconSprite(UnitObject unit)
+    {
+        if (unit == null) return null;
+
+        Transform root = unit.transform.Find("UnitRoot");
+        GameObject target = root != null ? root.gameObject : unit.gameObject;
+
+        var (rt, camObj) = RenderUtilities.RenderUnitToTexture(target, 1.25f);
+        if (rt == null)
+        {
+            if (camObj != null) Destroy(camObj);
+            return null;
+        }
+
+        Sprite sprite = RenderUtilities.ConvertRenderTextureToSprite(rt);
+
+        Destroy(camObj);
+        Destroy(rt);
+        return sprite;
     }
 } 
