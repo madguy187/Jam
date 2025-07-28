@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace StoryManager
 {
@@ -22,13 +24,28 @@ namespace StoryManager
         [SerializeField] private bool faceRight = true;
         [SerializeField] private Vector2 tooltipOffset = new Vector2(150f, 0f);
 
+        [Header("Entry Animation")]
+        [SerializeField] private Vector3 entryOffset = new Vector3(-3f, 0f, 0f); 
+        [SerializeField] private float entryDuration = 1.5f;
+
+        [Header("Dialogue")]
+        [SerializeField] private DialogueManager dialogueManager;
+        [TextArea(2,4)]
+        [SerializeField] private string[] dialogueLines;
+
+        private bool isInteractable = false;
+
         private RenderTexture previewTexture;
         private Camera previewCamera;
         private GameObject previewUnit;
+        private const string UI_LAYER_NAME = "UI";
+        private int uiLayer; 
+        private Coroutine entryRoutine;
 
         private void Awake()
         {
             instance = this;
+            uiLayer = LayerMask.NameToLayer(UI_LAYER_NAME);
         }
 
         private void Start()
@@ -53,6 +70,7 @@ namespace StoryManager
 
             CreatePreviewCamera();
             SpawnPreviewUnit();
+            entryRoutine = StartCoroutine(EntrySequence());
         }
 
         private void SelectUnitPrefab()
@@ -96,7 +114,7 @@ namespace StoryManager
             previewCamera.backgroundColor = Color.clear;
             previewCamera.orthographic = true;
             previewCamera.orthographicSize = cameraSize;
-            previewCamera.cullingMask = 1 << LayerMask.NameToLayer("UI");
+            previewCamera.cullingMask = 1 << uiLayer;
             previewCamera.targetTexture = previewTexture;
         }
 
@@ -108,11 +126,11 @@ namespace StoryManager
             Vector3 scale = Vector3.one;
             if (faceRight)
             {
-                scale.x *= -1f;  // mirror sprite when facing right
+                scale.x *= -1f;  
             }
             previewUnit.transform.localScale = scale;
 
-            SetLayerRecursive(previewUnit, LayerMask.NameToLayer("UI"));
+            SetLayerRecursive(previewUnit, uiLayer);
             HideHudWidgets(previewUnit);
         }
 
@@ -142,6 +160,7 @@ namespace StoryManager
 
         public void OnPointerClick(PointerEventData _)
         {
+            if (!isInteractable) return;
             if (recruitPanel != null)
             {
                 recruitPanel.SetActive(true);
@@ -150,6 +169,7 @@ namespace StoryManager
 
         public void OnPointerEnter(PointerEventData _)
         {
+            if (!isInteractable) return;
             if (recruitPanel != null && recruitPanel.activeInHierarchy)
             {
                 return; 
@@ -170,8 +190,40 @@ namespace StoryManager
             }
         }
 
+        private IEnumerator EntrySequence()
+        {
+            // move NPC from start offset to original position
+            Vector3 targetPos = transform.position;
+            transform.position = targetPos + entryOffset;
+
+            float elapsed = 0f;
+            while (elapsed < entryDuration)
+            {
+                transform.position = Vector3.Lerp(targetPos + entryOffset, targetPos, elapsed / entryDuration);
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
+            transform.position = targetPos;
+
+            // run dialogue
+            if (dialogueManager != null && dialogueLines != null && dialogueLines.Length > 0)
+            {
+                dialogueManager.StartDialogue(dialogueLines, () => { isInteractable = true; });
+            }
+            else
+            {
+                isInteractable = true;
+            }
+        }
+
         private void OnDestroy()
         {
+            if (entryRoutine != null)
+            {
+                StopCoroutine(entryRoutine);
+                entryRoutine = null;
+            }
+
             if (previewTexture != null)
             {
                 previewTexture.Release();
@@ -186,6 +238,17 @@ namespace StoryManager
             if (previewUnit != null)
             {
                 Destroy(previewUnit);
+            }
+        }
+
+        private void OnDisable()
+        {
+            TooltipSystem.Hide();
+
+            if (entryRoutine != null)
+            {
+                StopCoroutine(entryRoutine);
+                entryRoutine = null;
             }
         }
     }

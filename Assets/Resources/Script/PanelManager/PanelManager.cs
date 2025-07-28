@@ -158,13 +158,13 @@ public class PanelManager : MonoBehaviour
 
         // Hide all first
         foreach (var rb in relicBoxes)
-        {
-            if (rb != null)
             {
+            if (rb != null)
+                {
                 rb.SetupRelicSO(null); 
                 rb.gameObject.SetActive(false);
+                }
             }
-        }
 
         if (currentUnit == null) return;
 
@@ -199,7 +199,7 @@ public class PanelManager : MonoBehaviour
             {
                 SpriteRenderer sr = unit.GetComponent<SpriteRenderer>();
                 if (sr != null && sr.sprite != null)
-                {
+            {
                     unitIconImage.sprite = sr.sprite;
                 }
             }

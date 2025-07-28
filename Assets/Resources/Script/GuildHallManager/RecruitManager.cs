@@ -16,9 +16,10 @@ namespace StoryManager
         [SerializeField] private Button     takePartyButton;
         [SerializeField] private TextMeshProUGUI takePartyButtonText;
 
-        [Header("Hint Text Fade")]
-        [SerializeField] private TextMeshProUGUI hintText;
-        [SerializeField] private float hintFadeDuration = 1f;
+        [Header("Tutorial Dialogue")]
+        [SerializeField] private DialogueManager tutorialDialogue;
+        [TextArea(2,4)]
+        [SerializeField] private string[] tutorialLines;
 
         [Header("Button Text")]
         [SerializeField] private string takePartyText      = "Take Party";
@@ -27,9 +28,8 @@ namespace StoryManager
         [Header("Preview Anchors (world transforms)")]
         [SerializeField] private RectTransform[] previewAnchors = new RectTransform[3];
 
-        [Header("Reroll Cost Settings")]
-        [SerializeField] private int freeRerollsPerSlot = 3;
-
+        private const string MAP_SCENE_NAME = "Game_Map";
+        private Coroutine positionRefreshRoutine;
         private readonly List<GameObject> recruitPrefabs = new List<GameObject>();
         private bool poolBuilt  = false;
         private bool partyTaken = false;
@@ -73,7 +73,6 @@ namespace StoryManager
             }
         }
 
-        /* ----------------------------- Life-cycle ------------------------*/
         private void OnEnable()
         {
             if (!poolBuilt)
@@ -83,19 +82,43 @@ namespace StoryManager
                 poolBuilt = true;
             }
 
-            ShowTakePartyButton();
+            // Disable interactive buttons until tutorial completes
+            SetRecruitInteractable(false);
+
             InitialiseUnitSlots();
-            StartCoroutine(RefreshPositionsEndOfFrame());
+
+            // Refresh preview positions at end of frame 
+            positionRefreshRoutine = StartCoroutine(RefreshPositionsEndOfFrame());
+
+            if (tutorialDialogue != null && tutorialLines.Length > 0)
+            {
+                // Reactivate the dialogue panel 
+                if (!tutorialDialogue.gameObject.activeSelf)
+                {
+                    tutorialDialogue.gameObject.SetActive(true);
+                }
+                tutorialDialogue.StartDialogue(tutorialLines, () =>
+                {
+                    ShowTakePartyButton();
+                    SetRecruitInteractable(true);
+                });
+            }
+            else
+            {
+                ShowTakePartyButton();
+                SetRecruitInteractable(true);
+            }
         }
 
         private void OnDisable()
         {
-            foreach (UnitSlot slot in unitSlots)
+            CleanupSlotPreviews();
+
+            // Stop any running coroutine to avoid leaks
+            if (positionRefreshRoutine != null)
             {
-                if (slot != null)
-                {
-                    slot.DestroyPreview();
-                }
+                StopCoroutine(positionRefreshRoutine);
+                positionRefreshRoutine = null;
             }
         }
 
@@ -198,7 +221,7 @@ namespace StoryManager
             }
             else
             {
-                SceneManager.LoadScene("Game_Map");
+                SceneManager.LoadScene(MAP_SCENE_NAME);
             }
         }
 
@@ -238,7 +261,6 @@ namespace StoryManager
 
             DisableRerollButtons();
             UpdateTakePartyButtonText();
-            StartCoroutine(FadeAndDisableHint());
         }
 
         private static void HideUnitHud(UnitObject unit)
@@ -286,26 +308,24 @@ namespace StoryManager
             }
         }
 
-        private IEnumerator FadeAndDisableHint()
+        private void SetRecruitInteractable(bool state)
         {
-            if (hintText == null)
+            if (takePartyButton != null) takePartyButton.interactable = state;
+            foreach (var slot in unitSlots)
             {
-                yield break;
+                if (slot == null) continue;
+                Button b = slot.GetComponentInChildren<Button>(true);  
+                if (b != null) b.interactable = state;
             }
+        }
 
-            float elapsed = 0f;
-            Color startColor = hintText.color;
-            Color endColor   = new Color(startColor.r, startColor.g, startColor.b, 0f);
-
-            while (elapsed < hintFadeDuration)
+        private void CleanupSlotPreviews()
+        {
+            foreach (UnitSlot slot in unitSlots)
             {
-                elapsed += Time.deltaTime;
-                float t = Mathf.Clamp01(elapsed / hintFadeDuration);
-                hintText.color = Color.Lerp(startColor, endColor, t);
-                yield return null;
+                if (slot == null) continue;
+                slot.DestroyPreview();
             }
-
-            hintText.gameObject.SetActive(false);
         }
     }
 } 
