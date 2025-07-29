@@ -23,10 +23,9 @@ MonoBehaviour:
   res: 2
   critRate: 20
   critMulti: 160
-  singleMatchDescription: Deal Atk+ 6 damage
-  horizontalMatchDescription: Lower all enemy RES by 2
-  diagonalMatchDescription: Next attack ignore shield shield
-  zigzagMatchDescription: Enemy are stunned for 1 turn
-  xShapeMatchDescription: All units on the team trigger their single symbol effect
-    1 time.
-  fullGridMatchDescription: All enemies suffer -25% Crit Rate and RES
+  singleMatchDescription: 
+  horizontalMatchDescription: 
+  diagonalMatchDescription: 
+  zigzagMatchDescription: 
+  xShapeMatchDescription: 
+  fullGridMatchDescription: 

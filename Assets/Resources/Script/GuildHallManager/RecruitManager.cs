@@ -319,12 +319,6 @@ namespace StoryManager
             {
                 hb.gameObject.SetActive(false);
             }
-
-            Transform eg = unit.transform.Find("UIEffectGrid(Clone)");
-            if (eg != null)
-            {
-                eg.gameObject.SetActive(false);
-            }
         }
 
         private void DisableRerollButtons()

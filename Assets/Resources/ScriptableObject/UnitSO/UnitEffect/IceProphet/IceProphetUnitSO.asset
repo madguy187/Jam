@@ -23,9 +23,9 @@ MonoBehaviour:
   res: 2
   critRate: 10
   critMulti: 150
-  singleMatchDescription: Res + 1
-  horizontalMatchDescription: ' Apply freeze to lowest HP enemy (skip turn)'
-  diagonalMatchDescription: Enemy frontline Crit rate  -10%
-  zigzagMatchDescription: ' Random enemy - 3 ATK this turn'
-  xShapeMatchDescription: Freeze all enemies with < 40% HP
-  fullGridMatchDescription: 3 random enemies get frozen for 1 round
+  singleMatchDescription: 
+  horizontalMatchDescription: 
+  diagonalMatchDescription: 
+  zigzagMatchDescription: 
+  xShapeMatchDescription: 
+  fullGridMatchDescription: 

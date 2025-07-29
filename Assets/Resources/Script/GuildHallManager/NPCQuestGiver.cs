@@ -142,12 +142,6 @@ namespace StoryManager
             {
                 healthBar.gameObject.SetActive(false);
             }
-
-            Transform effectGrid = root.transform.Find("UIEffectGrid(Clone)");
-            if (effectGrid != null)
-            {
-                effectGrid.gameObject.SetActive(false);
-            }
         }
 
         private static void SetLayerRecursive(GameObject node, int layer)

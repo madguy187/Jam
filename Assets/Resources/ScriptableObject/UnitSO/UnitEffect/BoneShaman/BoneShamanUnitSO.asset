@@ -23,10 +23,9 @@ MonoBehaviour:
   res: 3
   critRate: 5
   critMulti: 125
-  singleMatchDescription: Heal a random undead by 3
-  horizontalMatchDescription: Heal all undead by 2
-  diagonalMatchDescription: Heal all undead by 4 and reduce a random enemy Res by
-    1
-  zigzagMatchDescription: Hex a random enemy (reduce atk by 3) for 3 turns
-  xShapeMatchDescription: All undead gain 4 shield and heal 3 hp
-  fullGridMatchDescription: Revive all undead to full HP
+  singleMatchDescription: 
+  horizontalMatchDescription: 
+  diagonalMatchDescription: 
+  zigzagMatchDescription: 
+  xShapeMatchDescription: 
+  fullGridMatchDescription: 

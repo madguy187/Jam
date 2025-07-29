@@ -23,12 +23,9 @@ MonoBehaviour:
   res: 1
   critRate: 25
   critMulti: 175
-  singleMatchDescription: Apply Bleed to the lowest hp enemy (2 FLAT damage / round)
-    for 1 round
-  horizontalMatchDescription: Bleed all enemies (2 Flat damage/round) for 2 rounds
-  diagonalMatchDescription: Gain 10% Crit Rate
-  zigzagMatchDescription: Attack the lowest hp enemy Atk + 5,  and apply 2 more turn
-    of bleed to the enemy.
-  xShapeMatchDescription: Attack the lowest HP enemy, and apply 4 turns of bleed
-    to all enemies
-  fullGridMatchDescription: Instant kill one enemy with 10 or less HP.
+  singleMatchDescription: 
+  horizontalMatchDescription: 
+  diagonalMatchDescription: 
+  zigzagMatchDescription: 
+  xShapeMatchDescription: 
+  fullGridMatchDescription: 

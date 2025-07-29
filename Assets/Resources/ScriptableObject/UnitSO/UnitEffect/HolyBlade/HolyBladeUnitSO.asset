@@ -23,9 +23,9 @@ MonoBehaviour:
   res: 2
   critRate: 25
   critMulti: 175
-  singleMatchDescription: Strike for ATK + 4 damage, ignores shield
-  horizontalMatchDescription: This attack is guaranteed crit
-  diagonalMatchDescription: Atk + 3,  heals lowest HP ally with the damage dealt.
-  zigzagMatchDescription: Gain invisibility for 1 round and heal for 5 HP.
-  xShapeMatchDescription: Gain 50% crit rate and 30 % crit damage on next attack
-  fullGridMatchDescription: Deal double damage to all enemies below 30% HP
+  singleMatchDescription: 
+  horizontalMatchDescription: 
+  diagonalMatchDescription: 
+  zigzagMatchDescription: 
+  xShapeMatchDescription: 
+  fullGridMatchDescription: 
