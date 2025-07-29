@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      ink-swirl-pixel_0: 4495680166758741022
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
