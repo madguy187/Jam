@@ -238,6 +238,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
+      propertyPath: _listZigZagEffect._listScriptableObject.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: _listFullGridEffect._listScriptableObject.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -245,6 +249,18 @@ PrefabInstance:
       propertyPath: '_listSingleEffect._listScriptableObject.Array.data[0]'
       value: 
       objectReference: {fileID: 11400000, guid: 65e834ec1224f7a40ae308c4186008ce, type: 2}
+    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
+      propertyPath: '_listZigZagEffect._listScriptableObject.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 1e193f8d45406b144bb5a65922decaa3, type: 2}
+    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
+      propertyPath: '_listZigZagEffect._listScriptableObject.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 7ca31f10f51e73c4dbf27aeb7041c028, type: 2}
+    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
+      propertyPath: '_listZigZagEffect._listScriptableObject.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 67f50ec361c845543b33ae1e074f329e, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: _listHorizontalEffect._listScriptableObject.Array.size
       value: 1

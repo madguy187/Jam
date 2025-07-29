@@ -7994,7 +7994,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: e0455e7730dca884d88dadae3c75df13, type: 2}
     - {fileID: 11400000, guid: f5959761e47b187479cd90c7bb863781, type: 2}
   _listZigZagEffect:
-    _listScriptableObject: []
+    _listScriptableObject:
+    - {fileID: 11400000, guid: dcc2e31e0be6b564aa3dc44032ae21c6, type: 2}
   _listXShapeEffect:
     _listScriptableObject:
     - {fileID: 11400000, guid: 7b3186f6e05395d44be33561db3172cb, type: 2}

@@ -242,6 +242,14 @@ PrefabInstance:
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
+      propertyPath: _listZigZagEffect._listScriptableObject.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
+      propertyPath: _listDiagonalEffect._listScriptableObject.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: _listFullGridEffect._listScriptableObject.Array.size
       value: 3
       objectReference: {fileID: 0}
@@ -262,9 +270,21 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 11400000, guid: 86022838acdcc9847879561ea5a51425, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
+      propertyPath: '_listZigZagEffect._listScriptableObject.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 42f0f0e59899b6b489862c9b0613e603, type: 2}
+    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
+      propertyPath: '_listZigZagEffect._listScriptableObject.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 3d263e306899d2a4db9e5441427eb4bf, type: 2}
+    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: _listHorizontalEffect._listScriptableObject.Array.size
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
+      propertyPath: '_listDiagonalEffect._listScriptableObject.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 497f9d0ad8cf0e7458cc034e8deb28a5, type: 2}
     - target: {fileID: -1822254470301686702, guid: 7f61d0ae9ac7a2642b4f93cfdcda5d4a, type: 3}
       propertyPath: '_listFullGridEffect._listScriptableObject.Array.data[0]'
       value: 

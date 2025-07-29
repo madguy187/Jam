@@ -150,7 +150,7 @@ public class CreatePrefabFromMenu {
         }
 
         AttachHealthBar(ref gameObj);
-        AttachEffectGrid(ref gameObj);
+        //AttachEffectGrid(ref gameObj);
 
         string infoPath = scriptablePath + FOLDER_SEPARATOR + unitName;
         List<UnitScriptableObject> unitSO = Resources.LoadAll<UnitScriptableObject>(infoPath).ToList();
@@ -167,6 +167,7 @@ public class CreatePrefabFromMenu {
         EffectList zigzag = new EffectList();
         EffectList fullgrid = new EffectList();
         foreach (EffectScriptableObject effect in effects) {
+            Debug.Log(effect.name);
             if (effect.name.Contains("Single")) {
                 single.AddEffect(effect);
             }
@@ -179,7 +180,7 @@ public class CreatePrefabFromMenu {
             if (effect.name.Contains("XShape")) {
                 xshape.AddEffect(effect);
             }
-            if (effect.name.Contains("ZigZag")) {
+            if (effect.name.Contains("Zigzag")) {
                 zigzag.AddEffect(effect);
             }
             if (effect.name.Contains("FullGrid")) {

@@ -10700,7 +10700,8 @@ MonoBehaviour:
     - {fileID: 11400000, guid: 949e4d5bb6beb5847a37057db11d9ae9, type: 2}
     - {fileID: 11400000, guid: 7787aa491a0004a419708db962252898, type: 2}
   _listZigZagEffect:
-    _listScriptableObject: []
+    _listScriptableObject:
+    - {fileID: 11400000, guid: d95d7653c42f5624f865e3291bbb6f3d, type: 2}
   _listXShapeEffect:
     _listScriptableObject:
     - {fileID: 11400000, guid: b280fd9d08a8d4840ace3b56b508686d, type: 2}
