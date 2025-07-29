@@ -28,7 +28,6 @@ public class Deck : IEnumerable<UnitObject> {
             if (unit == null) {
                 continue;
             }
-            Debug.Log("set");
             Transform pos = _GetPosition(i);
             unit.transform.position = pos.position;
         }
