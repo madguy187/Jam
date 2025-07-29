@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd039be287e5bad449a8a4343cc9f923, type: 3}
   m_Name: Encounter
   m_EditorClassIdentifier: 
-  sprite: {fileID: -6834524911116659543, guid: 1e2e6aeef94468046883549a6f4d248b, type: 3}
+  sprite: {fileID: 1780072902, guid: 43722c209d4d7884a99cd34556097cf7, type: 3}
   nodeType: 3
-  description: This is an encounter node
+  description: Encounter Chance

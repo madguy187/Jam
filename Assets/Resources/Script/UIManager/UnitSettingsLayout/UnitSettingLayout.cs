@@ -30,7 +30,8 @@ public class UnitSettingLayout : MonoBehaviour
     private ItemTracker tracker;
     private bool hasInitialized = false;
 
-    public void Awake() {
+    public void Awake() 
+    {
         if (instance != null) {
             Destroy(instance);
         }
@@ -38,13 +39,19 @@ public class UnitSettingLayout : MonoBehaviour
         instance = this;
     }
 
-    public void Init() {
-        tracker = ItemTracker.Instance;
-        if (tracker == null) {
-            Global.DEBUG_PRINT("[UnitSettingsLayout::Init] ItemTracker is null.");
+    public void Init() 
+    {
+        if (ItemTracker.Instance == null) {
+            Global.DEBUG_PRINT("[UnitSettingsLayout::Init] ItemTracker instance is null!");
+            tracker = new ItemTracker(); // Create a new instance if it doesn't exist
+        } else {
+            tracker = ItemTracker.Instance;
         }
-
-        inventory = MockPlayerInventoryHolder.Instance.playerInventory;
+        if (MockPlayerInventoryHolder.Instance == null) {
+            Global.DEBUG_PRINT("[UnitSettingsLayout::Init] MockPlayerInventoryHolder instance is null!");
+        } else {
+            inventory = MockPlayerInventoryHolder.Instance.playerInventory;
+        }
         gameObject.SetActive(true);
 
         if (!hasInitialized) {

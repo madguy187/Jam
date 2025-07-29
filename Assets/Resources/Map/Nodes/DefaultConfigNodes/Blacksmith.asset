@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cd039be287e5bad449a8a4343cc9f923, type: 3}
-  m_Name: Necromancer
+  m_Name: Blacksmith
   m_EditorClassIdentifier: 
-  sprite: {fileID: 21300000, guid: addc35e4d94afc3408e7c29b6ea5940e, type: 3}
-  nodeType: 6
-  description: Shrine
+  sprite: {fileID: 21300000, guid: 20965a96dfa0b2645a809f221be10e30, type: 3}
+  nodeType: 7
+  description: Relics Blacksmith
