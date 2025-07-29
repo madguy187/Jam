@@ -89,6 +89,7 @@ GameObject:
   - component: {fileID: 1659244635707958884}
   - component: {fileID: 4333004787432563615}
   - component: {fileID: 3660732496758091561}
+  - component: {fileID: 7051922935022575160}
   m_Layer: 0
   m_Name: ForgeRelicItemPrefab
   m_TagString: Untagged
@@ -224,6 +225,22 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &7051922935022575160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3687713428111328508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: afdd738693039df49ad6761bc9254813, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  titleText: 
+  detailsText: 
+  ToolTipDelaySeconds: 0.3
+  ToolTipFrameIncrease: 3
 --- !u!1 &8482019444371827411
 GameObject:
   m_ObjectHideFlags: 0
