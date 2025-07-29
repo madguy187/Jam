@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd039be287e5bad449a8a4343cc9f923, type: 3}
   m_Name: Shop
   m_EditorClassIdentifier: 
-  sprite: {fileID: 6840857970483876212, guid: 5a31d8150a6ea9d4aa943cf22f55ae71, type: 3}
+  sprite: {fileID: 21300000, guid: 68c41636bfcef0f4298ad7ff3b3bd919, type: 3}
   nodeType: 4
   description: This is a shop node
