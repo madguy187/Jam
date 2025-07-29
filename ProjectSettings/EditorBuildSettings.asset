@@ -9,17 +9,23 @@ EditorBuildSettings:
     path: Assets/Scenes/Game.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
-    path: Assets/Scenes/Fikrul_Sandbox.unity
-    guid: 934c594cd8172ed4885660bc38a701ed
-  - enabled: 1
-    path: Assets/Scenes/Fikrul_TestMiniBossEncounter.unity
-    guid: aac3a51326032e54087e7ec02eb4c025
-  - enabled: 0
     path: Assets/Scenes/Game_Shop.unity
-    guid: b17ade556da76f840b3b0f2b27402096
+    guid: 83e36562517dafb4e941aaac7b30b846
   - enabled: 1
     path: Assets/Scenes/Game_Map.unity
     guid: 1ee4df5c066fbf14ab08e8c2afa85909
+  - enabled: 1
+    path: Assets/Scenes/Game_GuildHall.unity
+    guid: 8781078a0a0174c55aa3c2f186184333
+  - enabled: 1
+    path: Assets/Scenes/Game_StoryTeller.unity
+    guid: 633ba9d56734ff840907b829306b8df1
+  - enabled: 1
+    path: Assets/Scenes/Game_Necromancer.unity
+    guid: db62d1c2fd3d83d4a8773678e69d4706
+  - enabled: 1
+    path: Assets/Scenes/Game_Blacksmith.unity
+    guid: 3512a37a771b86a41aad31c839c03cbb
   - enabled: 1
     path: Assets/Scenes/Game_MainMenu.unity
     guid: bfb00945552ef57478f7fbde45d9a8ae

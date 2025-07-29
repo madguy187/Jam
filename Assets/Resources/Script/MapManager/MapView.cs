@@ -8,7 +8,8 @@ namespace Map
     /// Handles the visual representation and interaction logic for the node-based map.
     /// Responsible for instantiating nodes and lines, setting up map orientation,
     /// coloring, and background, and updating node and line states based on player progress.
-    public class MapView : MonoBehaviour {
+    public class MapView : MonoBehaviour 
+    {
         /// Defines the orientation in which the map is displayed and scrolled
         public enum MapOrientation {
             BottomToTop,
@@ -242,6 +243,19 @@ namespace Map
             }
         }
 
+        private void InitOrReloadScrollPosition()
+        {
+            if (PlayerPrefs.HasKey("ScrollPositionX")) {
+                float x = PlayerPrefs.GetFloat("ScrollPositionX");
+                float y = PlayerPrefs.GetFloat("ScrollPositionY");
+                float z = PlayerPrefs.GetFloat("ScrollPositionZ");
+                mapParent.GetComponent<ScrollNonUI>().transform.position = new Vector3(x, y, z);
+                Global.DEBUG_PRINT("[MapView::SetOrientation] Restoring scroll position from PlayerPrefs: " + mapParent.GetComponent<ScrollNonUI>().transform.position);
+            } else {
+                firstParent.transform.position = new Vector3(cam.transform.position.x, cam.transform.position.y, 0f);
+            }
+        }
+
         /// Sets the orientation and scrolling constraints of the map based on the selected orientation
         protected virtual void SetOrientation()
         {
@@ -250,7 +264,7 @@ namespace Map
             MapNode bossNode = MapNodes.FirstOrDefault(node => node.Node.nodeType == NodeType.MajorBoss);
             Global.DEBUG_PRINT("[MapView::SetOrientation] Map span in set orientation: " + span + " camera aspect: " + cam.aspect);
 
-            // setting first parent to be right in front of the camera first:
+            InitOrReloadScrollPosition();
             firstParent.transform.position = new Vector3(cam.transform.position.x, cam.transform.position.y, 0f);
             float offset = orientationOffset;
             switch (orientation) {
@@ -371,5 +385,15 @@ namespace Map
         }
         
         public bool AreInteractionsLocked() => isInteractionLocked;
+        public Vector3 GetScrollPosition()
+        {
+            if (mapParent == null) { return Vector3.zero; }
+            var scrollNonUi = mapParent.GetComponent<ScrollNonUI>();
+            if (scrollNonUi != null) {
+                Global.DEBUG_PRINT("[MapView::GetScrollPosition] Getting scroll position");
+                return scrollNonUi.GetScrollPosition();
+            }
+            return Vector3.zero;
+        }
     }
 }
