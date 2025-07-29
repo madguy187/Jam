@@ -99,30 +99,6 @@ public class CreatePrefabFromMenu {
         healthBarTrans.anchoredPosition = pos;
     }
 
-    static void AttachEffectGrid(ref GameObject obj) {
-        Transform transOldGrid = obj.transform.Find("UIEffectGrid(Clone)");
-        if (transOldGrid != null) {
-            GameObject.DestroyImmediate(transOldGrid.gameObject);
-        }
-
-        // if (obj.GetComponentInChildren<UIEffectGrid>() != null) {
-        //     objGrid = obj.GetComponentInChildren<UIEffectGrid>().gameObject;
-        //     GameObject.Destroy(objGrid);
-        // }
-
-        GameObject prefab = Resources.Load<GameObject>(EFFECT_GRID_PATH);
-        GameObject objGrid = GameObject.Instantiate(prefab);
-        objGrid.transform.SetParent(obj.transform);
-
-        UnitObject unitComp = obj.GetComponent<UnitObject>();
-        UIEffectGrid effectComp = objGrid.GetComponent<UIEffectGrid>();
-        effectComp.SetUnit(unitComp);
-
-        Vector3 pos = new Vector3(0.0f, obj.transform.position.y, 0.0f);
-        RectTransform healthBarTrans = objGrid.GetComponent<RectTransform>();
-        healthBarTrans.anchoredPosition = pos;
-    }
-
     static void CreateUnit(string path, string outputPath, string scriptablePath, string unitName) {
         GameObject prefab = null;
 
@@ -149,7 +125,6 @@ public class CreatePrefabFromMenu {
         }
 
         AttachHealthBar(ref gameObj);
-        //AttachEffectGrid(ref gameObj);
 
         string infoPath = scriptablePath + FOLDER_SEPARATOR + unitName;
         List<UnitScriptableObject> unitSO = Resources.LoadAll<UnitScriptableObject>(infoPath).ToList();

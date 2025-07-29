@@ -151,6 +151,9 @@ public class EnemyManager : MonoBehaviour {
         cEnemyDeck.DestroyAllUnit();
 
         for (int i = 0; i < listResult.Count; i++) {
+            if (listResult.Count >= maxFront + maxBack) {
+                break;
+            }
             if (listResult[i] == null) {
                 continue;
             }

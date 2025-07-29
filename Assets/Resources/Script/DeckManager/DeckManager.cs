@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System.Linq;
 
 public enum eDeckType {
     NONE,
@@ -20,6 +21,8 @@ public class DeckManager : MonoBehaviour {
 
     void Awake() {
         if (instance != null) {
+            instance.SetAllPositionByType(eDeckType.PLAYER, GetAllPositionByType(eDeckType.PLAYER));
+            instance.SetAllPositionByType(eDeckType.ENEMY, GetAllPositionByType(eDeckType.PLAYER));
             Destroy(gameObject);
         } else {
             instance = this;
@@ -47,6 +50,16 @@ public class DeckManager : MonoBehaviour {
             cEnemyDeck.Init(eDeckType.ENEMY, vecPos);
             Global.DEBUG_PRINT("[Deck] Loaded EnemyPos: " + vecPos.Count);
         }
+    }
+
+    public UnitPosition[] GetAllPositionByType(eDeckType eType) {
+        Transform trans = eType == eDeckType.PLAYER ? _transPlayerPos : _transEnemyPos;
+        return trans.GetComponentsInChildren<UnitPosition>();
+    }
+
+    public void SetAllPositionByType(eDeckType eType, UnitPosition[] listPos) {
+        Deck cDeck = eType == eDeckType.PLAYER ? cPlayerDeck : cEnemyDeck;
+        cDeck.ReInitUnitPosition(listPos.ToList());
     }
 
     public UnitObject AddUnit(eDeckType eType, string strUnitName) {

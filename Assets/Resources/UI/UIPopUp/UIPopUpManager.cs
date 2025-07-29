@@ -40,9 +40,6 @@ public class UIPopUpManager : MonoBehaviour {
     }
 
     public void Update() {
-        if (Input.GetKeyDown(KeyCode.Q)) {
-            CreatePopUp("test");
-        }
         if (_listCurrentPopUp.Count <= 0) {
             return;
         }
