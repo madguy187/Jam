@@ -85,7 +85,7 @@ public class ProbabilityCalculator : MonoBehaviour
         float random = Random.value;
         float cumulativeProb = 0f;
 
-        /*Debug.Log($"[ProbabilityCalculator] Generating random symbol. Random value: {random:F3}");*/
+        /*Global.DEBUG_PRINT($"[ProbabilityCalculator] Generating random symbol. Random value: {random:F3}");*/
         
         foreach (var kvp in currentProbabilities)
         {
@@ -132,14 +132,14 @@ public class ProbabilityCalculator : MonoBehaviour
     {
         float remainingProb = Mathf.Max(0f, 1f - emptyProb);
         float probPerArchetype = remainingProb / archetypes.Count;
-        /*Debug.Log($"[ProbabilityCalculator] Initial prob per archetype: {probPerArchetype:P1}");*/
+        /*Global.DEBUG_PRINT($"[ProbabilityCalculator] Initial prob per archetype: {probPerArchetype:P1}");*/
 
         if (probPerArchetype < minArchetypeProbability)
         {
             float neededProb = minArchetypeProbability * archetypes.Count;
             currentProbabilities[SymbolType.EMPTY] = Mathf.Max(0.1f, 1f - neededProb);
             probPerArchetype = minArchetypeProbability;
-            /*Debug.Log($"[ProbabilityCalculator] Adjusted for minimum. New empty: {currentProbabilities[SymbolType.EMPTY]:P1}, New per archetype: {probPerArchetype:P1}");*/
+            /*Global.DEBUG_PRINT($"[ProbabilityCalculator] Adjusted for minimum. New empty: {currentProbabilities[SymbolType.EMPTY]:P1}, New per archetype: {probPerArchetype:P1}");*/
         }
 
         foreach (eUnitArchetype archetype in archetypes)

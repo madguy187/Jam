@@ -34,6 +34,7 @@ namespace StoryManager
         [SerializeField] private string[] dialogueLines;
 
         private bool isInteractable = false;
+        private bool hasOpenedRecruit = false;
 
         private RenderTexture previewTexture;
         private Camera previewCamera;
@@ -160,16 +161,18 @@ namespace StoryManager
 
         public void OnPointerClick(PointerEventData _)
         {
-            if (!isInteractable) return;
+            if (!isInteractable || hasOpenedRecruit) return;
             if (recruitPanel != null)
             {
                 recruitPanel.SetActive(true);
+                DestroyBackgroundNpcs();
             }
+            hasOpenedRecruit = true; // disable future clicks
         }
 
         public void OnPointerEnter(PointerEventData _)
         {
-            if (!isInteractable) return;
+            if (!isInteractable || hasOpenedRecruit) return;
             if (recruitPanel != null && recruitPanel.activeInHierarchy)
             {
                 return; 
@@ -249,6 +252,19 @@ namespace StoryManager
             {
                 StopCoroutine(entryRoutine);
                 entryRoutine = null;
+            }
+        }
+
+        private void DestroyBackgroundNpcs()
+        {
+            var npcs = FindObjectsOfType<MonoBehaviour>();
+            foreach (var m in npcs)
+            {
+                if (m == null) continue;
+                if (m.GetType().Name == "HallNpc")
+                {
+                    Destroy(m.gameObject);
+                }
             }
         }
     }

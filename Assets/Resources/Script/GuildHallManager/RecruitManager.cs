@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.Events;
 
 namespace StoryManager
 {
@@ -25,6 +26,11 @@ namespace StoryManager
         [SerializeField] private string takePartyText      = "Take Party";
         [SerializeField] private string startAdventureText = "Start Adventure";
 
+        [Header("Confirmation Dialogue")]
+        [SerializeField] private DialogueManager confirmDialogue;
+        [TextArea(2,4)]
+        [SerializeField] private string[] confirmLines;
+
         [Header("Preview Anchors (world transforms)")]
         [SerializeField] private RectTransform[] previewAnchors = new RectTransform[3];
 
@@ -33,6 +39,12 @@ namespace StoryManager
         private readonly List<GameObject> recruitPrefabs = new List<GameObject>();
         private bool poolBuilt  = false;
         private bool partyTaken = false;
+
+        // Store confirmed units and original state for potential reset
+        private readonly List<(UnitObject unit, Vector3 originalPos)> confirmedUnits = new();
+
+        // Cache for button parent
+        private Transform takePartyButtonOriginalParent;
 
         private void Awake()
         {
@@ -48,6 +60,8 @@ namespace StoryManager
 
         private void InitialiseTakePartyButton()
         {
+            takePartyButton.gameObject.SetActive(false);
+            
             if (takePartyButton == null)
             {
                 Debug.LogError("RecruitController: Take Party button reference missing.");
@@ -82,25 +96,30 @@ namespace StoryManager
                 poolBuilt = true;
             }
 
+            // Build slots then disable buttons so slot.Init() doesn't re-enable them
+            InitialiseUnitSlots();
+
             // Disable interactive buttons until tutorial completes
             SetRecruitInteractable(false);
-
-            InitialiseUnitSlots();
 
             // Refresh preview positions at end of frame 
             positionRefreshRoutine = StartCoroutine(RefreshPositionsEndOfFrame());
 
             if (tutorialDialogue != null && tutorialLines.Length > 0)
             {
-                // Reactivate the dialogue panel 
-                if (!tutorialDialogue.gameObject.activeSelf)
+                // Disable button until tutorial finishes
+                if (takePartyButton != null)
                 {
-                    tutorialDialogue.gameObject.SetActive(true);
+                    takePartyButton.gameObject.SetActive(false);
+                    Global.DEBUG_PRINT("[RecruitController] Button hidden during initial NPC dialogue");
                 }
+
+                if (!tutorialDialogue.gameObject.activeSelf) tutorialDialogue.gameObject.SetActive(true);
                 tutorialDialogue.StartDialogue(tutorialLines, () =>
                 {
                     ShowTakePartyButton();
                     SetRecruitInteractable(true);
+                    Global.DEBUG_PRINT("[RecruitController] Initial dialogue finished - Take Party button enabled");
                 });
             }
             else
@@ -198,6 +217,7 @@ namespace StoryManager
 
         private void ShowTakePartyButton()
         {
+            Global.DEBUG_PRINT("[RecruitController] ShowTakePartyButton called");
             if (takePartyButton == null)
             {
                 return;
@@ -210,6 +230,22 @@ namespace StoryManager
             {
                 takePartyButtonText.text = takePartyText;
             }
+            Global.DEBUG_PRINT($"[RecruitController] Button active: {takePartyButton.gameObject.activeSelf}, text: {takePartyButtonText?.text}");
+        }
+
+        // Shows the button as "Start Adventure" and makes it interactable
+        private void ShowStartAdventureButton()
+        {
+            if (takePartyButton == null) return;
+
+            takePartyButton.gameObject.SetActive(true);
+            if (takePartyButtonText != null)
+            {
+                takePartyButtonText.text = startAdventureText;
+            }
+            takePartyButton.interactable = true;
+
+            Global.DEBUG_PRINT("[RecruitController] Start Adventure button now ACTIVE and interactable");
         }
 
         private void OnTakeParty()
@@ -227,40 +263,48 @@ namespace StoryManager
 
         private void ProcessPartySelection()
         {
-            Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
-            if (playerDeck == null)
-            {
-                Debug.LogError("RecruitController: Player deck missing.");
-                return;
-            }
-
-            int addedCount = 0;
+            var addedUnits = new List<UnitObject>();
             foreach (UnitSlot slot in unitSlots)
             {
-                if (slot == null)
+                if (slot == null || slot.CurrentPrefab == null)
                 {
                     continue;
                 }
 
-                GameObject prefab = slot.CurrentPrefab;
-                if (prefab == null)
+                // Get the unit name from the prefab
+                UnitObject unitObj = slot.CurrentPrefab.GetComponent<UnitObject>();
+                string unitName = unitObj?.unitSO?.unitName;
+                if (string.IsNullOrEmpty(unitName))
                 {
-                    continue;
+                    unitName = slot.CurrentPrefab.name;
                 }
 
-                UnitObject unit = playerDeck.AddUnit(prefab);
-                if (unit != null)
+                UnitObject u = DeckManager.instance.AddUnit(eDeckType.PLAYER, unitName);
+                if (u != null)
                 {
-                    unit.transform.position += Vector3.down; 
-                    HideUnitHud(unit);
-                    addedCount++;
+                    HideUnitHud(u);
+                    addedUnits.Add(u);
                 }
+                slot.DestroyPreview();
             }
 
-            Debug.Log($"RecruitController: Added {addedCount} units to deck.");
+            Global.DEBUG_PRINT($"RecruitController: Added {addedUnits.Count} units to deck.");
 
             DisableRerollButtons();
-            UpdateTakePartyButtonText();
+
+            // Keep button visible but non-interactable during sequence
+            if (takePartyButton != null) {
+                takePartyButton.interactable = false;
+            }
+
+            // Hide button during confirmation sequence
+            if (takePartyButton != null)
+            {
+                takePartyButton.gameObject.SetActive(false);
+                Global.DEBUG_PRINT("[RecruitController] Take Party button hidden for confirmation sequence");
+            }
+
+            ShowStartAdventureButton();
         }
 
         private static void HideUnitHud(UnitObject unit)

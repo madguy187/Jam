@@ -121,6 +121,13 @@ namespace StoryManager
 
         public void DestroyPreview()
         {
+            // Stop animation first
+            if (animationRoutine != null)
+            {
+                StopCoroutine(animationRoutine);
+                animationRoutine = null;
+            }
+
             if (currentPreview != null)
             {
                 Destroy(currentPreview);
@@ -226,12 +233,27 @@ namespace StoryManager
             var validClips = GetValidClips(anim.runtimeAnimatorController);
             if (validClips.Count == 0) yield break;
 
-            while (target == currentPreview)
+            // Added null checks
+            while (target != null && target == currentPreview && anim != null) 
             {
+                // Extra safety check
+                if (anim == null || !anim.gameObject.activeInHierarchy)
+                {
+                    yield break;
+                }
+
                 AnimationClip clip = validClips[Random.Range(0, validClips.Count)];
                 if (clip != null)
                 {
-                    anim.Play(clip.name, 0, 0f);
+                    try
+                    {
+                        anim.Play(clip.name, 0, 0f);
+                    }
+                    catch (MissingReferenceException)
+                    {
+                        // Exit if animator was destroyed
+                        yield break; 
+                    }
                 }
                 yield return new WaitForSeconds(animationInterval);
             }
