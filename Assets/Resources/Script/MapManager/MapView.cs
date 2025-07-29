@@ -319,8 +319,8 @@ namespace Map
             GameObject lineObject = Instantiate(linePrefab, mapParent.transform);
             LineRenderer lineRenderer = lineObject.GetComponent<LineRenderer>();
             lineRenderer.sortingOrder = 10;
-            lineRenderer.startWidth = 0.03f;
-            lineRenderer.endWidth = 0.03f;
+            lineRenderer.startWidth = 0.1f;
+            lineRenderer.endWidth = 0.1f;
             Vector3 fromPoint = from.transform.position +
                                 (to.transform.position - from.transform.position).normalized * offsetFromNodes;
 

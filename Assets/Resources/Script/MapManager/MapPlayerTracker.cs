@@ -26,7 +26,8 @@ namespace Map
         /// Indicates whether node selection is currently locked
         public bool Locked { get; set; }
 
-        private void Awake() {
+        private void Awake() 
+        {
             /// Sets the singleton instance on Awake
             if (Instance != null) {
                 Destroy(Instance);
@@ -38,7 +39,8 @@ namespace Map
         /// Attempts to select a node. Only allows selection if the node is accessible from the current path.
         /// If the path is empty, only nodes in the first layer (y == 0) can be selected.
         /// Otherwise, only nodes connected to the current node can be selected.
-        public void SelectNode(MapNode mapNode) {
+        public void SelectNode(MapNode mapNode) 
+        {
             if (Locked) { return; }
 
             if (mapManager.CurrentMap.path.Count == 0) {
@@ -58,10 +60,12 @@ namespace Map
                 }
             }
         }
+
         /// Handles the logic for moving the player to the selected node, updating 
         /// the path, saving the map, updating visuals,
         /// and starting the delayed node entry coroutine
-        private void SendPlayerToNode(MapNode mapNode) {
+        private void SendPlayerToNode(MapNode mapNode) 
+        {
             Locked = lockAfterSelecting;
             mapManager.CurrentMap.path.Add(mapNode.Node.point);
             mapManager.SaveMap();
@@ -74,59 +78,52 @@ namespace Map
         }
 
         /// Coroutine that waits for a specified delay before entering the node
-        private System.Collections.IEnumerator EnterNodeAfterDelay(MapNode mapNode, float delay) {
+        private System.Collections.IEnumerator EnterNodeAfterDelay(MapNode mapNode, float delay) 
+        {
             yield return new WaitForSeconds(delay);
             EnterNode(mapNode);
         }
 
         /// Handles the logic for entering a node, such as loading a new scene or triggering events based on node type
-        private void EnterNode(MapNode mapNode) {
+        private void EnterNode(MapNode mapNode) 
+        {
             // We have access to blueprint name here as well
             Global.DEBUG_PRINT("[MapPlayerTracker::EnterNode] Entering node: " + mapNode.Node.blueprintName + " of type: " + mapNode.Node.nodeType);
             // Load appropriate scene with context based on nodeType:
             // If choose to show GUI in some of these cases, do not forget to set "Locked" in MapPlayerTracker back to false
             switch (mapNode.Node.nodeType) {
                 case NodeType.Enemy:
-                    // mapManager.SaveMap();
-                    // EnemyManager.instance.nodeType = mapNode.Node.nodeType;
-                    // EnemyManager.instance.PopulateMobBasedOnNodeType();
-                    // SceneManager.LoadScene("Game");
+                    mapManager.SaveMap();
+                    EnemyManager.instance.nodeType = mapNode.Node.nodeType;
+                    EnemyManager.instance.PopulateMobBasedOnNodeType();
+                    SceneManager.LoadScene("Game");
                     break;
                 case NodeType.Encounter:
-                    // mapManager.SaveMap();
-                    // SceneManager.LoadScene("Game_StoryTeller");
+                    mapManager.SaveMap();
+                    SceneManager.LoadScene("Game_StoryTeller");
                     break;
                 case NodeType.Necromancer:
-                    // mapManager.SaveMap();
-                    // SceneManager.LoadScene("Game_Necromancer");
+                    mapManager.SaveMap();
+                    SceneManager.LoadScene("Game_Necromancer");
                     break;
                 case NodeType.Shop:
-                    // mapManager.SaveMap();
-                    // SceneManager.LoadScene("Game_Shop");
+                    mapManager.SaveMap();
+                    SceneManager.LoadScene("Game_Shop");
                     break;
                 case NodeType.Blacksmith:
-                    // mapManager.SaveMap();
-                    // SceneManager.LoadScene("Game_Blacksmith");
+                    mapManager.SaveMap();
+                    SceneManager.LoadScene("Game_Blacksmith");
                     break;
                 case NodeType.MiniBoss:
-                    // mapManager.SaveMap();
-                    // EnemyManager.instance.nodeType = mapNode.Node.nodeType;
-                    // SceneManager.LoadScene("Game");
-                    // Save map state before leaving
-                    // MapPlayerTracker.Instance.mapManager.SaveMap();
-                    // Load new scene for mini-boss encounter
-                    // SceneManager.LoadScene("Fikrul_TestMiniBossEncounter");
+                    mapManager.SaveMap();
+                    EnemyManager.instance.nodeType = mapNode.Node.nodeType;
+                    SceneManager.LoadScene("Game");
                     break;
                 case NodeType.MajorBoss:
-                    // mapManager.SaveMap();
-                    // EnemyManager.instance.nodeType = mapNode.Node.nodeType;
-                    // EnemyManager.instance.PopulateMobBasedOnNodeType();
-                    // SceneManager.LoadScene("Game");
-                    // ADDED: Trigger major boss fight, then call some function to handle the result
-                    // Example: StartMajorBossFight(mapNode);
-                    // When the fight ends, call:
-                    // MapPlayerTracker.Instance.OnMajorBossResult(playerWon);
-                    // MapPlayerTracker.Instance.mapManager.LoadNextConfig("DefaultMapConfig2");
+                    mapManager.SaveMap();
+                    EnemyManager.instance.nodeType = mapNode.Node.nodeType;
+                    EnemyManager.instance.PopulateMobBasedOnNodeType();
+                    SceneManager.LoadScene("Game");
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
