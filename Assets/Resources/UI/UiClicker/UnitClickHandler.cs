@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 
 public class UnitClickHandler : MonoBehaviour
 {
@@ -21,7 +22,12 @@ public class UnitClickHandler : MonoBehaviour
     void OnMouseDown()
     {
         Global.DEBUG_PRINT("[UnitClickHandler] Unit clicked!");
-        
+
+        if (SceneManager.GetActiveScene().name != "Game")
+        {
+            return;
+        }
+
         if (unit != null)
         {
             PanelManager.instance.ShowUnitInfo(unit);

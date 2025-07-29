@@ -314,6 +314,12 @@ public class SkillSlotMachine : MonoBehaviour
 
         lastSpinResult = new SpinResult(matches, totalGold);
 
+        // Update help panel text only during player's turn
+        if (!isEnemyTurn && MatchHelpScreen.instance != null)
+        {
+            MatchHelpScreen.instance.DisplaySpinResults(lastSpinResult);
+        }
+
         // Debug output - , can be removed
         if (matches.Count > 0)
         {

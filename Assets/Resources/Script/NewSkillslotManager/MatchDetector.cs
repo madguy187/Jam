@@ -84,15 +84,20 @@ public class MatchDetector
     {
         zigzagPatterns = new List<List<Vector2Int>>
         {
-            new List<Vector2Int> { // Left zigzag
-                new Vector2Int(0, 0), new Vector2Int(0, 1),
-                new Vector2Int(1, 1),
-                new Vector2Int(2, 1), new Vector2Int(2, 2)
+            // Vertical H
+            new List<Vector2Int>
+            {
+                new Vector2Int(0, 0), new Vector2Int(1, 0), new Vector2Int(2, 0), // left column
+                new Vector2Int(1, 1),                                            // middle cross-bar
+                new Vector2Int(0, 2), new Vector2Int(1, 2), new Vector2Int(2, 2)  // right column
             },
-            new List<Vector2Int> { // Right zigzag
-                new Vector2Int(0, 2), new Vector2Int(0, 1),
-                new Vector2Int(1, 1),
-                new Vector2Int(2, 1), new Vector2Int(2, 0)
+
+            // Horizontal H 
+            new List<Vector2Int>
+            {
+                new Vector2Int(0, 0), new Vector2Int(0, 1), new Vector2Int(0, 2), // top row
+                new Vector2Int(1, 1),                                            // middle cross-bar
+                new Vector2Int(2, 0), new Vector2Int(2, 1), new Vector2Int(2, 2)  // bottom row
             }
         };
     }
