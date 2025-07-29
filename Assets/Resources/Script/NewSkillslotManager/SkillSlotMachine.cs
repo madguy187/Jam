@@ -51,7 +51,6 @@ public class SkillSlotMachine : MonoBehaviour
     [SerializeField] private bool previewSpin;
     [SerializeField] private bool playerCombatSpin;
     [SerializeField] private bool fullCombatSpin;
-    [SerializeField] private AttackBehaviour behaviour = AttackBehaviour.PlayerAndEnemyCombat;
 
     [Header("Enemy Spin Settings")]
     // If false, enemy dont spin visually, results processed in background

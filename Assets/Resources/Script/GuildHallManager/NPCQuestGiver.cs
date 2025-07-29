@@ -14,14 +14,10 @@ namespace StoryManager
 
         [Header("General")]
         [SerializeField] private string tooltipText = "Click to recruit your adventurers!";
-        [SerializeField] private GameObject recruitPanel;
+        [SerializeField] public GameObject recruitPanel;
 
-        [Header("Config")]
-        [SerializeField] private RawImage previewImage;           
-        [SerializeField] private GameObject unitPrefab;          
-        [SerializeField, Min(0.01f)] private float cameraSize = 0.4f;  
+        [Header("Config")]        
         [SerializeField] private Vector2 renderOffset = new Vector2(0f, -0.25f);
-        [SerializeField] private bool faceRight = true;
         [SerializeField] private Vector2 tooltipOffset = new Vector2(150f, 0f);
 
         [Header("Entry Animation")]
@@ -29,7 +25,7 @@ namespace StoryManager
         [SerializeField] private float entryDuration = 1.5f;
 
         [Header("Dialogue")]
-        [SerializeField] private DialogueManager dialogueManager;
+        [SerializeField] public DialogueManager dialogueManager;
         [TextArea(2,4)]
         [SerializeField] private string[] dialogueLines;
 
@@ -56,83 +52,8 @@ namespace StoryManager
                 recruitPanel.SetActive(false);
             }
 
-            if (previewImage == null)
-            {
-                Debug.LogError("NPCQuestGiver: Preview RawImage reference is missing.");
-                return;
-            }
-
-            SelectUnitPrefab();
-
-            if (unitPrefab == null)
-            {
-                return;
-            }
-
-            CreatePreviewCamera();
-            SpawnPreviewUnit();
             entryRoutine = StartCoroutine(EntrySequence());
-        }
-
-        private void SelectUnitPrefab()
-        {
-            if (unitPrefab != null)
-            {
-                return;
-            }
-
-            if (ResourceManager.instance == null)
-            {
-                return;
-            }
-
-            var pool = ResourceManager.instance.GetAllUnitPrefabs();
-            if (pool.Count > 0)
-            {
-                int randomIndex = Random.Range(0, pool.Count);
-                unitPrefab = pool[randomIndex];
-            }
-        }
-
-        private void CreatePreviewCamera()
-        {
-            Rect rect = previewImage.rectTransform.rect;
-            int width = Mathf.CeilToInt(rect.width);
-            int height = Mathf.CeilToInt(rect.height);
-
-            previewTexture = new RenderTexture(width, height, 16)
-            {
-                antiAliasing = 1
-            };
-            previewImage.texture = previewTexture;
-
-            GameObject cameraObject = new GameObject("NPCPreviewCamera");
-            cameraObject.transform.SetParent(transform, false);
-            cameraObject.transform.localPosition = new Vector3(0f, 0f, -1f);
-
-            previewCamera = cameraObject.AddComponent<Camera>();
-            previewCamera.clearFlags = CameraClearFlags.SolidColor;
-            previewCamera.backgroundColor = Color.clear;
-            previewCamera.orthographic = true;
-            previewCamera.orthographicSize = cameraSize;
-            previewCamera.cullingMask = 1 << uiLayer;
-            previewCamera.targetTexture = previewTexture;
-        }
-
-        private void SpawnPreviewUnit()
-        {
-            Vector3 spawnPosition = previewCamera.transform.position + Vector3.forward + (Vector3)renderOffset;
-            previewUnit = Instantiate(unitPrefab, spawnPosition, Quaternion.identity);
-
-            Vector3 scale = Vector3.one;
-            if (faceRight)
-            {
-                scale.x *= -1f;  
-            }
-            previewUnit.transform.localScale = scale;
-
-            SetLayerRecursive(previewUnit, uiLayer);
-            HideHudWidgets(previewUnit);
+            return;
         }
 
         private static void HideHudWidgets(GameObject root)
@@ -156,12 +77,15 @@ namespace StoryManager
         public void OnPointerClick(PointerEventData _)
         {
             if (!isInteractable || hasOpenedRecruit) return;
+
             if (recruitPanel != null)
             {
                 recruitPanel.SetActive(true);
                 DestroyBackgroundNpcs();
             }
-            hasOpenedRecruit = true; // disable future clicks
+
+            // disable future clicks
+            hasOpenedRecruit = true; 
         }
 
         public void OnPointerEnter(PointerEventData _)
@@ -207,10 +131,6 @@ namespace StoryManager
             {
                 dialogueManager.StartDialogue(dialogueLines, () => { isInteractable = true; });
             }
-            else
-            {
-                isInteractable = true;
-            }
         }
 
         private void OnDestroy()
@@ -218,7 +138,7 @@ namespace StoryManager
             if (entryRoutine != null)
             {
                 StopCoroutine(entryRoutine);
-                entryRoutine = null;
+                entryRoutine = null;    
             }
 
             if (previewTexture != null)

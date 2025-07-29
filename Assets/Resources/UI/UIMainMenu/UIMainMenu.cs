@@ -17,6 +17,6 @@ public class UIMainMenu : MonoBehaviour {
 
     void FadeEnd() {
         UIFade.instance.FadeIn(2.0f);
-        SceneManager.LoadScene("Game_Map");
+        SceneManager.LoadScene("Game_GuildHall");
     }
 }

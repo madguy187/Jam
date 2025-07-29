@@ -23,7 +23,7 @@ namespace StoryManager
         [SerializeField] private string[] tutorialLines;
 
         [Header("Button Text")]
-        [SerializeField] private string takePartyText      = "Take Party";
+        [SerializeField] private string takePartyText      = "Recruit Party";
         [SerializeField] private string startAdventureText = "Start Adventure";
 
         [Header("Confirmation Dialogue")]
@@ -305,6 +305,7 @@ namespace StoryManager
             }
 
             ShowStartAdventureButton();
+            gameObject.SetActive(false);
         }
 
         private static void HideUnitHud(UnitObject unit)
