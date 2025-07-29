@@ -2781,35 +2781,35 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2000384013946094307, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 201.25
       objectReference: {fileID: 0}
     - target: {fileID: 2000384013946094307, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 83
+      value: 133
       objectReference: {fileID: 0}
     - target: {fileID: 2000384013946094307, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 44
+      value: 87
       objectReference: {fileID: 0}
     - target: {fileID: 3451315520783028325, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3451315520783028325, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3451315520783028325, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 36.01
       objectReference: {fileID: 0}
     - target: {fileID: 3451315520783028325, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 302.75
       objectReference: {fileID: 0}
     - target: {fileID: 3451315520783028325, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -36.004997
       objectReference: {fileID: 0}
     - target: {fileID: 3531109670025618864, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_IsActive
@@ -2929,27 +2929,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7058870403223364766, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7058870403223364766, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7058870403223364766, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 24.01
       objectReference: {fileID: 0}
     - target: {fileID: 7058870403223364766, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 289.65
       objectReference: {fileID: 0}
     - target: {fileID: 7058870403223364766, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -79.244995
       objectReference: {fileID: 0}
     - target: {fileID: 7988476949493948911, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
       propertyPath: m_Name
       value: ToolTipMenu
+      objectReference: {fileID: 0}
+    - target: {fileID: 7988476949493948911, guid: 2314a898d465e1d46aa64679b3cd06ce, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3616,7 +3620,6 @@ GameObject:
   - component: {fileID: 1910004502}
   - component: {fileID: 1910004501}
   - component: {fileID: 1910004500}
-  - component: {fileID: 1910004503}
   - component: {fileID: 1910004504}
   m_Layer: 0
   m_Name: BagScrollView
@@ -3713,20 +3716,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1910004498}
   m_CullTransparentMesh: 1
---- !u!114 &1910004503
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1910004498}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding: {x: 0, y: 0, z: 0, w: 0}
-  m_Softness: {x: 0, y: 0}
 --- !u!114 &1910004504
 MonoBehaviour:
   m_ObjectHideFlags: 0
