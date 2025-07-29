@@ -77,6 +77,33 @@ namespace Map
             }
 
             SetState(NodeStates.Locked);
+
+            if (sr != null && sr.sprite != null)
+            {
+                float desiredHeight = 1.0f; // or whatever target height you want in world units
+                float currentHeight = sr.sprite.bounds.size.y;
+            
+                float scaleFactor = desiredHeight / currentHeight;
+                sr.transform.localScale = Vector3.one * scaleFactor;
+                initialScale = sr.transform.localScale.x; // update initial scale for hover animation
+            }
+
+            // Adjust UI image size (in pixels or units, depending on your Canvas settings)
+            if (visitedCircleImage != null && sr != null && visitedCircleImage.sprite != null)
+            {
+                visitedCircleImage.transform.localScale = Vector3.one;
+            
+                float spriteHeight = sr.sprite.rect.height / sr.sprite.pixelsPerUnit;  // intrinsic sprite height (unscaled)
+                float imageHeight = visitedCircleImage.sprite.rect.height / visitedCircleImage.sprite.pixelsPerUnit;
+            
+                float scaleFactor = spriteHeight / imageHeight;
+                scaleFactor *= 1.1f; // optional buffer
+            
+                visitedCircleImage.transform.localScale = Vector3.one * scaleFactor;
+            }
+
+
+
         }
 
         /// Sets the visual state of the node (Locked, Visited, Attainable) and triggers corresponding animations

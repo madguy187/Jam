@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd039be287e5bad449a8a4343cc9f923, type: 3}
   m_Name: Major Boss
   m_EditorClassIdentifier: 
-  sprite: {fileID: 1092193355370073605, guid: 32a3c20204e23ba4b96a51d6d4ac6f3c, type: 3}
+  sprite: {fileID: 1337823023, guid: e426240216631ac48bf288a371ab27c4, type: 3}
   nodeType: 5
-  description: This is a major boss node
+  description: Final Boss

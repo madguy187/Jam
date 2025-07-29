@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd039be287e5bad449a8a4343cc9f923, type: 3}
   m_Name: Mini Boss
   m_EditorClassIdentifier: 
-  sprite: {fileID: 9220052400780551148, guid: 53b212e6ccfac8a44893b2d70458004d, type: 3}
+  sprite: {fileID: 8407791574078346708, guid: 7495177a1b6d3e94f85fba37265220dd, type: 3}
   nodeType: 2
-  description: This is a mini boss node
+  description: Mini Boss
