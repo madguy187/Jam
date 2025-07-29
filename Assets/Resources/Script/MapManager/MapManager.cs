@@ -65,6 +65,11 @@ namespace Map
             MapDTO mapDTO = CurrentMap.ToDTO();
             string json = JsonUtility.ToJson(mapDTO, true);
             PlayerPrefs.SetString("Map", json);
+            var scrollPosition = view.GetScrollPosition();
+            PlayerPrefs.SetFloat("ScrollPositionX", scrollPosition.x);
+            PlayerPrefs.SetFloat("ScrollPositionY", scrollPosition.y);
+            PlayerPrefs.SetFloat("ScrollPositionZ", scrollPosition.z);
+            Global.DEBUG_PRINT("[MapManager::SaveMap] Map saved with scroll position: " + scrollPosition);
             PlayerPrefs.Save();
         }
 

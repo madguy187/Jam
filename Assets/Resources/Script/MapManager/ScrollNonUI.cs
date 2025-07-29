@@ -148,5 +148,10 @@ namespace Map
                 snapBackCoroutine = null;
             }
         }
+
+        public Vector3 GetScrollPosition() 
+        {
+            return transform.position;
+        }
     }
 }
