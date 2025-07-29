@@ -28,6 +28,7 @@ public class CreatePrefabFromMenu {
     const string UNIT_DEFAULT_RELIC_FULL_PATH = "Assets/Resources/" + "ScriptableObject/RelicSO/_Base/RelicDefault.asset";
 
     const string HEALTH_BAR_PATH = "UI/UIHealthBar/UIHealthBar";
+    const string SHIELD_BAR_PATH = "ScriptableObject/UnitSO/_Base/Shield";
     const string EFFECT_GRID_PATH = "UI/UIEffect/UIEffectGrid";
 
     const string FOLDER_SEPARATOR = "/";
@@ -99,6 +100,24 @@ public class CreatePrefabFromMenu {
         healthBarTrans.anchoredPosition = pos;
     }
 
+    static void AttachShield(ref GameObject obj) {
+        GameObject objShield = null;
+        if (obj.GetComponentInChildren<ShieldScript>() != null) {
+            objShield = obj.GetComponentInChildren<ShieldScript>().gameObject;
+        } else {
+            GameObject prefab = Resources.Load<GameObject>(SHIELD_BAR_PATH);
+            objShield = GameObject.Instantiate(prefab);
+            objShield.transform.parent = obj.transform;
+        }
+
+        UnitObject unitComp = obj.GetComponent<UnitObject>();
+        ShieldScript shieldComp = objShield.GetComponent<ShieldScript>();
+        shieldComp.unit = unitComp;
+
+        Vector3 pos = new Vector3(0.0f, 0.0f, 0.0f);
+        shieldComp.transform.position = pos;
+    }
+
     static void CreateUnit(string path, string outputPath, string scriptablePath, string unitName) {
         GameObject prefab = null;
 
@@ -125,6 +144,7 @@ public class CreatePrefabFromMenu {
         }
 
         AttachHealthBar(ref gameObj);
+        AttachShield(ref gameObj);
 
         string infoPath = scriptablePath + FOLDER_SEPARATOR + unitName;
         List<UnitScriptableObject> unitSO = Resources.LoadAll<UnitScriptableObject>(infoPath).ToList();
