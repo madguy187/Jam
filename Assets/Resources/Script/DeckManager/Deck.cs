@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class Deck : IEnumerable<UnitObject> {
@@ -19,6 +18,19 @@ public class Deck : IEnumerable<UnitObject> {
 
         for (int i = 0; i < _vecPosition.Count; i++) {
             _vecUnit.Add(null);
+        }
+    }
+
+    public void ReInitUnitPosition(List<UnitPosition> vecPos) {
+        _vecPosition = vecPos;
+        for (int i = 0; i < _vecPosition.Count; i++) {
+            UnitObject unit = _vecUnit[i];
+            if (unit == null) {
+                continue;
+            }
+            Debug.Log("set");
+            Transform pos = _GetPosition(i);
+            unit.transform.position = pos.position;
         }
     }
 

@@ -1,23 +1,45 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class UIEffectGrid : MonoBehaviour {
     [SerializeField] Transform transParentCanvas;
-    [SerializeField] UnitObject unit;
 
     Dictionary<EffectType, UIEffect> _mapEffectObj = new Dictionary<EffectType, UIEffect>();
 
-    public UnitObject GetUnit() { return unit; }
+    public UnitObject GetUnit() { return PanelManager.instance.GetCurrentUnit(); }
 
-#if UNITY_EDITOR
-    public void SetCanvasParent(Transform trans) {
-        transParentCanvas = trans;
-    }
+    void Update() {
+        UnitObject unit = GetUnit();
+        if (unit == null) {
+            return;
+        }
 
-    public void SetUnit(UnitObject _unit) {
-        unit = _unit;
+        List<EffectType> listKey = _mapEffectObj.Keys.ToList();
+
+        EffectMap effectMap = unit.GetAllTempEffect();
+        foreach (EffectObject effectObj in effectMap) {
+            EffectType eType = effectObj.GetEffectType();
+
+            if (listKey.Contains(eType)) {
+                listKey.Remove(eType);
+            }
+
+            if (HasEffectUI(eType)) {
+                continue;
+            }
+
+            AddEffectUI(eType);
+        }
+
+        foreach (EffectType eTypeRemove in listKey) {
+            UIEffect uiEffect = _mapEffectObj[eTypeRemove];
+            if (uiEffect != null) {
+                Destroy(uiEffect.gameObject);
+            }
+            _mapEffectObj.Remove(eTypeRemove);
+        }
     }
-#endif
 
     public void AddEffectUI(EffectType eType) {
         if (!_mapEffectObj.ContainsKey(eType)) {
