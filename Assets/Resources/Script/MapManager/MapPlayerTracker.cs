@@ -87,41 +87,41 @@ namespace Map
             // If choose to show GUI in some of these cases, do not forget to set "Locked" in MapPlayerTracker back to false
             switch (mapNode.Node.nodeType) {
                 case NodeType.Enemy:
-                    mapManager.SaveMap();
-                    EnemyManager.instance.nodeType = mapNode.Node.nodeType;
-                    EnemyManager.instance.PopulateMobBasedOnNodeType();
-                    SceneManager.LoadScene("Game");
+                    // mapManager.SaveMap();
+                    // EnemyManager.instance.nodeType = mapNode.Node.nodeType;
+                    // EnemyManager.instance.PopulateMobBasedOnNodeType();
+                    // SceneManager.LoadScene("Game");
                     break;
                 case NodeType.Encounter:
-                    mapManager.SaveMap();
-                    SceneManager.LoadScene("Game_StoryTeller");
+                    // mapManager.SaveMap();
+                    // SceneManager.LoadScene("Game_StoryTeller");
                     break;
                 case NodeType.Necromancer:
-                    mapManager.SaveMap();
-                    SceneManager.LoadScene("Game_Necromancer");
+                    // mapManager.SaveMap();
+                    // SceneManager.LoadScene("Game_Necromancer");
                     break;
                 case NodeType.Shop:
-                    mapManager.SaveMap();
-                    SceneManager.LoadScene("Game_Shop");
+                    // mapManager.SaveMap();
+                    // SceneManager.LoadScene("Game_Shop");
                     break;
                 case NodeType.Blacksmith:
-                    mapManager.SaveMap();
-                    SceneManager.LoadScene("Game_Blacksmith");
+                    // mapManager.SaveMap();
+                    // SceneManager.LoadScene("Game_Blacksmith");
                     break;
                 case NodeType.MiniBoss:
-                    mapManager.SaveMap();
-                    EnemyManager.instance.nodeType = mapNode.Node.nodeType;
-                    SceneManager.LoadScene("Game");
+                    // mapManager.SaveMap();
+                    // EnemyManager.instance.nodeType = mapNode.Node.nodeType;
+                    // SceneManager.LoadScene("Game");
                     // Save map state before leaving
                     // MapPlayerTracker.Instance.mapManager.SaveMap();
                     // Load new scene for mini-boss encounter
                     // SceneManager.LoadScene("Fikrul_TestMiniBossEncounter");
                     break;
                 case NodeType.MajorBoss:
-                    mapManager.SaveMap();
-                    EnemyManager.instance.nodeType = mapNode.Node.nodeType;
-                    EnemyManager.instance.PopulateMobBasedOnNodeType();
-                    SceneManager.LoadScene("Game");
+                    // mapManager.SaveMap();
+                    // EnemyManager.instance.nodeType = mapNode.Node.nodeType;
+                    // EnemyManager.instance.PopulateMobBasedOnNodeType();
+                    // SceneManager.LoadScene("Game");
                     // ADDED: Trigger major boss fight, then call some function to handle the result
                     // Example: StartMajorBossFight(mapNode);
                     // When the fight ends, call:

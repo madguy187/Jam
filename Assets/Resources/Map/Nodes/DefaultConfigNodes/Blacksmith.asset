@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 21300000, guid: 20965a96dfa0b2645a809f221be10e30, type: 3}
   nodeType: 7
-  description: This is a blacksmith node
+  description: Relics Blacksmith

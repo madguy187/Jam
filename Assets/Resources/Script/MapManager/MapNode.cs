@@ -89,24 +89,20 @@ namespace Map
             }
 
             // Adjust UI image size (in pixels or units, depending on your Canvas settings)
-            if (visitedCircleImage != null)
+            if (visitedCircleImage != null && sr != null && visitedCircleImage.sprite != null)
             {
-                // Reset the scale
                 visitedCircleImage.transform.localScale = Vector3.one;
-
-                // Scale it proportionally to sprite
-                float spriteHeight = sr.bounds.size.y;
-                float desiredSwirlSize = spriteHeight * 1.0f;
-
-                // Get current rect height in world units
-                float imagePixelHeight = visitedCircleImage.sprite.rect.height;
-                float pixelsPerUnit = visitedCircleImage.sprite.pixelsPerUnit;
-                float imageWorldHeight = imagePixelHeight / pixelsPerUnit;
-
-                // Compute needed scale factor
-                float scaleFactor = desiredSwirlSize / imageWorldHeight;
+            
+                float spriteHeight = sr.sprite.rect.height / sr.sprite.pixelsPerUnit;  // intrinsic sprite height (unscaled)
+                float imageHeight = visitedCircleImage.sprite.rect.height / visitedCircleImage.sprite.pixelsPerUnit;
+            
+                float scaleFactor = spriteHeight / imageHeight;
+                scaleFactor *= 1.1f; // optional buffer
+            
                 visitedCircleImage.transform.localScale = Vector3.one * scaleFactor;
             }
+
+
 
         }
 

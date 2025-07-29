@@ -25,7 +25,8 @@ public class UnitButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     }
 
     // Initialize with the unit and click callback, plus assign the inventory item
-    public void Init(UnitObject unit, MockInventoryItem inventoryItem, Action<UnitObject> onClick) {
+    public void Init(UnitObject unit, MockInventoryItem inventoryItem, Action<UnitObject> onClick) 
+    {
         unitData = unit;
         boundItem = inventoryItem;
         onClickCallback = onClick;
@@ -35,7 +36,7 @@ public class UnitButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
         nameText.text = unit.unitSO.unitName;
 
-        Sprite sprite = DeckDisplayManager.RenderUnitToSprite(unit);
+        Sprite sprite = GetUnitSprite(unit.gameObject);
         if (sprite != null) {
             unitIcon.sprite = sprite;
         }
@@ -44,27 +45,32 @@ public class UnitButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         SetHover(false);
     }
 
-    public void Init(UnitObject unit, Action<UnitObject> onClick) {
+    public void Init(UnitObject unit, Action<UnitObject> onClick) 
+    {
         Init(unit, null, onClick); // Call the main Init with null for boundItem
     }
 
-    public void OnClick() {
+    public void OnClick() 
+    {
         onClickCallback?.Invoke(unitData);
     }
 
-    public void SetSelected(bool selected) {
+    public void SetSelected(bool selected) 
+    {
         isSelected = selected;
         UpdateIconScale();
     }
 
     // Call this on hover enter/exit if you have hover effects
-    public void SetHover(bool isHovering) {
+    public void SetHover(bool isHovering) 
+    {
         if (isSelected) { return; } // don't override selected scale while selected
 
         unitIcon.rectTransform.localScale = isHovering ? hoverScale : normalScale;
     }
 
-    private void UpdateIconScale() {
+    private void UpdateIconScale() 
+    {
         unitIcon.rectTransform.localScale = isSelected ? selectedScale : normalScale;
     }
 
@@ -78,5 +84,22 @@ public class UnitButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     public void OnPointerExit(PointerEventData eventData)
     {
         SetHover(false);
+    }
+
+    Sprite GetUnitSprite(GameObject unit)
+    {
+        RenderTexture tex;
+        GameObject camObj;
+        var unitRoot = unit.transform.Find("UnitRoot");
+        if (unitRoot == null) {
+            Global.DEBUG_PRINT("[UnitButton::GetUnitSprite] UnitRoot not found on unitPrefab!");
+            GameObject.DestroyImmediate(unit);
+            return null; // Or handle error properly
+        }
+        (tex, camObj) = RenderUtilities.RenderUnitToTexture(unitRoot.gameObject, 2.0f);
+        Sprite unitIcon = RenderUtilities.ConvertRenderTextureToSprite(tex);
+        Destroy(camObj);
+        Destroy(tex);
+        return unitIcon;
     }
 }

@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 21300000, guid: 3bf5f71dd5ca9b64ebd14af8e4a59d62, type: 3}
   nodeType: 1
-  description: This is an enemy node
+  description: Enemy

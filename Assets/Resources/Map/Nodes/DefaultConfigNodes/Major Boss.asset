@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 1337823023, guid: e426240216631ac48bf288a371ab27c4, type: 3}
   nodeType: 5
-  description: This is a major boss node
+  description: Final Boss

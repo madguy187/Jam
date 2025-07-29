@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 1780072902, guid: 43722c209d4d7884a99cd34556097cf7, type: 3}
   nodeType: 3
-  description: This is an encounter node
+  description: Encounter Chance

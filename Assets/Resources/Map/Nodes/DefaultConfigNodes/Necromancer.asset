@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sprite: {fileID: 21300000, guid: addc35e4d94afc3408e7c29b6ea5940e, type: 3}
   nodeType: 4
-  description: This is a shop node
+  description: Shrine
