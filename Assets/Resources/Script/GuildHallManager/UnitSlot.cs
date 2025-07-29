@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
+using System.Collections;
+using System.Linq;
 
 namespace StoryManager
 {
@@ -24,12 +26,21 @@ namespace StoryManager
         private RenderTexture previewTexture;
         private Camera previewCamera;
 
+        [SerializeField, Min(0.1f)] private float animationInterval = 2f; 
+
+        private Coroutine animationRoutine;
+
+        private const string UI_LAYER_NAME = "UI";
+        private int uiLayer;
+        private static readonly Dictionary<RuntimeAnimatorController, List<AnimationClip>> ValidClipCache = new();
+
         public GameObject CurrentPrefab => currentPrefab;
 
         private static List<GameObject> recruitPool;
 
         private void Awake()
         {
+            uiLayer = LayerMask.NameToLayer(UI_LAYER_NAME);
             CreatePreviewRenderTargets();
         }
 
@@ -71,7 +82,7 @@ namespace StoryManager
             previewCamera.orthographic = true;
             previewCamera.orthographicSize = cameraSize;
             previewCamera.targetTexture = previewTexture;
-            previewCamera.cullingMask = 1 << LayerMask.NameToLayer("UI");
+            previewCamera.cullingMask = 1 << uiLayer;
         }
 
         private void UpdateCameraSettings()
@@ -110,6 +121,13 @@ namespace StoryManager
 
         public void DestroyPreview()
         {
+            // Stop animation first
+            if (animationRoutine != null)
+            {
+                StopCoroutine(animationRoutine);
+                animationRoutine = null;
+            }
+
             if (currentPreview != null)
             {
                 Destroy(currentPreview);
@@ -157,12 +175,99 @@ namespace StoryManager
 
             DestroyPreview();
 
+            // Stop any previous animation loop
+            if (animationRoutine != null)
+            {
+                StopCoroutine(animationRoutine);
+                animationRoutine = null;
+            }
+
             Vector3 spawnPosition = previewCamera.transform.position + Vector3.forward + (Vector3)renderOffset;
             currentPreview = Instantiate(currentPrefab, spawnPosition, Quaternion.identity);
             currentPreview.transform.localScale = Vector3.one;
 
-            SetLayerRecursive(currentPreview, LayerMask.NameToLayer("UI"));
+            SetLayerRecursive(currentPreview, uiLayer);
             HideHudWidgets(currentPreview);
+
+            // Play a random animation clip if an Animator is present
+            PlayRandomAnimation(currentPreview);
+
+            // Start looping random animations
+            animationRoutine = StartCoroutine(AnimationLoop(currentPreview));
+        }
+
+        private void PlayRandomAnimation(GameObject target)
+        {
+            if (target == null) return;
+
+            // Try to fetch an Animator on the root first, then search children
+            Animator anim = target.GetComponent<Animator>();
+            if (anim == null)
+            {
+                anim = target.GetComponentInChildren<Animator>();
+            }
+
+            if (anim == null || anim.runtimeAnimatorController == null)
+            {
+                return;
+            }
+
+            var validClips = GetValidClips(anim.runtimeAnimatorController);
+            if (validClips.Count == 0) return;
+
+            AnimationClip randomClip = validClips[Random.Range(0, validClips.Count)];
+            if (randomClip != null)
+            {
+                anim.Play(randomClip.name, 0, 0f);
+            }
+        }
+
+        private IEnumerator AnimationLoop(GameObject target)
+        {
+            if (target == null) yield break;
+
+            Animator anim = target.GetComponent<Animator>();
+            if (anim == null) anim = target.GetComponentInChildren<Animator>();
+            if (anim == null || anim.runtimeAnimatorController == null) yield break;
+
+            var validClips = GetValidClips(anim.runtimeAnimatorController);
+            if (validClips.Count == 0) yield break;
+
+            // Added null checks
+            while (target != null && target == currentPreview && anim != null) 
+            {
+                // Extra safety check
+                if (anim == null || !anim.gameObject.activeInHierarchy)
+                {
+                    yield break;
+                }
+
+                AnimationClip clip = validClips[Random.Range(0, validClips.Count)];
+                if (clip != null)
+                {
+                    try
+                    {
+                        anim.Play(clip.name, 0, 0f);
+                    }
+                    catch (MissingReferenceException)
+                    {
+                        // Exit if animator was destroyed
+                        yield break; 
+                    }
+                }
+                yield return new WaitForSeconds(animationInterval);
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (animationRoutine != null)
+            {
+                StopCoroutine(animationRoutine);
+                animationRoutine = null;
+            }
+
+            DestroyPreview();
         }
 
         private static void SetLayerRecursive(GameObject node, int layer)
@@ -195,6 +300,21 @@ namespace StoryManager
             {
                 rerollButton.interactable = rerollsLeft > 0;
             }
+        }
+
+        private static List<AnimationClip> GetValidClips(RuntimeAnimatorController controller)
+        {
+            if (controller == null) return new List<AnimationClip>();
+
+            if (ValidClipCache.TryGetValue(controller, out var cached))
+            {
+                return cached;
+            }
+
+            var clips = controller.animationClips ?? new AnimationClip[0];
+            var valid = clips.Where(c => c != null && !c.name.ToLower().Contains("death")).ToList();
+            ValidClipCache[controller] = valid;
+            return valid;
         }
     }
 }
