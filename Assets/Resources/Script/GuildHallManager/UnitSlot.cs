@@ -14,6 +14,7 @@ namespace StoryManager
         [SerializeField] private TMP_Text rerollText;
         [SerializeField] private RectTransform previewAnchor;
         [SerializeField] private RawImage previewImage;
+        [SerializeField] private TMP_Text unitNameLabel;
 
         [Header("Config")]
         [SerializeField] private int maxRerolls = 3;
@@ -161,6 +162,9 @@ namespace StoryManager
             int randomIndex = Random.Range(0, recruitPool.Count);
             currentPrefab = recruitPool[randomIndex];
 
+            // Update the name label immediately
+            UpdateNameLabel();
+
             SpawnPreview();
             rerollsLeft--;
             UpdateRerollUI();
@@ -194,6 +198,9 @@ namespace StoryManager
 
             // Start looping random animations
             animationRoutine = StartCoroutine(AnimationLoop(currentPreview));
+
+            // Ensure the name label is correct after spawning
+            UpdateNameLabel();
         }
 
         private void PlayRandomAnimation(GameObject target)
@@ -315,6 +322,24 @@ namespace StoryManager
             var valid = clips.Where(c => c != null && !c.name.ToLower().Contains("death")).ToList();
             ValidClipCache[controller] = valid;
             return valid;
+        }
+
+        private void UpdateNameLabel()
+        {
+            if (unitNameLabel == null) return;
+
+            string displayName = "";
+            if (currentPrefab != null)
+            {
+                UnitObject uo = currentPrefab.GetComponent<UnitObject>();
+                displayName = uo?.unitSO?.unitName;
+                if (string.IsNullOrEmpty(displayName))
+                {
+                    displayName = currentPrefab.name;
+                }
+            }
+
+            unitNameLabel.text = string.IsNullOrEmpty(displayName) ? "???" : displayName;
         }
     }
 }

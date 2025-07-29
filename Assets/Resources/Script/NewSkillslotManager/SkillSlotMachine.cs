@@ -51,7 +51,6 @@ public class SkillSlotMachine : MonoBehaviour
     [SerializeField] private bool previewSpin;
     [SerializeField] private bool playerCombatSpin;
     [SerializeField] private bool fullCombatSpin;
-    [SerializeField] private AttackBehaviour behaviour = AttackBehaviour.PlayerAndEnemyCombat;
 
     [Header("Enemy Spin Settings")]
     // If false, enemy dont spin visually, results processed in background
@@ -314,6 +313,12 @@ public class SkillSlotMachine : MonoBehaviour
 
         lastSpinResult = new SpinResult(matches, totalGold);
 
+        // Update help panel text only during player's turn
+        if (!isEnemyTurn && MatchHelpScreen.instance != null)
+        {
+            MatchHelpScreen.instance.DisplaySpinResults(lastSpinResult);
+        }
+
         // Debug output - , can be removed
         if (matches.Count > 0)
         {
@@ -456,35 +461,8 @@ public class SkillSlotMachine : MonoBehaviour
         // restore original mode for subsequent player actions
         spinMode = previousMode;
 
-        // Show popup summarising enemy roll 
-        if (UIPopUpManager.instance != null && lastSpinResult != null)
-        {
-            List<Match> enemyMatches = lastSpinResult.GetAllMatches();
-            foreach (Match m in enemyMatches)
-            {
-                UnitObject matchUnit = null;
-                for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
-                {
-                    UnitObject u = enemyDeck.GetUnitObject(i);
-                    if (u != null && u.unitSO != null && u.unitSO.eUnitArchetype == m.GetArchetype())
-                    {
-                        matchUnit = u; break;
-                    }
-                }
-
-                Sprite iconSprite = null;
-                if (matchUnit != null)
-                {
-                    iconSprite = RenderUtilities.RenderUnitHeadSprite(matchUnit);
-                }
-
-                string popupText = $"{m.GetMatchType()} {m.GetArchetype()}";
-                if (iconSprite != null)
-                    UIPopUpManager.instance.CreatePopUp(popupText, iconSprite);
-                else
-                    UIPopUpManager.instance.CreatePopUp(popupText);
-            }
-        }
+        // Show pop-ups summarising enemy roll
+        ShowEnemyRollPopups(enemyDeck);
 
         ProcessEnemyTurnCombat();
 
@@ -622,5 +600,34 @@ public class SkillSlotMachine : MonoBehaviour
     public void ExecuteFullCombat()
     {
         ExecuteCombat(true);
+    }
+
+    // UI helpers
+    void ShowEnemyRollPopups(Deck enemyDeck)
+    {
+        if (UIPopUpManager.instance == null || lastSpinResult == null) return;
+
+        foreach (Match m in lastSpinResult.GetAllMatches())
+        {
+            // Find an alive unit of the same archetype for the icon
+            UnitObject matchUnit = null;
+            for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
+            {
+                UnitObject u = enemyDeck.GetUnitObject(i);
+                if (u != null && !u.IsDead() && u.unitSO != null && u.unitSO.eUnitArchetype == m.GetArchetype())
+                {
+                    matchUnit = u;
+                    break;
+                }
+            }
+
+            Sprite iconSprite = matchUnit != null ? RenderUtilities.RenderUnitHeadSprite(matchUnit) : null;
+
+            string popupText = $"{m.GetMatchType()} {m.GetArchetype()}";
+            if (iconSprite != null)
+                UIPopUpManager.instance.CreatePopUp(popupText, iconSprite);
+            else
+                UIPopUpManager.instance.CreatePopUp(popupText);
+        }
     }
 } 
