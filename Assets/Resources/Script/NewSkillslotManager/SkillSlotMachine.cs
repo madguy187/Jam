@@ -462,35 +462,8 @@ public class SkillSlotMachine : MonoBehaviour
         // restore original mode for subsequent player actions
         spinMode = previousMode;
 
-        // Show popup summarising enemy roll 
-        if (UIPopUpManager.instance != null && lastSpinResult != null)
-        {
-            List<Match> enemyMatches = lastSpinResult.GetAllMatches();
-            foreach (Match m in enemyMatches)
-            {
-                UnitObject matchUnit = null;
-                for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
-                {
-                    UnitObject u = enemyDeck.GetUnitObject(i);
-                    if (u != null && u.unitSO != null && u.unitSO.eUnitArchetype == m.GetArchetype())
-                    {
-                        matchUnit = u; break;
-                    }
-                }
-
-                Sprite iconSprite = null;
-                if (matchUnit != null)
-                {
-                    iconSprite = RenderUtilities.RenderUnitHeadSprite(matchUnit);
-                }
-
-                string popupText = $"{m.GetMatchType()} {m.GetArchetype()}";
-                if (iconSprite != null)
-                    UIPopUpManager.instance.CreatePopUp(popupText, iconSprite);
-                else
-                    UIPopUpManager.instance.CreatePopUp(popupText);
-            }
-        }
+        // Show pop-ups summarising enemy roll
+        ShowEnemyRollPopups(enemyDeck);
 
         ProcessEnemyTurnCombat();
 
@@ -628,5 +601,34 @@ public class SkillSlotMachine : MonoBehaviour
     public void ExecuteFullCombat()
     {
         ExecuteCombat(true);
+    }
+
+    // UI helpers
+    void ShowEnemyRollPopups(Deck enemyDeck)
+    {
+        if (UIPopUpManager.instance == null || lastSpinResult == null) return;
+
+        foreach (Match m in lastSpinResult.GetAllMatches())
+        {
+            // Find an alive unit of the same archetype for the icon
+            UnitObject matchUnit = null;
+            for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
+            {
+                UnitObject u = enemyDeck.GetUnitObject(i);
+                if (u != null && !u.IsDead() && u.unitSO != null && u.unitSO.eUnitArchetype == m.GetArchetype())
+                {
+                    matchUnit = u;
+                    break;
+                }
+            }
+
+            Sprite iconSprite = matchUnit != null ? RenderUtilities.RenderUnitHeadSprite(matchUnit) : null;
+
+            string popupText = $"{m.GetMatchType()} {m.GetArchetype()}";
+            if (iconSprite != null)
+                UIPopUpManager.instance.CreatePopUp(popupText, iconSprite);
+            else
+                UIPopUpManager.instance.CreatePopUp(popupText);
+        }
     }
 } 
