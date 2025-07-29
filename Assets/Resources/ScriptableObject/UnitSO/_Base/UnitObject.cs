@@ -60,7 +60,6 @@ public class UnitObject : MonoBehaviour {
     public void SetEffectList_Diagonal(EffectList _list) { _listDiagonalEffect = _list; }
     public void SetEffectList_ZigZag(EffectList _list) { _listZigZagEffect = _list; }
     public void SetEffectList_FullGrid(EffectList _list) { _listFullGridEffect = _list; }
-    public void SetEffectUIGrid(UIEffectGrid _grid) { _listTempEffect.SetGrid(_grid); }
 #endif
 
 

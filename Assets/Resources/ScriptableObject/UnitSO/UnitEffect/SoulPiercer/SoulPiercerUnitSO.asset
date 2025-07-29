@@ -23,9 +23,9 @@ MonoBehaviour:
   res: 1
   critRate: 20
   critMulti: 160
-  singleMatchDescription: Attack enemy , lifesteal dealt damage
-  horizontalMatchDescription: Atk +4 this round
-  diagonalMatchDescription: ' If crit, restore 3 HP'
-  zigzagMatchDescription: Double attack next turn
-  xShapeMatchDescription: Attack Ignore enemy Res
-  fullGridMatchDescription: Deal 12 flat damage to all enemies below 50% HP
+  singleMatchDescription: 
+  horizontalMatchDescription: 
+  diagonalMatchDescription: 
+  zigzagMatchDescription: 
+  xShapeMatchDescription: 
+  fullGridMatchDescription: 

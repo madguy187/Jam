@@ -75,6 +75,9 @@ public class CreateEffectSO_Editor {
         LoadUnitSO();
         LoadEffectSO();
 
+        AssetDatabase.SaveAssets(); // Ensure changes are saved
+        AssetDatabase.Refresh(); // Refresh the Project window to show the new asset
+        
         CreatePrefabFromMenu.LoadAllSO();
         CreatePrefabFromMenu.LoadAllRelicSO();
         Debug.Log("Loaded");

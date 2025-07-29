@@ -23,10 +23,9 @@ MonoBehaviour:
   res: 4
   critRate: 5
   critMulti: 125
-  singleMatchDescription: Heal lowest HP ally for 3
-  horizontalMatchDescription: All allies Base HP + 2
-  diagonalMatchDescription: Boost all ally's Crit Rate + 2%
-  zigzagMatchDescription: Revive 1 random fallen ally at 1 HP and heal all other
-    allies for 5HP.
-  xShapeMatchDescription: Cleanse all negative effects from units and heal 3 HP.
-  fullGridMatchDescription: All unitsRes + 1 and heal 4 HP
+  singleMatchDescription: 
+  horizontalMatchDescription: 
+  diagonalMatchDescription: 
+  zigzagMatchDescription: 
+  xShapeMatchDescription: 
+  fullGridMatchDescription: 

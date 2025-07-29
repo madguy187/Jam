@@ -23,9 +23,9 @@ MonoBehaviour:
   res: 1
   critRate: 30
   critMulti: 210
-  singleMatchDescription: Gain +15% crit for 1 turn
-  horizontalMatchDescription: Deal Atk +9 damage
-  diagonalMatchDescription: Attacks twice
-  zigzagMatchDescription: After attacking go into invis immue to AOE damage
-  xShapeMatchDescription: Atk + 5, attack all enemy with a charged AOE  attack
-  fullGridMatchDescription: Attack the lowest HP enemy 3 times.
+  singleMatchDescription: 
+  horizontalMatchDescription: 
+  diagonalMatchDescription: 
+  zigzagMatchDescription: 
+  xShapeMatchDescription: 
+  fullGridMatchDescription: 

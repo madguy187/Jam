@@ -23,9 +23,9 @@ MonoBehaviour:
   res: 2
   critRate: 5
   critMulti: 125
-  singleMatchDescription: ' shield + 3 and Taunt  (forces targeting for 3 turn)'
-  horizontalMatchDescription: ' Gain + 2 RES for 2 turns'
-  diagonalMatchDescription: Gain Res + 2 for 3 turns and sheild + 2
-  zigzagMatchDescription: Take 0 damage next round
-  xShapeMatchDescription: Dies and revive with full HP, then attack enemy with Atk+1
-  fullGridMatchDescription: Cannot die this round (1 HP minimum)
+  singleMatchDescription: 
+  horizontalMatchDescription: 
+  diagonalMatchDescription: 
+  zigzagMatchDescription: 
+  xShapeMatchDescription: 
+  fullGridMatchDescription: 
