@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d20bd35cc99faf5449424bcc9241ce5a, type: 3}
-  m_Name: Paladin_Single_EFFECT_STAT_INCREASE_SHIELD
+  m_Name: "Executioner\uFFFD\uFFFD\uFFFD_EFFECT_STAT_INCREASE_CRIT_RATE"
   m_EditorClassIdentifier: 
-  _eType: 5
-  _fEffectVal: 3
-  _eTargetType: 1
-  _eTargetCondition: 1
+  _eType: 10
+  _fEffectVal: 10
+  _eTargetType: 0
+  _eTargetCondition: 0
   _fTargetParam: 0
-  _eExecType: 0
+  _eExecType: 1
   _effectAffinityType: 0
-  _effectResolveType: 1
-  _fEffectCount: 1
+  _effectResolveType: 0
+  _fEffectCount: 0

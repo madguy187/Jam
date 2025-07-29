@@ -17,7 +17,7 @@ MonoBehaviour:
   unitCost: 0
   eTier: 0
   eUnitArchetype: 4
-  hp: 18
+  hp: 48
   attack: 1
   shield: 2
   res: 2
