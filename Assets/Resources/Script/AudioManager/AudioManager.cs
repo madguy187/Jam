@@ -61,13 +61,6 @@ public class AudioManager : MonoBehaviour
         CreateEssentialComp();
     }
 
-    // Update is called once per frame
-    void Update() {
-        if (Input.GetKeyDown(KeyCode.Z)) {
-            maxComponent = 50;
-        }
-    }
-
     public AudioComponent CreateComp() {
         if (m_queueAvailable.Count <= 0) {
             Debug.Log("Not enough audioComp");
