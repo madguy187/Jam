@@ -6,22 +6,15 @@ using UnityEngine;
 [Serializable]
 public class EffectMap : IEnumerable<EffectObject> {
     Dictionary<EffectType, EffectObject> _dictEffect = new Dictionary<EffectType, EffectObject>();
-    [SerializeField] UIEffectGrid _effectGridUI = null;
-
-#if UNITY_EDITOR
-    public void SetGrid(UIEffectGrid grid) { _effectGridUI = grid; }
-#endif
 
     public void AddEffect(EffectType eType, EffectObject objEffect) {
         if (!_dictEffect.ContainsKey(eType)) {
             _dictEffect.Add(eType, objEffect);
-            _effectGridUI.AddEffectUI(eType);
         }
     }
 
     public void RemoveEffect(EffectType eType) {
         _dictEffect.Remove(eType);
-        _effectGridUI.RemoveEffectUI(eType);
     }
 
     public void RemoveEffectByPredicate(Predicate<EffectObject> predicate) {

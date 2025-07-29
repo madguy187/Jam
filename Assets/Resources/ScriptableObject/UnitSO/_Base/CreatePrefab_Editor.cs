@@ -117,7 +117,6 @@ public class CreatePrefabFromMenu {
         UnitObject unitComp = obj.GetComponent<UnitObject>();
         UIEffectGrid effectComp = objGrid.GetComponent<UIEffectGrid>();
         effectComp.SetUnit(unitComp);
-        unitComp.SetEffectUIGrid(effectComp);
 
         Vector3 pos = new Vector3(0.0f, obj.transform.position.y, 0.0f);
         RectTransform healthBarTrans = objGrid.GetComponent<RectTransform>();
