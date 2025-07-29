@@ -89,13 +89,13 @@ public class SymbolGenerator : MonoBehaviour
     {
         if (deck == null) return null;
 
+        // Collect ONLY alive units so dead archetypes are not considered
         HashSet<UnitObject> uniqueUnits = new HashSet<UnitObject>();
         foreach (UnitObject unit in deck)
         {
-            if (unit != null && unit.unitSO != null)
-            {
-                uniqueUnits.Add(unit);
-            }
+            if (unit.IsDead()) continue;
+
+            uniqueUnits.Add(unit);
         }
 
         SymbolType[] symbols = new SymbolType[9];
