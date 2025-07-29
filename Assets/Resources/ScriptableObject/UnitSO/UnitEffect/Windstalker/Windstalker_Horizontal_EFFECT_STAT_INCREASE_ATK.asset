@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Windstalker_Horizontal_EFFECT_STAT_INCREASE_ATK
   m_EditorClassIdentifier: 
   _eType: 2
-  _fEffectVal: 9
+  _fEffectVal: 5
   _eTargetType: 0
   _eTargetCondition: 0
   _fTargetParam: 0

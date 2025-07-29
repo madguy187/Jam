@@ -17,12 +17,12 @@ MonoBehaviour:
   unitCost: 0
   eTier: 2
   eUnitArchetype: 3
-  hp: 20
+  hp: 40
   attack: 3
   shield: 2
   res: 3
-  critRate: 5
-  critMulti: 125
+  critRate: 10
+  critMulti: 110
   singleMatchDescription: 
   horizontalMatchDescription: 
   diagonalMatchDescription: 
