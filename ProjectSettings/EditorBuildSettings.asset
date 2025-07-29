@@ -23,6 +23,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Game_MainMenu.unity
     guid: bfb00945552ef57478f7fbde45d9a8ae
+  - enabled: 1
+    path: Assets/Scenes/Game_GuildHall.unity
+    guid: 8781078a0a0174c55aa3c2f186184333
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
