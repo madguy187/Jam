@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b5582afcca3112d4db68ad91c7708617, type: 3}
-  m_Name: "Executioner\u2019sEdge"
+  m_Name: ExecutionerEdge
   m_EditorClassIdentifier: 
-  strRelicName: Executioner's edge
+  strRelicName: Executioner's Edge
   strRelicDescription: Atk +3, Crit Rate +10%
   relicCost: 0
   spriteRelic: {fileID: 21300000, guid: a1aea7c48cb5e164ebd5f9669ffb205f, type: 3}
   listEffect:
-  - {fileID: 11400000, guid: cf51407f924b7a047acf206ba1a1c0d7, type: 2}
-  - {fileID: 11400000, guid: c4dde7ab9f3f19141b40d4030091ccf9, type: 2}
+  - {fileID: 11400000, guid: 3be051f45d3eeca45be32a380d5fbb3e, type: 2}
+  - {fileID: 11400000, guid: 2458f7a3c29bf0846ab69686ae95cf68, type: 2}

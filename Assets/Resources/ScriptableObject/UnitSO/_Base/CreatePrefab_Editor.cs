@@ -147,7 +147,9 @@ public class CreatePrefabFromMenu {
         AttachShield(ref gameObj);
 
         string infoPath = scriptablePath + FOLDER_SEPARATOR + unitName;
+        Debug.Log(infoPath);
         List<UnitScriptableObject> unitSO = Resources.LoadAll<UnitScriptableObject>(infoPath).ToList();
+        Debug.Log(unitSO.Count);
         foreach (UnitScriptableObject unit in unitSO) {
             comp.SetUnitSO(unit);
         }

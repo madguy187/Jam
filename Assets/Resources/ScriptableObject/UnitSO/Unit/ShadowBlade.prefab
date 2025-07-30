@@ -6803,7 +6803,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <unitSO>k__BackingField: {fileID: 11400000, guid: 8b8899ddd4ddf2142bff95bf681bd586, type: 2}
   _listSingleEffect:
-    _listScriptableObject: []
+    _listScriptableObject:
+    - {fileID: 11400000, guid: 6fad2e0035676604383288fe1118b6f5, type: 2}
   _listHorizontalEffect:
     _listScriptableObject:
     - {fileID: 11400000, guid: 1db78289730a1dd4d855a1898579c1d9, type: 2}
