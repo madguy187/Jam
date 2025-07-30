@@ -261,11 +261,6 @@ public class CombatManager : MonoBehaviour {
 
     List<MatchType> _GetRollType(string unitName) {
         List<MatchType> listResult = new List<MatchType>();
-        listResult = new List<MatchType>() {
-            MatchType.SINGLE,
-            MatchType.HORIZONTAL,
-            MatchType.DIAGONAL,
-        };
         if (_listMatch == null) {
             return listResult;
         }
