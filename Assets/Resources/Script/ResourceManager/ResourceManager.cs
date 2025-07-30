@@ -27,11 +27,9 @@ public class ResourceManager : MonoBehaviour {
 
         instance = this;
 
-        foreach (Object obj in Resources.LoadAll("ScriptableObject/UnitSO/Unit", typeof(GameObject)).ToList())
-        {
+        foreach (Object obj in Resources.LoadAll("ScriptableObject/UnitSO/Unit", typeof(GameObject)).ToList()) {
             if (obj == null) continue;
-            if (obj.name.Equals("SoulPiercer", System.StringComparison.OrdinalIgnoreCase))
-            {
+            if (obj.name.Equals("SoulPiercer", System.StringComparison.OrdinalIgnoreCase)) {
                 // Skip deprecated prefab
                 continue;
             }
@@ -41,11 +39,9 @@ public class ResourceManager : MonoBehaviour {
         }
         Global.DEBUG_PRINT("[Resources] Loaded Units: " + _mapUnitSO.Count());
 
-        foreach (Object obj in Resources.LoadAll("ScriptableObject/UnitSO/Mob", typeof(GameObject)).ToList())
-        {
+        foreach (Object obj in Resources.LoadAll("ScriptableObject/UnitSO/Mob", typeof(GameObject)).ToList()) {
             if (obj == null) continue;
-            if (obj.name.Equals("SoulPiercer", System.StringComparison.OrdinalIgnoreCase))
-            {
+            if (obj.name.Equals("SoulPiercer", System.StringComparison.OrdinalIgnoreCase)) {
                 continue; // deprecated
             }
 
@@ -76,6 +72,8 @@ public class ResourceManager : MonoBehaviour {
             _mapEffectDetailSO.Add(effectDetailSO.eEffectType, effectDetailSO);
         }
         Global.DEBUG_PRINT("[Resources] Loaded Effect Detail: " + _mapRelicSO.Count());
+
+        DontDestroyOnLoad(gameObject);
     }
 
     public string Debug_RandUnit() {
