@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e6c0d2d182458c4786d479368332411, type: 3}
+  m_Name: EFFECT_HEAL
+  m_EditorClassIdentifier: 
+  eEffectType: 23
+  strEffectName: Heal
+  strDescription: Heal for %param%
+  sprite: {fileID: 21300000, guid: 77a3a14a48082934d942ef0ee706ac2c, type: 3}

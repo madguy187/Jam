@@ -271,7 +271,7 @@ public class CreatePrefabFromMenu {
                 { "ExecutionerBrand", new List<string>() { "BlessedFang", "ExecutionerEdge" } },
             };
         }
-        
+
         if (mapCombination.ContainsKey(relicName)) {
             return mapCombination[relicName];
         }
