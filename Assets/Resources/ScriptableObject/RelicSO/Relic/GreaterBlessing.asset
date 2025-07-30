@@ -15,7 +15,7 @@ MonoBehaviour:
   strRelicName: Greater Blessing
   strRelicDescription: Heal 5 HP at start of turn
   relicCost: 0
-  spriteRelic: {fileID: 21300000, guid: a1aea7c48cb5e164ebd5f9669ffb205f, type: 3}
+  spriteRelic: {fileID: 21300000, guid: 77a3a14a48082934d942ef0ee706ac2c, type: 3}
   listEffect:
   - {fileID: 11400000, guid: 3521bf396b42e5b4cb50688cda450054, type: 2}
   rarity: 1

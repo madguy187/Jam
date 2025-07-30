@@ -15,7 +15,7 @@ MonoBehaviour:
   strRelicName: Vampiric Brand
   strRelicDescription: Lifesteal damage dealt
   relicCost: 0
-  spriteRelic: {fileID: 21300000, guid: a1aea7c48cb5e164ebd5f9669ffb205f, type: 3}
+  spriteRelic: {fileID: 21300000, guid: c5ca02c91df414441a0e82e67305cba1, type: 3}
   listEffect:
   - {fileID: 11400000, guid: ee54ec99b2f73ce46af6a03cc4597ed7, type: 2}
   rarity: 1

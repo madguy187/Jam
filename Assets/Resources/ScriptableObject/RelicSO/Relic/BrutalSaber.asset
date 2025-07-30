@@ -15,7 +15,7 @@ MonoBehaviour:
   strRelicName: Brutal Saber
   strRelicDescription: Atk +2, Crit Damage +15
   relicCost: 0
-  spriteRelic: {fileID: 21300000, guid: a1aea7c48cb5e164ebd5f9669ffb205f, type: 3}
+  spriteRelic: {fileID: 21300000, guid: 30e47371660a44f038c174865e5af8d3, type: 3}
   listEffect:
   - {fileID: 11400000, guid: 86cf1a5ee9778e04387b610af462134d, type: 2}
   - {fileID: 11400000, guid: b20a203df7964794192ed2a2e26535e6, type: 2}
