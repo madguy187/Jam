@@ -9,7 +9,8 @@ namespace Map
     /// Handles node selection, path progression, node accessibility, and triggers node entry logic.
     /// Ensures only valid nodes can be selected based on the current path and node connections.
     /// Supports locking after selection and delayed node entry for animation or transition effects
-    public class MapPlayerTracker : MonoBehaviour {
+    public class MapPlayerTracker : MonoBehaviour 
+    {
         /// If true, the tracker will lock after a node is selected, preventing further selections 
         /// until unlocked
         public bool lockAfterSelecting = false;
@@ -93,9 +94,10 @@ namespace Map
             // If choose to show GUI in some of these cases, do not forget to set "Locked" in MapPlayerTracker back to false
             switch (mapNode.Node.nodeType) {
                 case NodeType.Enemy:
-                    // mapManager.SaveMap();
-                    // EnemyManager.instance.nodeType = mapNode.Node.nodeType;
-                    // SceneManager.LoadScene("Game");
+                    mapManager.SaveMap();
+                    EnemyManager.instance.nodeType = mapNode.Node.nodeType;
+                    EnemyManager.instance.PopulateMobBasedOnNodeType();
+                    SceneManager.LoadScene("Game");
                     break;
                 case NodeType.Encounter:
                     mapManager.SaveMap();
@@ -114,9 +116,10 @@ namespace Map
                     SceneManager.LoadScene("Game_Blacksmith");
                     break;
                 case NodeType.MiniBoss:
-                    // mapManager.SaveMap();
-                    // EnemyManager.instance.nodeType = mapNode.Node.nodeType;
-                    // SceneManager.LoadScene("Game");
+                    mapManager.SaveMap();
+                    EnemyManager.instance.nodeType = mapNode.Node.nodeType;
+                    EnemyManager.instance.PopulateMobBasedOnNodeType();
+                    SceneManager.LoadScene("Game");
                     break;
                 case NodeType.MajorBoss:
                     mapManager.SaveMap();
@@ -130,10 +133,9 @@ namespace Map
             Locked = false;
         }
 
-        // Example stub for starting the boss fight (implement as needed)
-        // private static void StartMajorBossFight(MapNode mapNode)
-        // {
-        //     // Start the fight, then call OnMajorBossResult(true/false) when done
-        // }
+        public void CleanUpMap()
+        {
+            mapManager.CleanUpMap();
+        }
     }
 }

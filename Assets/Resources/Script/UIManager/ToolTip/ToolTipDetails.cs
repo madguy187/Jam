@@ -48,4 +48,12 @@ public class ToolTipDetails : MonoBehaviour, IPointerEnterHandler, IPointerExitH
         hasMouseOver = false;
         ToolTipManager.Instance.Hide();
     }
+
+    // Ensures tooltip is hidden when this component is disabled
+    void OnDisable()
+    {
+        if (ToolTipManager.Instance != null) {
+            ToolTipManager.Instance.Hide();
+        }
+    }
 }
