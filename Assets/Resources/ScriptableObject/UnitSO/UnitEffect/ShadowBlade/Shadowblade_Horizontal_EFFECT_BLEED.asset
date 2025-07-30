@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Shadowblade_Horizontal_EFFECT_BLEED
   m_EditorClassIdentifier: 
   _eType: 45
-  _fEffectVal: 2
+  _fEffectVal: 0
   _eTargetType: 2
   _eTargetCondition: 2
   _fTargetParam: 0

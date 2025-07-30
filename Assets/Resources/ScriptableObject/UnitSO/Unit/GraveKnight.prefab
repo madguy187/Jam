@@ -8098,7 +8098,7 @@ MonoBehaviour:
     - {fileID: 11400000, guid: dcc2e31e0be6b564aa3dc44032ae21c6, type: 2}
   _listXShapeEffect:
     _listScriptableObject:
-    - {fileID: 11400000, guid: 7b3186f6e05395d44be33561db3172cb, type: 2}
+    - {fileID: 11400000, guid: 0eee3ebcea6b7a04faab26e4fa5ba6fa, type: 2}
     - {fileID: 11400000, guid: 70966a1552c1d854a914d19416159d75, type: 2}
   _listFullGridEffect:
     _listScriptableObject:
