@@ -262,8 +262,42 @@ namespace StoryManager
             }
             else
             {
-                SceneManager.LoadScene(MAP_SCENE_NAME);
+                // Re-enable the UI, then fade out and load map scene
+                EnableHudForPlayerDeck();
+                if (UIFade.instance != null)
+                {
+                    UIFade.instance.FadeOut(1.5f);
+                    UIFade.instance.SetOnFadeFinish(() => {
+                        SceneManager.LoadScene(MAP_SCENE_NAME);
+                        UIFade.instance.FadeIn(1.5f);
+                    });
+                }
+                else
+                {
+                    SceneManager.LoadScene(MAP_SCENE_NAME);
+                }
             }
+        }
+
+        private void EnableHudForPlayerDeck()
+        {
+            Deck deck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
+            if (deck == null) return;
+            foreach (UnitObject u in deck)
+            {
+                ShowUnitHud(u);
+            }
+        }
+
+        private static void ShowUnitHud(UnitObject unit)
+        {
+            if (unit == null) return;
+            Transform hb = unit.transform.Find("UIHealthBar(Clone)");
+            if (hb != null) hb.gameObject.SetActive(true);
+            Transform effectGrid = unit.transform.Find("UIEffectGrid(Clone)");
+            if (effectGrid != null) effectGrid.gameObject.SetActive(true);
+            Transform shieldGrid = unit.transform.Find("Shield(Clone)");
+            if (shieldGrid != null) shieldGrid.gameObject.SetActive(true);
         }
 
         private void ProcessPartySelection()

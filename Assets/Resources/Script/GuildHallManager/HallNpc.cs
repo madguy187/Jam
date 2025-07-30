@@ -11,6 +11,9 @@ namespace StoryManager
 
             Transform effectGrid = transform.Find("UIEffectGrid(Clone)");
             if (effectGrid != null) effectGrid.gameObject.SetActive(false);
+
+            Transform shieldGrid = transform.Find("Shield(Clone)");
+            if (shieldGrid != null) shieldGrid.gameObject.SetActive(false);
         }
     }
 }
