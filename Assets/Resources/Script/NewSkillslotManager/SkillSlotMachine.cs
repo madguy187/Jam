@@ -517,13 +517,28 @@ public class SkillSlotMachine : MonoBehaviour
     private bool CheckAllEnemiesDead()
     {
         Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
-        for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
+
+        // Determine if the enemy deck ever contained at least one unit.
+        bool hadEnemyUnits = false;
+        foreach (UnitObject u in enemyDeck)
         {
-            UnitObject unit = enemyDeck.GetUnitObject(i);
-            if (unit != null && !unit.IsDead())
+            if (u != null)
             {
-                return false;
+                hadEnemyUnits = true;
+                break;
             }
+        }
+
+        if (!hadEnemyUnits)
+        {
+            // Nothing to defeat yet – dont auto-win.
+            return false;
+        }
+
+        if (!DeckHelperFunc.IsDeckEmptyOrDead(enemyDeck))
+        {
+            // Still some enemies alive.
+            return false;
         }
 
         if (!victoryPopupShown)
@@ -531,7 +546,6 @@ public class SkillSlotMachine : MonoBehaviour
             victoryPopupShown = true;
             StartCoroutine(ShowVictoryAfterDelay(1f));
         }
-
         return true;
     }
 
