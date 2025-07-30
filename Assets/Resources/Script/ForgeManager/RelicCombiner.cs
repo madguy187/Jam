@@ -169,13 +169,13 @@ public class RelicCombiner : MonoBehaviour
 
         var sb = new System.Text.StringBuilder();
 
-        sb.AppendLine("<b><size=24>Forge Combinations</size></b>");
+        sb.AppendLine("<b><size=24>Merge Combinations</size></b>");
         foreach (var combo in GetAllCombinationDescriptions())
             sb.AppendLine("• " + combo);
 
         sb.AppendLine(); // Spacer
 
-        sb.AppendLine("<b><size=24>Break Results</size></b>");
+        sb.AppendLine("<b><size=24>Break Combinations</size></b>");
         foreach (var br in GetAllBreakDescriptions())
             sb.AppendLine("• " + br);
 

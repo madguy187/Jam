@@ -114,6 +114,7 @@ public class ForgeManager : MonoBehaviour
             "Either a relic or a question mark appears as the result.",
             "Relic means your combination works, question mark means not.",
             "Press the Forge or Break button below to add it to your bag!",
+            "Press the Help button on the top right to see the combinations available.",
             "Now, drag your relics from your bag on the right and into the slots and watch the magic happen!",
         };
 
