@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class VictoryPopup : MonoBehaviour
 {
+    public static VictoryPopup instance;
     [Header("UI Refs")]
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Transform iconContainer; 
@@ -22,6 +23,12 @@ public class VictoryPopup : MonoBehaviour
 
     void Awake()
     {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
         if (canvasGroup == null)
             canvasGroup = GetComponent<CanvasGroup>() ?? gameObject.AddComponent<CanvasGroup>();
 
@@ -32,13 +39,34 @@ public class VictoryPopup : MonoBehaviour
             returnButton.onClick.AddListener(OnReturnClicked);
     }
 
-    public void Show(IEnumerable<UnitObject> playerUnits)
+    public void Show(IEnumerable<UnitObject> playerUnits, string header = "VICTORY", string overrideSceneName = null)
+    {
+        ShowInternal(playerUnits, header, overrideSceneName);
+    }
+
+    public void ShowDefeat(string sceneName = "Game_MainMenu")
+    {
+        ShowInternal(null, "D E F E A T", sceneName);
+    }
+
+    public void ShowVictory(IEnumerable<UnitObject> playerUnits, string sceneName = "Game_MainMenu")
+    {
+        ShowInternal(playerUnits, "V I C T O R Y", sceneName);
+    }
+
+    // Core display logic
+    private void ShowInternal(IEnumerable<UnitObject> playerUnits, string header, string overrideSceneName)
     {
         if (playerUnits == null)
         {
-            Debug.LogWarning("[VictoryPopup] Show called with null playerUnits");
-            return;
+            playerUnits = System.Linq.Enumerable.Empty<UnitObject>();
         }
+
+        if (headerText != null)
+            headerText.text = header;
+
+        if (!string.IsNullOrEmpty(overrideSceneName))
+            mapSceneName = overrideSceneName;
 
         int index = 0;
         foreach (UnitObject u in playerUnits)
