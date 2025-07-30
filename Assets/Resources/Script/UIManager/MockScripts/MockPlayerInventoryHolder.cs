@@ -13,12 +13,11 @@ public class MockPlayerInventoryHolder : MonoBehaviour
             return;
         }
         Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
-    private void Start() {
-        // Initialize with some test data here
-        playerInventory.gold = 100;
-        
+    private void Start() 
+    {
         Action<MockItemType, MockInventoryItem> onAddAction = (MockItemType itemType, MockInventoryItem item) => {
             playerInventory.bagItems.Add(item);
             Deck cDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);

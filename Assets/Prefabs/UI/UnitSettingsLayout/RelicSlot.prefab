@@ -60,15 +60,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.8490566, g: 0.76495194, b: 0.76495194, a: 1}
+  m_Color: {r: 0.5471698, g: 0.53942686, b: 0.53942686, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 3149493693299277514, guid: 6b9ccb1c864e78e41acbdc7873cf1341, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 1157096351, guid: ff3a13f848717354d9eb56697565c1b1, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -92,23 +92,8 @@ MonoBehaviour:
   iconImage: {fileID: 0}
   boundItem:
     itemType: 0
-    unitData:
-      unitName: 
-      level: 0
-      maxHP: 0
-      currentHP: 0
-      attack: 0
-      defense: 0
-      equippedRelics: []
-      icon: {fileID: 0}
-    relicData:
-      relicName: 
-      description: 
-      icon: {fileID: 0}
-      rarity: 0
-      bonusHP: 0
-      bonusAttack: 0
-      bonusDefense: 0
+    unitData: {fileID: 0}
+    relicData: {fileID: 0}
 --- !u!225 &1292442768437039321
 CanvasGroup:
   m_ObjectHideFlags: 0
