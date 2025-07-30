@@ -40,21 +40,11 @@ public class SkillSlotMachine : MonoBehaviour
         PlayerAndEnemy      
     }
 
-    public enum AttackBehaviour 
-    { 
-        PlayerCombatOnly, PlayerAndEnemyCombat 
-    }
-
-
     [SerializeField] public SpinMode spinMode = SpinMode.PlayerAndEnemy;
     [Header("Individual Roll Settings")]
     [SerializeField] private bool previewSpin;
     [SerializeField] private bool playerCombatSpin;
     [SerializeField] private bool fullCombatSpin;
-
-    [Header("Enemy Spin Settings")]
-    // If false, enemy dont spin visually, results processed in background
-    [SerializeField] private bool enemyVisualSpin = false; 
 
     private void Awake()
     {
@@ -406,78 +396,8 @@ public class SkillSlotMachine : MonoBehaviour
         CombatManager.instance.StartBattleLoop(matches);
     }
 
-    private void ExecutePlayerCombat(Match match)
-    {
-        Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
-        Deck enemyDeck  = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
 
-        for (int i = 0; i < playerDeck.GetDeckMaxSize(); i++)
-        {
-            UnitObject unit = playerDeck.GetUnitObject(i);
-            if (unit != null && unit.unitSO != null)
-            {
-                int targetIndex = CombatManager.instance.GetLowestHealth(enemyDeck);
-                UnitObject target = enemyDeck.GetUnitObject(targetIndex);
-                if (target != null)
-                {
-                    if (unit.unitSO.eUnitArchetype == match.GetArchetype())
-                    {
-                        match.SetUnitName(unit.unitSO.unitName);
-                    }
-                    CombatManager.instance.ExecBattle(eDeckType.PLAYER, i);
-                }
-            }
-        }
-    }
 
-    private IEnumerator WaitPlayerCombatThenEnemy()
-    {
-        // Wait until CombatManager finishes current battle loop
-        while (CombatManager.instance != null && CombatManager.instance.IsRunning())
-            yield return null;
-
-        // Small buffer to let animations settle
-        yield return new WaitForSeconds(0.3f);
-
-        yield return ExecuteEnemyTurn();
-    }
-
-    private IEnumerator ExecuteEnemyTurn()
-    {
-        Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
-
-        yield return new WaitForSeconds(1f);
-
-        SymbolType[] symbols = SymbolGenerator.instance.GenerateSymbolsForDeck(enemyDeck);
-
-        SpinMode previousMode = spinMode;
-        spinMode = SpinMode.PreviewOnly;       
-
-        if (enemyVisualSpin)
-        {
-            yield return SpinWithPresetSymbols(symbols);  
-        }
-        else
-        {
-            ProcessSpinResults(symbols);                 
-        }
-
-        // restore player setting
-        spinMode = previousMode;
-
-        // Show pop-ups first (uses lastSpinResult)
-        ShowEnemyRollPopups(enemyDeck);
-
-        // Run enemy combat via CombatManager
-        if (lastSpinResult != null && lastSpinResult.GetAllMatches().Count > 0)
-            CombatManager.instance.StartBattleLoop(lastSpinResult.GetAllMatches());
-
-        // Wait until combat finishes
-        while (CombatManager.instance != null && CombatManager.instance.IsRunning())
-            yield return null;
-
-        yield return new WaitForSeconds(0.3f); 
-    }
 
     public void ExecuteFullCombat()
     {
@@ -564,27 +484,6 @@ public class SkillSlotMachine : MonoBehaviour
         }
     }
 
-    private void ExecuteEnemyCombat(Match match)
-    {
-        Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
-        for (int i = 0; i < enemyDeck.GetDeckMaxSize(); i++)
-        {
-            UnitObject unit = enemyDeck.GetUnitObject(i);
-            if (unit != null && unit.unitSO != null)
-            {
-                int targetIndex = CombatManager.instance.GetLowestHealth(DeckManager.instance.GetDeckByType(eDeckType.PLAYER));
-                UnitObject target = DeckManager.instance.GetDeckByType(eDeckType.PLAYER).GetUnitObject(targetIndex);
-                if (target != null)
-                {
-                    if (unit.unitSO.eUnitArchetype == match.GetArchetype())
-                    {
-                        match.SetUnitName(unit.unitSO.unitName);
-                    }
-                    CombatManager.instance.ExecBattle(eDeckType.ENEMY, i);
-                }
-            }
-        }
-    }
 
     private bool victoryPopupShown = false;
 
