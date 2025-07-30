@@ -13,19 +13,12 @@ public class ShopManager : MonoBehaviour
     private List<ShopItemUI> itemUIs = new List<ShopItemUI>();
     private Dictionary<ShopItem, MockInventoryItem> shopToMockInventoryMap = new Dictionary<ShopItem, MockInventoryItem>();
 
-    private int currentGold = 100;
-
     [Header("Shop Settings")]
     public int refreshCost = 2;
     public float randomizeValue = 0.5f; // Adjust this to control the randomness of item selection
 
     private void Start()
     {
-        if (MockPlayerInventoryHolder.Instance == null) {
-            Global.DEBUG_PRINT("[ShopManager::Start] MockPlayerInventoryHolder instance is null!");
-        } else {
-            currentGold = MockPlayerInventoryHolder.Instance.playerInventory.gold;
-        }
         var refreshButtonText = refreshButton.GetComponentInChildren<TextMeshProUGUI>();
         refreshButtonText.text = $"Refresh ({refreshCost}g)";
         refreshButton.onClick.AddListener(OnRefreshClicked);
@@ -35,16 +28,13 @@ public class ShopManager : MonoBehaviour
 
     void UpdateGoldUI()
     {
-        goldText.text = $"Gold: {currentGold}";
+        goldText.text = $"Gold: {GoldManager.instance.GetCurrentGold()}";
     }
 
     void OnRefreshClicked()
     {
-        if (currentGold < refreshCost) { return; }
-        currentGold -= refreshCost;
-        if (MockPlayerInventoryHolder.Instance != null) {
-            MockPlayerInventoryHolder.Instance.playerInventory.gold = currentGold;
-        }
+        if (!GoldManager.instance.HasEnoughGold(refreshCost)) { return; }
+        GoldManager.instance.SpendGold(refreshCost);
         GenerateShopItems();
         UpdateGoldUI();
     }
@@ -117,7 +107,7 @@ public class ShopManager : MonoBehaviour
                 unitIcon
             );
             shopToMockInventoryMap[shopItem] = new MockInventoryItem(unitObj);
-            Destroy(unitInstance); // Clean up the temporary unit instance
+            // Destroy(unitInstance); // Clean up the temporary unit instance
             return shopItem;
         }
     }
@@ -141,8 +131,8 @@ public class ShopManager : MonoBehaviour
 
     void OnItemBought(ShopItem item)
     {
-        if (item.isSold || currentGold < item.cost) { return; }
-        currentGold -= item.cost;
+        if (item.isSold || !GoldManager.instance.HasEnoughGold(item.cost)) { return; }
+        GoldManager.instance.SpendGold(item.cost);
         item.isSold = true;
         UpdateGoldUI();
 
@@ -152,6 +142,10 @@ public class ShopManager : MonoBehaviour
         } else {
             // For unit or relic
             if (item.type == ShopItemType.Unit) {
+                if (shopToMockInventoryMap[item].unitData == null) {
+                    Global.DEBUG_PRINT("[ShopManager::OnItemBought] MockInventoryItem unitData is null for item: " + item.name);
+                    return; // Handle error appropriately
+                }
                 ItemTracker.Instance.AddItem(TrackerType.BagContainer, MockItemType.Unit, shopToMockInventoryMap[item]);
             } else {
                 ItemTracker.Instance.AddItem(TrackerType.BagContainer, MockItemType.Relic, shopToMockInventoryMap[item]);

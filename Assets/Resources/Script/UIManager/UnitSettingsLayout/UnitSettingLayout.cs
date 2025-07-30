@@ -69,7 +69,7 @@ public class UnitSettingLayout : MonoBehaviour
 
     void RefreshUI()
     {
-        goldText.text = $"Gold: {inventory.gold}";
+        goldText.text = $"Gold: {GoldManager.instance.GetCurrentGold()}";
         // Always clear tracker counts before repopulating
         tracker.ClearItems();
         ClearTeamUnitButtonsOnly();
@@ -183,7 +183,8 @@ public class UnitSettingLayout : MonoBehaviour
         }
     }
 
-    private void PopulateTeamUnits() {
+    private void PopulateTeamUnits() 
+    {
         List<UnitObject> listUnit = DeckHelperFunc.GetAllUnitIncludeEmpty(DeckManager.instance.GetDeckByType(eDeckType.PLAYER));
 
         for (int i = 0; i < teamUnitContainer.childCount; i++) {
