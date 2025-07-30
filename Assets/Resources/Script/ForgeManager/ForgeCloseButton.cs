@@ -12,9 +12,6 @@ public class ForgeCloseButton : MonoBehaviour
         if (myButton != null) {
             myButton.onClick.AddListener(OnButtonClicked);
         }
-
-        // Make sure layout starts hidden
-        panel.SetActive(false);
     }
 
     private void OnButtonClicked() 

@@ -37,7 +37,7 @@ public class RelicCombiner : MonoBehaviour
         referenceRelics = ResourceManager.instance?.RelicSOMap;
         if (referenceRelics == null)
         {
-            Debug.LogError("Reference relics not found in ResourceManager.");
+            Global.DEBUG_PRINT("Reference relics not found in ResourceManager.");
             return;
         }
         BuildCombinationMap();
@@ -53,17 +53,17 @@ public class RelicCombiner : MonoBehaviour
         {
             if (!referenceRelics.ContainsKey(nameA))
             {
-                Debug.LogWarning($"[RelicCombiner::BuildCombinationMap] Missing relic from Resource Manager: {nameA}");
+                Global.DEBUG_PRINT($"[RelicCombiner::BuildCombinationMap] Missing relic from Resource Manager: {nameA}");
                 return;
             }
             if (!referenceRelics.ContainsKey(nameB))
             {
-                Debug.LogWarning($"[RelicCombiner::BuildCombinationMap] Missing relic from Resource Manager: {nameB}");
+                Global.DEBUG_PRINT($"[RelicCombiner::BuildCombinationMap] Missing relic from Resource Manager: {nameB}");
                 return;
             }
             if (!referenceRelics.ContainsKey(resultName))
             {
-                Debug.LogWarning($"[RelicCombiner::BuildCombinationMap] Missing relic from Resource Manager: {resultName}");
+                Global.DEBUG_PRINT($"[RelicCombiner::BuildCombinationMap] Missing relic from Resource Manager: {resultName}");
                 return;
             }
 

@@ -366,6 +366,7 @@ public class ForgeManager : MonoBehaviour
         GameObject relicGO = Instantiate(relicItemPrefab, parent);
         var image = relicGO.transform.Find("RelicImage").GetComponent<Image>();
         var label = relicGO.transform.Find("RelicNameText").GetComponent<TMP_Text>();
+        relicGO.GetComponent<ToolTipDetails>().Init(relic.GetRelicName(), relic.GetRelicDescription());
         image.sprite = relic.GetRelicSprite();
         label.text = relic.GetRelicName();
 
@@ -428,12 +429,12 @@ public class ForgeManager : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Invalid combination.");
+                    Global.DEBUG_PRINT("[ForgeManager::DoForgeOrBreak] Invalid combination.");
                 }
             }
             else
             {
-                Debug.Log("Select two relics first.");
+                Global.DEBUG_PRINT("[ForgeManager::DoForgeOrBreak] Select two relics first.");
             }
         }
         else
@@ -469,12 +470,12 @@ public class ForgeManager : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Cannot break this relic.");
+                    Global.DEBUG_PRINT("[ForgeManager::DoForgeOrBreak] Cannot break this relic.");
                 }
             }
             else
             {
-                Debug.Log("Select a relic to break first.");
+                Global.DEBUG_PRINT("[ForgeManager::DoForgeOrBreak] Select a relic to break first.");
             }
         }
     }

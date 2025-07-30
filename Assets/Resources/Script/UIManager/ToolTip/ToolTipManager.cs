@@ -34,7 +34,7 @@ public class ToolTipManager : MonoBehaviour {
             Vector2 localPoint;
             // Convert screen position to local position in the canvas
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                parentCanvas.transform as RectTransform,
+                ToolTipTransform.parent as RectTransform, // Use actual parent
                 Input.mousePosition,
                 parentCanvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : parentCanvas.worldCamera,
                 out localPoint
