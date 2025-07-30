@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro; // At the top
 
 public enum ForgeRelicRarity
 {
@@ -13,6 +14,8 @@ public class RelicCombiner : MonoBehaviour
     private Dictionary<RelicScriptableObject, (RelicScriptableObject part1, RelicScriptableObject part2, ForgeRelicRarity rarity)> breakMap;
 
     [SerializeField] private IReadOnlyDictionary<string, RelicScriptableObject> referenceRelics;
+
+    public TMP_Text forgeInfoTextUI;
 
     private class RelicPairComparer : IEqualityComparer<(RelicScriptableObject, RelicScriptableObject)>
     {
@@ -38,21 +41,13 @@ public class RelicCombiner : MonoBehaviour
             return;
         }
         BuildCombinationMap();
-        foreach (var line in GetAllCombinationDescriptions())
-        {
-            Debug.Log(line);
-        }
+        DisplayForgeInfo();
     }
 
     void BuildCombinationMap()
     {
         combinationMap = new Dictionary<(RelicScriptableObject, RelicScriptableObject), (RelicScriptableObject result, ForgeRelicRarity rarity)>(new RelicPairComparer());
         breakMap = new Dictionary<RelicScriptableObject, (RelicScriptableObject part1, RelicScriptableObject part2, ForgeRelicRarity rarity)>();
-
-        // foreach (var key in referenceRelics.Keys)
-        // {
-        //     Debug.Log("Loaded relic: " + key);
-        // }
 
         void AddComboAndBreak(string nameA, string nameB, string resultName, ForgeRelicRarity rarity)
         {
@@ -162,6 +157,29 @@ public class RelicCombiner : MonoBehaviour
         }
         result = null;
         return false;
+    }
+
+    public void DisplayForgeInfo()
+    {
+        if (forgeInfoTextUI == null)
+        {
+            Global.DEBUG_PRINT("ForgeInfoTextUI not assigned.");
+            return;
+        }
+
+        var sb = new System.Text.StringBuilder();
+
+        sb.AppendLine("<b><size=24>Forge Combinations</size></b>");
+        foreach (var combo in GetAllCombinationDescriptions())
+            sb.AppendLine("• " + combo);
+
+        sb.AppendLine(); // Spacer
+
+        sb.AppendLine("<b><size=24>Break Results</size></b>");
+        foreach (var br in GetAllBreakDescriptions())
+            sb.AppendLine("• " + br);
+
+        forgeInfoTextUI.text = sb.ToString();
     }
 
     public ForgeRelicRarity? GetCombineRarity(RelicScriptableObject a, RelicScriptableObject b)
