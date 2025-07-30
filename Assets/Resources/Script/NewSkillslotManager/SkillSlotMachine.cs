@@ -148,7 +148,7 @@ public class SkillSlotMachine : MonoBehaviour
         {
             if (!GoldManager.instance.SpendGold(cost))
             {
-                Debug.Log("[SkillSlotMachine] Not enough gold to spin. Cost: " + cost);
+                Global.DEBUG_PRINT("[SkillSlotMachine] Not enough gold to spin. Cost: " + cost);
                 return;
             }
         }
@@ -210,7 +210,7 @@ public class SkillSlotMachine : MonoBehaviour
             }
         }
 
-        Debug.Log("[SkillSlotMachine] Spin complete – symbols: " + string.Join(",", symbols));
+        Global.DEBUG_PRINT("[SkillSlotMachine] Spin complete – symbols: " + string.Join(",", symbols));
 
         ProcessSpinResults(symbols);
 
@@ -322,13 +322,13 @@ public class SkillSlotMachine : MonoBehaviour
         // Debug output - , can be removed
         if (matches.Count > 0)
         {
-            Debug.Log("=== MATCHES FOUND ===");
+            Global.DEBUG_PRINT("=== MATCHES FOUND ===");
             foreach (Match m in matches)
             {
                 string posStr = string.Join(", ", m.GetPositions().ConvertAll(PosName));
-                Debug.Log($"{m.GetMatchType()} : {m.GetArchetype()} @ {posStr}");
+                Global.DEBUG_PRINT($"{m.GetMatchType()} : {m.GetArchetype()} @ {posStr}");
             }
-            Debug.Log("=====================");
+            Global.DEBUG_PRINT("=====================");
         }
 
         switch (spinMode)
@@ -379,7 +379,7 @@ public class SkillSlotMachine : MonoBehaviour
 
     public void EndPlayerTurn()
     {
-        Debug.Log("=== PLAYER TURN COMBAT EXECUTION ===");
+        Global.DEBUG_PRINT("=== PLAYER TURN COMBAT EXECUTION ===");
 
         ProcessPlayerTurnCombat();
 
@@ -387,7 +387,7 @@ public class SkillSlotMachine : MonoBehaviour
 
         if (CheckAllEnemiesDead())
         {
-            Debug.Log("[SkillSlotMachine] All enemies dead, player wins!");
+            Global.DEBUG_PRINT("[SkillSlotMachine] All enemies dead, player wins!");
             GoldManager.instance.OnVictory();
             SetButtonsInteractable(false);
             return;

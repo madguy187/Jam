@@ -268,46 +268,38 @@ namespace StoryManager
 
         private void ProcessPartySelection()
         {
-            var addedUnits = new List<UnitObject>();
+            // Ensure new deck
+            Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
+            playerDeck?.DestroyAllUnit();
+
+            int addedCount = 0;
+
             foreach (UnitSlot slot in unitSlots)
             {
-                if (slot == null || slot.CurrentPrefab == null)
+                if (slot == null) continue;
+
+                string unitName = ResolveUnitName(slot.CurrentPrefab);
+                if (string.IsNullOrEmpty(unitName))    
                 {
                     continue;
                 }
 
-                // Get the unit name from the prefab
-                UnitObject unitObj = slot.CurrentPrefab.GetComponent<UnitObject>();
-                string unitName = unitObj?.unitSO?.unitName;
-                if (string.IsNullOrEmpty(unitName))
+                UnitObject u = DeckManager.instance.AddUnit(eDeckType.PLAYER, unitName);
+                if (u == null)
                 {
-                    unitName = slot.CurrentPrefab.name;
+                    continue;
                 }
 
-                UnitObject u = DeckManager.instance.AddUnit(eDeckType.PLAYER, unitName);
-                if (u != null)
-                {
-                    HideUnitHud(u);
-                    addedUnits.Add(u);
-                }
+                HideUnitHud(u);
+                addedCount++;
                 slot.DestroyPreview();
+                Global.DEBUG_PRINT($"[Recruit] Added {unitName}");
             }
 
-            Global.DEBUG_PRINT($"RecruitController: Added {addedUnits.Count} units to deck.");
+            Global.DEBUG_PRINT($"[Recruit] Total recruited: {addedCount}");
 
             DisableRerollButtons();
-
-            // Keep button visible but non-interactable during sequence
-            if (takePartyButton != null) {
-                takePartyButton.interactable = false;
-            }
-
-            // Hide button during confirmation sequence
-            if (takePartyButton != null)
-            {
-                takePartyButton.gameObject.SetActive(false);
-                Global.DEBUG_PRINT("[RecruitController] Take Party button hidden for confirmation sequence");
-            }
+            if (takePartyButton != null) takePartyButton.gameObject.SetActive(false);
 
             ShowStartAdventureButton();
             gameObject.SetActive(false);
@@ -361,6 +353,34 @@ namespace StoryManager
                 Button b = slot.GetComponentInChildren<Button>(true);  
                 if (b != null) b.interactable = state;
             }
+        }
+
+        private string ResolveUnitName(GameObject prefab)
+        {
+            if (prefab == null) return null;
+
+            UnitObject uObj = prefab.GetComponent<UnitObject>();
+            string key = uObj?.unitSO?.unitName;
+
+            if (string.IsNullOrEmpty(key))
+                key = prefab.name;
+
+            if (ResourceManager.instance.GetUnit(key) != null)
+                return key;
+
+            return FindUnitNameIgnoreCase(key);
+        }
+
+        private string FindUnitNameIgnoreCase(string original)
+        {
+            if (string.IsNullOrEmpty(original)) return null;
+            foreach (GameObject p in ResourceManager.instance.GetAllUnitPrefabs())
+            {
+                if (p == null) continue;
+                if (p.name.Equals(original, System.StringComparison.OrdinalIgnoreCase))
+                    return p.name;
+            }
+            return null;
         }
 
         private void CleanupSlotPreviews()
