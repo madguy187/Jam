@@ -25,15 +25,7 @@ public class UIAttack : MonoBehaviour
 
     private void OnAttackClicked()
     {
-        switch (behaviour)
-        {
-            case AttackBehaviour.PlayerCombatOnly:
-                SkillSlotMachine.instance.ExecutePlayerCombatOnly();
-                break;
-            case AttackBehaviour.PlayerAndEnemy:
-                SkillSlotMachine.instance.ExecuteFullCombat();
-                break;
-        }
+        SkillSlotMachine.instance.ExecuteFullCombatButton();
     }
 
     public void SetInteractable(bool interactable)
