@@ -534,7 +534,7 @@ public class SkillSlotMachine : MonoBehaviour
     private IEnumerator ShowVictoryAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        VictoryPopup popup = FindObjectOfType<VictoryPopup>(true);
+        VictoryPopup popup = Object.FindFirstObjectByType<VictoryPopup>(FindObjectsInactive.Include);
         if (popup != null)
         {
             Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);

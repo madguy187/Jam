@@ -374,11 +374,11 @@ namespace StoryManager
         private string FindUnitNameIgnoreCase(string original)
         {
             if (string.IsNullOrEmpty(original)) return null;
-            foreach (GameObject p in ResourceManager.instance.GetAllUnitPrefabs())
+            foreach (GameObject prefab in ResourceManager.instance.GetAllUnitPrefabs())
             {
-                if (p == null) continue;
-                if (p.name.Equals(original, System.StringComparison.OrdinalIgnoreCase))
-                    return p.name;
+                if (prefab == null) continue;
+                if (prefab.name.Equals(original, System.StringComparison.OrdinalIgnoreCase))
+                    return prefab.name;
             }
             return null;
         }
