@@ -305,12 +305,6 @@ public class SkillSlotMachine : MonoBehaviour
 
         lastSpinResult = new SpinResult(matches, totalGold);
 
-        // Update help panel text only during player's turn
-        if (!isEnemyTurn && MatchHelpScreen.instance != null)
-        {
-            MatchHelpScreen.instance.DisplaySpinResults(lastSpinResult);
-        }
-
         // Debug output - , can be removed
         if (matches.Count > 0)
         {
@@ -415,6 +409,12 @@ public class SkillSlotMachine : MonoBehaviour
             yield break;
         }
         List<Match> playerMatches = new List<Match>(lastSpinResult.GetAllMatches());
+        
+        // update help panel with player matches for this attack
+        if (MatchHelpScreen.instance != null)
+        {
+            MatchHelpScreen.instance.DisplaySpinResults(new SpinResult(playerMatches,0));
+        }
 
         // 2. generate enemy symbols & matches immediately
         Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
