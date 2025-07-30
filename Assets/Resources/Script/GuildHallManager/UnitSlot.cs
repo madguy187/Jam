@@ -10,6 +10,7 @@ namespace StoryManager
     public class UnitSlot : MonoBehaviour
     {
         [Header("UI Refs")]
+        [SerializeField] private ParticleSystem rerollEffectPrefab;
         [SerializeField] private Button rerollButton;
         [SerializeField] private TMP_Text rerollText;
         [SerializeField] private RectTransform previewAnchor;
@@ -151,6 +152,7 @@ namespace StoryManager
 
         private void HandleReroll()
         {
+            PlayRerollEffect();
             if (rerollsLeft <= 0)
             {
                 return;
@@ -336,6 +338,14 @@ namespace StoryManager
             var valid = clips.Where(c => c != null && !c.name.ToLower().Contains("death")).ToList();
             ValidClipCache[controller] = valid;
             return valid;
+        }
+
+        private void PlayRerollEffect()
+        {
+            if (rerollEffectPrefab == null || previewAnchor == null) return;
+            ParticleSystem ps = Instantiate(rerollEffectPrefab, previewAnchor.position, Quaternion.identity, transform);
+            ps.Play();
+            Destroy(ps.gameObject, ps.main.duration + ps.main.startLifetime.constantMax + 0.1f);
         }
 
         private void UpdateNameLabel()
