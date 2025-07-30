@@ -24,7 +24,7 @@ public class StoryTellerManager : MonoBehaviour
     [Header("Sample Content Pools")]
     public Sprite goldIcon;
     public int minGold = 5;
-    public int maxGold = 20;
+    public int maxGold = 15;
 
     private MockItemType finalMockItemType;
     private UnitObject finalUnitObject;

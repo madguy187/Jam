@@ -11,6 +11,7 @@ public class DialogueManager : MonoBehaviour
     private string[] lines;
     private int currentLine = 0;
     private System.Action onDialogueComplete;
+    private bool isTyping = false; // To prevent starting next coroutine while typing
 
     public void StartDialogue(string[] dialogueLines, System.Action onComplete = null)
     {
@@ -18,25 +19,39 @@ public class DialogueManager : MonoBehaviour
         currentLine = 0;
         onDialogueComplete = onComplete;
         dialogueText.text = "";
+        StopAllCoroutines();
+        isTyping = false;
+        gameObject.SetActive(true);
         StartCoroutine(TypeLine());
     }
 
     private IEnumerator TypeLine()
     {
+        isTyping = true;
         dialogueText.text = "";
         foreach (char c in lines[currentLine])
         {
             dialogueText.text += c;
-            AudioManager.instance.Play("Typing");
+            if (AudioManager.instance != null) {
+                AudioManager.instance.Play("Typing");
+            }
             yield return new WaitForSeconds(typingSpeed);
         }
+        isTyping = false;
     }
 
     private void Update()
     {
+        if (!gameObject.activeInHierarchy || dialogueText == null || lines == null) return;
         if (Input.GetMouseButtonDown(0))
         {
-            if (dialogueText.text == lines[currentLine])
+            if (isTyping)
+            {
+                StopAllCoroutines();
+                dialogueText.text = lines[currentLine];
+                isTyping = false;
+            }
+            else
             {
                 currentLine++;
                 if (currentLine < lines.Length)
@@ -48,11 +63,6 @@ public class DialogueManager : MonoBehaviour
                     onDialogueComplete?.Invoke();
                     gameObject.SetActive(false); // Hide or disable UI
                 }
-            }
-            else
-            {
-                StopAllCoroutines();
-                dialogueText.text = lines[currentLine];
             }
         }
     }
