@@ -36,10 +36,7 @@ public class UIRevive : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.Alpha1)) {
-            Debug.Log("enter");
-            UnitSettingLayout.instance.OpenLayout();
-        }
+
     }
 
     void ChangeScene() {

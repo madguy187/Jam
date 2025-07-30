@@ -126,13 +126,7 @@ public class UnitObject : MonoBehaviour {
     }
 
     public void Update() {
-        if (Input.GetKeyDown(KeyCode.Q)) {
-            AddTempEffect(EffectType.EFFECT_BLEED, 2.0f, EffectTargetType.SELF, EffectTargetCondition.NONE, 0.0f, EffectAffinityType.NONE, EffectResolveType.RESOLVE_TURN, 1);
-        }
 
-        if (Input.GetKeyDown(KeyCode.W)) {
-            RemoveEffect(EffectType.EFFECT_BLEED);
-        }
     }
 
     public void Init(bool isEnemy = false) {

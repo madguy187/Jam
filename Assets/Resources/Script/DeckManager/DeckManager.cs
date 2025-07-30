@@ -49,9 +49,7 @@ public class DeckManager : MonoBehaviour {
     }
 
     void Update() {
-        if (Input.GetKeyDown(KeyCode.S)) {
-            Debug.Log("deck is " + cPlayerDeck == null);
-        }
+
     }
 
     void Awake() {

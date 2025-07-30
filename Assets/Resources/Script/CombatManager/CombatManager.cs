@@ -94,13 +94,12 @@ public class CombatManager : MonoBehaviour {
         List<UnitObject> listPlayerUnit = DeckHelperFunc.GetAllAliveUnit(DeckManager.instance.GetDeckByType(eDeckType.PLAYER));
         List<UnitObject> listEnemyUnit = DeckHelperFunc.GetAllAliveUnit(DeckManager.instance.GetDeckByType(eDeckType.ENEMY));
         if (listPlayerUnit.Count <= 0) {
+            // All player units dead – show defeat popup.
             Deck cPlayerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
+            ResultPopup.instance.ShowDefeat(cPlayerDeck);
             cPlayerDeck.DestroyAllUnit();
             Deck cEnemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
             cEnemyDeck.DestroyAllUnit();
-            sceneNameOnFinish = "Game_MainMenu";
-            UIFade.instance.FadeOut(2.0f);
-            UIFade.instance.SetOnFadeFinish(_SceneChangeFunc);
         }
         else if (listEnemyUnit.Count <= 0) {
             Deck cEnemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);

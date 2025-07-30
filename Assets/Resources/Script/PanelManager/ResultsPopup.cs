@@ -5,14 +5,17 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public class VictoryPopup : MonoBehaviour
+public class ResultPopup : MonoBehaviour
 {
+    public static ResultPopup instance;
     [Header("UI Refs")]
     [SerializeField] private CanvasGroup canvasGroup;
     [SerializeField] private Transform iconContainer; 
     [SerializeField] private Image iconPrefab;       
     [SerializeField] private TMP_Text headerText;
     [SerializeField] private Button returnButton;
+    [SerializeField] private UIReturnSceneButton returnButtonScript;
+    [SerializeField] private TMP_Text returnButtonText;
     [SerializeField] private string mapSceneName = "Game_Map";
     [SerializeField] private float fadeTime = 0.4f;
     [Header("Icon Settings")]
@@ -22,6 +25,12 @@ public class VictoryPopup : MonoBehaviour
 
     void Awake()
     {
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
         if (canvasGroup == null)
             canvasGroup = GetComponent<CanvasGroup>() ?? gameObject.AddComponent<CanvasGroup>();
 
@@ -30,14 +39,52 @@ public class VictoryPopup : MonoBehaviour
 
         if (returnButton != null)
             returnButton.onClick.AddListener(OnReturnClicked);
+
+        if (returnButtonText == null && returnButton != null)
+            returnButtonText = returnButton.GetComponentInChildren<TMP_Text>(true);
     }
 
-    public void Show(IEnumerable<UnitObject> playerUnits)
+    public void Show(IEnumerable<UnitObject> playerUnits, string header = "VICTORY", string overrideSceneName = null)
+    {
+        ShowInternal(playerUnits, header, overrideSceneName);
+    }
+
+    public void ShowDefeat(IEnumerable<UnitObject> playerUnits, string sceneName = "Game_MainMenu")
+    {
+        if (returnButtonText != null) returnButtonText.text = "Return to Main Menu";
+        ShowInternal(playerUnits, "D E F E A T", sceneName);
+    }
+
+    public void ShowDefeat(string sceneName = "Game_MainMenu")
+    {
+        if (returnButtonText != null) returnButtonText.text = "Return to Main Menu";
+        ShowInternal(null, "D E F E A T", sceneName);
+    }
+
+    public void ShowVictory(IEnumerable<UnitObject> playerUnits, string sceneName = "Game_Map")
+    {
+        if (returnButtonText != null) returnButtonText.text = "Return to Map";
+        ShowInternal(playerUnits, "V I C T O R Y", sceneName);
+    }
+
+    // Core display logic
+    private void ShowInternal(IEnumerable<UnitObject> playerUnits, string header, string overrideSceneName)
     {
         if (playerUnits == null)
         {
-            Debug.LogWarning("[VictoryPopup] Show called with null playerUnits");
-            return;
+            playerUnits = System.Linq.Enumerable.Empty<UnitObject>();
+        }
+
+        if (headerText != null)
+            headerText.text = header;
+
+        if (!string.IsNullOrEmpty(overrideSceneName))
+            mapSceneName = overrideSceneName;
+
+        // update return button target
+        if (returnButtonScript != null)
+        {
+            returnButtonScript.SetTargetScene(mapSceneName);
         }
 
         int index = 0;

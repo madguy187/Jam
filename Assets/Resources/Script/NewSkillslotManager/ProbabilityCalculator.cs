@@ -92,6 +92,10 @@ public class ProbabilityCalculator : MonoBehaviour
         
         foreach (var kvp in currentProbabilities)
         {
+            if (kvp.Value <= 0f)
+                // skip symbols with zero probability
+                continue; 
+
             cumulativeProb += kvp.Value;
             if (random <= cumulativeProb)
             {
