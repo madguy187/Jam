@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public enum eDeckType {
     NONE,
@@ -19,10 +20,40 @@ public class DeckManager : MonoBehaviour {
     Deck cPlayerDeck = new Deck();
     Deck cEnemyDeck = new Deck();
 
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // This function will be called every time a scene is loaded.
+        // You can add logic here based on the loaded scene's name or build index.
+        Debug.Log("Scene " + scene.name + " loaded in mode: " + mode);
+
+        cEnemyDeck.DestroyAllUnit();
+
+        // Example: Perform actions only for a specific scene
+        if (scene.name == "Game") {
+            EnemyManager.instance.PopulateMobBasedOnNodeType();
+        }
+    }
+
+    void Update() {
+        if (Input.GetKeyDown(KeyCode.S)) {
+            Debug.Log("deck is " + cPlayerDeck == null);
+        }
+    }
+
     void Awake() {
         if (instance != null) {
             instance.SetAllPositionByType(eDeckType.PLAYER, GetAllPositionByType(eDeckType.PLAYER));
-            instance.SetAllPositionByType(eDeckType.ENEMY, GetAllPositionByType(eDeckType.PLAYER));
+            instance.SetAllPositionByType(eDeckType.ENEMY, GetAllPositionByType(eDeckType.ENEMY));
             Destroy(gameObject);
         } else {
             instance = this;
@@ -62,7 +93,8 @@ public class DeckManager : MonoBehaviour {
     }
 
     public void SetAllPositionByType(eDeckType eType, UnitPosition[] listPos) {
-        Deck cDeck = eType == eDeckType.PLAYER ? cPlayerDeck : cEnemyDeck;
+        Deck cDeck = instance.GetDeckByType(eType);
+        //Deck cDeck = eType == eDeckType.PLAYER ? cPlayerDeck : cEnemyDeck;
         cDeck.ReInitUnitPosition(listPos.ToList());
     }
 
