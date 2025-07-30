@@ -8,7 +8,11 @@ public class ShieldScript : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
+        if (unit == null) {
+            return;
+        }
+
         float fCurrentShield = unit._currentShield.GetVal();
-        text.text = fCurrentShield.ToString();
+        text.text = Mathf.FloorToInt(fCurrentShield).ToString();
     }
 }
