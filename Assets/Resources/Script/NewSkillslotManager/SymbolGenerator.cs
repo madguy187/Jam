@@ -98,11 +98,6 @@ public class SymbolGenerator : MonoBehaviour
             return System.Linq.Enumerable.Repeat(SymbolType.EMPTY, SLOT_COUNT).ToArray();
         }
 
-        List<eUnitArchetype> aliveArchetypes = DeckHelperFunc
-            .GetAllAliveUnit(deck)
-            .Select(u => u.unitSO.eUnitArchetype)
-            .ToList();
-
         // Collect ONLY alive units so dead archetypes are not considered
         HashSet<UnitObject> uniqueUnits = new HashSet<UnitObject>();
         foreach (UnitObject unit in deck)
