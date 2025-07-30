@@ -95,7 +95,6 @@ namespace Map
                 case NodeType.Enemy:
                     mapManager.SaveMap();
                     EnemyManager.instance.nodeType = mapNode.Node.nodeType;
-                    EnemyManager.instance.PopulateMobBasedOnNodeType();
                     SceneManager.LoadScene("Game");
                     break;
                 case NodeType.Encounter:

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Deck : IEnumerable<UnitObject> {
@@ -22,8 +23,8 @@ public class Deck : IEnumerable<UnitObject> {
     }
 
     public void ReInitUnitPosition(List<UnitPosition> vecPos) {
-        _vecPosition = vecPos;
         for (int i = 0; i < _vecPosition.Count; i++) {
+            _vecPosition[i].transform.position = vecPos[i].transform.position;
             UnitObject unit = _vecUnit[i];
             if (unit == null) {
                 continue;
@@ -48,7 +49,7 @@ public class Deck : IEnumerable<UnitObject> {
             if (_vecUnit[i] == null) {
                 continue;
             }
-            GameObject.Destroy(_vecUnit[i]);
+            GameObject.Destroy(_vecUnit[i].gameObject);
             _vecUnit[i] = null;
         }
     }
@@ -214,6 +215,9 @@ public class Deck : IEnumerable<UnitObject> {
     }
 
     Transform _GetPosition(int nIndex) {
+        if (_vecPosition == null) {
+            _vecPosition = DeckManager.instance.GetAllPositionByType(_eType).ToList();
+        }
         if (nIndex < 0 || nIndex > _vecPosition.Count) {
             return null;
         }
