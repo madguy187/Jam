@@ -21,14 +21,18 @@ public class MockPlayerInventoryHolder : MonoBehaviour
         Action<MockItemType, MockInventoryItem> onAddAction = (MockItemType itemType, MockInventoryItem item) => {
             playerInventory.bagItems.Add(item);
             Deck cDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
-            cDeck.RemoveUnit(item.unitData);
+            if (itemType == MockItemType.Unit) {
+                cDeck.RemoveUnit(item.unitData);
+            }
         };
         ItemTracker.Instance.AddOnAdd(TrackerType.BagContainer, onAddAction);
 
         Action<MockItemType, MockInventoryItem> onRemoveAction = (MockItemType itemType, MockInventoryItem item) => {
             playerInventory.bagItems.Remove(item);
             Deck cDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
-            cDeck.AddUnit(item.unitData);
+            if (itemType == MockItemType.Unit) {
+                cDeck.AddUnit(item.unitData);
+            }
         };
         ItemTracker.Instance.AddOnRemove(TrackerType.BagContainer, onRemoveAction);
     }

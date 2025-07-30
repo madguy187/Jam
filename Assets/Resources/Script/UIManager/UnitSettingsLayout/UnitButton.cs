@@ -34,7 +34,12 @@ public class UnitButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         GetComponent<Button>().onClick.RemoveAllListeners(); // Safe rebind
         GetComponent<Button>().onClick.AddListener(OnClick);
 
-        nameText.text = unit.unitSO.unitName;
+        if (unit.unitSO == null) {
+            Global.DEBUG_PRINT("[UnitButton::Init] unitSO is null for unit: " + unit.name);
+            nameText.text = "Unknown";
+        } else {
+            nameText.text = unit.unitSO.GetUnitName();
+        }
 
         Sprite sprite = GetUnitSprite(unit.gameObject);
         if (sprite != null) {

@@ -76,6 +76,11 @@ namespace Map
         private void OnApplicationQuit() 
         {
             PlayerPrefs.DeleteKey("Map");
+            PlayerPrefs.DeleteKey("ScrollPositionX");
+            PlayerPrefs.DeleteKey("ScrollPositionY");
+            PlayerPrefs.DeleteKey("ScrollPositionZ");
+            PlayerPrefs.Save();
+            Global.DEBUG_PRINT("[MapManager::OnApplicationQuit] Map and scroll position cleared from PlayerPrefs");
         }
     }
 }
