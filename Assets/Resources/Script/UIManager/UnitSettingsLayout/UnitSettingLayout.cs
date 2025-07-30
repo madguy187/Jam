@@ -183,7 +183,8 @@ public class UnitSettingLayout : MonoBehaviour
         }
     }
 
-    private void PopulateTeamUnits() {
+    private void PopulateTeamUnits() 
+    {
         List<UnitObject> listUnit = DeckHelperFunc.GetAllUnitIncludeEmpty(DeckManager.instance.GetDeckByType(eDeckType.PLAYER));
 
         for (int i = 0; i < teamUnitContainer.childCount; i++) {

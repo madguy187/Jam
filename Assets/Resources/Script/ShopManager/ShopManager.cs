@@ -117,7 +117,7 @@ public class ShopManager : MonoBehaviour
                 unitIcon
             );
             shopToMockInventoryMap[shopItem] = new MockInventoryItem(unitObj);
-            Destroy(unitInstance); // Clean up the temporary unit instance
+            // Destroy(unitInstance); // Clean up the temporary unit instance
             return shopItem;
         }
     }
@@ -152,6 +152,10 @@ public class ShopManager : MonoBehaviour
         } else {
             // For unit or relic
             if (item.type == ShopItemType.Unit) {
+                if (shopToMockInventoryMap[item].unitData == null) {
+                    Global.DEBUG_PRINT("[ShopManager::OnItemBought] MockInventoryItem unitData is null for item: " + item.name);
+                    return; // Handle error appropriately
+                }
                 ItemTracker.Instance.AddItem(TrackerType.BagContainer, MockItemType.Unit, shopToMockInventoryMap[item]);
             } else {
                 ItemTracker.Instance.AddItem(TrackerType.BagContainer, MockItemType.Relic, shopToMockInventoryMap[item]);

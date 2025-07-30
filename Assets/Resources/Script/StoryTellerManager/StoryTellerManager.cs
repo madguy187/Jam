@@ -197,7 +197,7 @@ public class StoryTellerManager : MonoBehaviour
         Sprite unitIcon = RenderUtilities.ConvertRenderTextureToSprite(tex);
         Destroy(camObj);
         Destroy(tex);
-        Destroy(unit); // Clean up the temporary unit instance
+        // Destroy(unit); 
         return unitIcon;
     }
 
