@@ -48,6 +48,7 @@ public class CreatePrefabFromMenu {
             CreateUnit(UNIT_PREFAB_MOB_PATH, UNIT_PREFAB_MOB_FULL_PATH, UNIT_SCRIPTABLE_MOB_PATH, Path.GetFileName(path));
         }
 
+        AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
     }
 
@@ -148,11 +149,11 @@ public class CreatePrefabFromMenu {
         AttachShield(ref gameObj);
 
         string infoPath = scriptablePath + FOLDER_SEPARATOR + unitName;
-        Debug.Log(infoPath);
         List<UnitScriptableObject> unitSO = Resources.LoadAll<UnitScriptableObject>(infoPath).ToList();
-        Debug.Log(unitSO.Count);
+        Debug.Log(unitName + " has " + unitSO.Count);
         foreach (UnitScriptableObject unit in unitSO) {
             comp.SetUnitSO(unit);
+            break;
         }
 
 
@@ -164,7 +165,6 @@ public class CreatePrefabFromMenu {
         EffectList zigzag = new EffectList();
         EffectList fullgrid = new EffectList();
         foreach (EffectScriptableObject effect in effects) {
-            Debug.Log(effect.name);
             if (effect.name.Contains("Single")) {
                 single.AddEffect(effect);
             }
@@ -271,7 +271,7 @@ public class CreatePrefabFromMenu {
                 { "ExecutionerBrand", new List<string>() { "BlessedFang", "ExecutionerEdge" } },
             };
         }
-        
+
         if (mapCombination.ContainsKey(relicName)) {
             return mapCombination[relicName];
         }

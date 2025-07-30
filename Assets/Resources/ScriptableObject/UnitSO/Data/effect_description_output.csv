@@ -1,0 +1,49 @@
+enum,name,desc
+EFFECT_STAT_INCREASE_BASE_HP,Bleed,Add base %param% HP
+EFFECT_STAT_INCREASE_ATK,Attack Increase,Add %param% ATK
+EFFECT_STAT_INCREASE_ATK_TURN,Attack Increase Turn,Add %param% ATK every turn
+EFFECT_STAT_REDUCE_ATK,Attack Reduce,Reduce %param% ATK
+EFFECT_STAT_INCREASE_SHIELD,Shield Increase,Increase %param% SHIELD
+EFFECT_STAT_INCREASE_RES,Resistance Increase,Increase %param% Resistance
+EFFECT_STAT_INCREASE_RES_TURN,Resistance Increase Turn,Increase %param% Resistance every turn
+EFFECT_STAT_REDUCE_RES,Resistance Reduce,Reduce %param% Resistance
+EFFECT_STAT_REDUCE_RES_PERCENT,Resistance Reduce Percent,Reduce %param% Resistance by percentage
+EFFECT_STAT_INCREASE_CRIT_RATE,Critical Rate Increase,Increase %param% Critical Rate
+EFFECT_STAT_INCREASE_CRIT_RATE_TURN,Critical Rate Increase Turn,Increase %param% Critical Rate every turn
+EFFECT_STAT_REDUCE_CRIT_RATE,Critical Rate Reduce,Reduce %param% Critical Rate
+EFFECT_STAT_REDUCE_CRIT_RATE_PERCENT,Critical Rate Reduce Percent,Reduce %param% Critical Rate by percentage
+EFFECT_STAT_INCREASE_CRIT_MULTI,Critical Multi Increase,Increase %param% Critical Multiplier
+EFFECT_STAT_INCREASE_CRIT_MULTI_TURN,Critical Multi Increase Turn,Increase %param% Critical Multiplier every turn
+EFFECT_DAMAGE_IGNORE_SHIELD,Flat Damage Ignore,"Deals %param% damage, ignoring shield"
+EFFECT_DAMAGE_FLAT_DAMAGE,Flat Damage Given,Deals %param% damage
+EFFECT_DAMAGE_CRIT_HIT,Critical Hit,Next hit will be a critical hit
+EFFECT_DAMAGE_CRIT_FLAT_HEAL,Critical Hit Heal,"If next hit is critical, heal yourself for %param%"
+EFFECT_DAMAGE_LIFESTEAL,Lifesteal,Lifesteal for %param% of damage
+EFFECT_IGNORE_SHIELD,Ignore Shield,Next hit ignores shield
+EFFECT_IGNORE_RES,Ignore Resistance,Next hit ignores resistance
+EFFECT_HEAL,Heal,Heal for %param%
+EFFECT_HEAL_TURN,Heal Turn,Heal for %param% every turn
+EFFECT_STUN,Stun,Stun for %param% turn
+EFFECT_SHIELD_REMOVE,Remove Shield,Remove all shield
+EFFECT_TRIGGER_ALL_SINGLE,Trigger Single,Triggers all single symbols
+EFFECT_ATTACK_HEAL,Attack Heal,Heal for %param% amount
+EFFECT_TAUNT,Taunt,Taunt for %param% turn
+EFFECT_REFLECT,Reflect,Reflect for %param% turn
+EFFECT_REVIVE,Revive,Revive with 1 HP
+EFFECT_REVIVE_FULL,Revive Max,Revive with full HP
+EFFECT_CLEANSE,Cleanse,Cleanse all negative effect
+EFFECT_FREEZE,Freeze,Freeze for %param% turn
+EFFECT_HEX,Hex,Hex for %param% turn
+EFFECT_INVISIBLITY,Invisibility,Invisibility for %param% turn
+EFFECT_DAMAGE_MULTIPLY,Multiply Base Damage,Base damage multiply by %param% times
+EFFECT_DAMAGE_MULTIPLY_POST,Multiply Final Damage,Final damage multiply by %param% times
+EFFECT_ATTACK_TIMES,Increase Attack Times,Increase attack count to %param% times
+EFFECT_ATTACK_MULTIPLE,Increase Target Count,Increase attack target to %param% targets
+EFFECT_ATTACK_MULTIPLE_IF_DEAD,Increase Target Count If Dead,Increase attack target to %param% targets if target dies
+EFFECT_ZERO_DAMAGE,Zero Damage Receive,Receive zero damage when hit
+EFFECT_DIE_REVIVE,Die and Revivie,Increase death count by 1
+EFFECT_CANNOT_DIE,Cannot Die,Cannot die for %param% turn
+EFFECT_BLEED,Bleed,Bleed for %param% turn
+EFFECT_SHADOW_BLADE_BLEED,NOT USED,NOT USED
+EFFECT_INSTANT_KILL,Instant Kill,Instant kill
+EFFECT_DODGE,Dodge,%param% chance to dodge

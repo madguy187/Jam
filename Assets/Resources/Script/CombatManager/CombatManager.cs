@@ -535,7 +535,7 @@ public class CombatManager : MonoBehaviour {
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_DAMAGE_IGNORE_SHIELD)) {
-                unit._currentHealth.MinusVal(cEffect.GetEffectVal());
+                unit.ReceiveDamage(cEffect.GetEffectVal());
             }
 
             if (cEffect.IsEffectType(EffectType.EFFECT_HEAL)) {
