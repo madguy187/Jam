@@ -14,10 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _eType: 39
   _fEffectVal: 3
-  _eTargetType: 0
+  _eTargetType: 2
   _eTargetCondition: 1
   _fTargetParam: 0
   _eExecType: 0
   _effectAffinityType: 0
-  _effectResolveType: 4
+  _effectResolveType: 1
   _fEffectCount: 1
