@@ -96,12 +96,10 @@ public class CombatManager : MonoBehaviour {
         if (listPlayerUnit.Count <= 0) {
             // All player units dead – show defeat popup.
             Deck cPlayerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
+            ResultPopup.instance.ShowDefeat(cPlayerDeck);
             cPlayerDeck.DestroyAllUnit();
             Deck cEnemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
             cEnemyDeck.DestroyAllUnit();
-
-            // If all player units dead - Show defeat
-            VictoryPopup.instance.ShowDefeat();
         }
         else if (listEnemyUnit.Count <= 0) {
             Deck cEnemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);

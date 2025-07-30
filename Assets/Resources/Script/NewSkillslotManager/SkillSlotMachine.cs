@@ -552,10 +552,10 @@ public class SkillSlotMachine : MonoBehaviour
     private IEnumerator ShowVictoryAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
-        if (VictoryPopup.instance != null)
+        if (ResultPopup.instance != null)
         {
             Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
-            VictoryPopup.instance.ShowVictory(playerDeck);
+            ResultPopup.instance.ShowVictory(playerDeck);
         }
     }
 
