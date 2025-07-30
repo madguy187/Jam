@@ -38,6 +38,10 @@ public class RelicCombiner : MonoBehaviour
             return;
         }
         BuildCombinationMap();
+        foreach (var line in GetAllCombinationDescriptions())
+        {
+            Debug.Log(line);
+        }
     }
 
     void BuildCombinationMap()
@@ -113,6 +117,40 @@ public class RelicCombiner : MonoBehaviour
         AddComboAndBreak("IronVeil", "ReflectiveCore", "CrimsonFortress", ForgeRelicRarity.Legendary);
         AddComboAndBreak("SkyDagger", "SteelFrame", "SkyhammerCannon", ForgeRelicRarity.Legendary);
         AddComboAndBreak("NullField", "GreaterBlessing", "BlessedCircuit", ForgeRelicRarity.Legendary);
+    }
+
+    public List<string> GetAllCombinationDescriptions()
+    {
+        List<string> descriptions = new List<string>();
+
+        foreach (var kvp in combinationMap)
+        {
+            var (a, b) = kvp.Key;
+            var (result, rarity) = kvp.Value;
+
+            // To prevent duplicate mirrored entries (A+B and B+A), only list when a name is lexicographically smaller
+            if (string.Compare(a.name, b.name) <= 0)
+            {
+                descriptions.Add($"{a.name} + {b.name} → {result.name} ({rarity})");
+            }
+        }
+
+        return descriptions;
+    }
+
+    public List<string> GetAllBreakDescriptions()
+    {
+        List<string> descriptions = new List<string>();
+
+        foreach (var kvp in breakMap)
+        {
+            var result = kvp.Key;
+            var (part1, part2, rarity) = kvp.Value;
+
+            descriptions.Add($"{result.name} → {part1.name} + {part2.name} ({rarity})");
+        }
+
+        return descriptions;
     }
 
     public bool TryCombine(RelicScriptableObject a, RelicScriptableObject b, out RelicScriptableObject result)
