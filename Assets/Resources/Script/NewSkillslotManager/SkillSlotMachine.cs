@@ -438,9 +438,10 @@ public class SkillSlotMachine : MonoBehaviour
 
     private IEnumerator ExecuteEnemyTurn()
     {
+        Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+
         yield return new WaitForSeconds(1f);
 
-        Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
         SymbolType[] symbols = SymbolGenerator.instance.GenerateSymbolsForDeck(enemyDeck);
 
         SpinMode previousMode = spinMode;
@@ -507,6 +508,8 @@ public class SkillSlotMachine : MonoBehaviour
         }
     }
 
+    private bool victoryPopupShown = false;
+
     private bool CheckAllEnemiesDead()
     {
         Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
@@ -518,7 +521,25 @@ public class SkillSlotMachine : MonoBehaviour
                 return false;
             }
         }
+
+        if (!victoryPopupShown)
+        {
+            victoryPopupShown = true;
+            StartCoroutine(ShowVictoryAfterDelay(1f));
+        }
+
         return true;
+    }
+
+    private IEnumerator ShowVictoryAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        VictoryPopup popup = FindObjectOfType<VictoryPopup>(true);
+        if (popup != null)
+        {
+            Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
+            popup.Show(playerDeck);
+        }
     }
 
     // Public helpers
