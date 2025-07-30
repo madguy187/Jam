@@ -1880,6 +1880,11 @@ MonoBehaviour:
   baseSpinCost: 2
   rerollButton: {fileID: 0}
   attackButton: {fileID: 0}
+  spinMode: 2
+  previewSpin: 0
+  playerCombatSpin: 0
+  fullCombatSpin: 0
+  enemyVisualSpin: 0
 --- !u!1 &6413151707245335871
 GameObject:
   m_ObjectHideFlags: 0

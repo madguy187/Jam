@@ -106,8 +106,17 @@ public class Deck : IEnumerable<UnitObject> {
         if (objUnitPrefab == null) {
             return null;
         }
-        
-        return AddUnit(objUnitPrefab);
+
+        // Create and add unit using prefab
+        UnitObject unit = AddUnit(objUnitPrefab);
+
+        // Parent under DeckManager so the player unit persists across scene loads
+        // Not sure about enemy though, i set for player first.
+        if (_eType == eDeckType.PLAYER && unit != null && DeckManager.instance != null) {
+            unit.transform.SetParent(DeckManager.instance.transform, true);
+        }
+
+        return unit;
     }
 
     public UnitObject GetUnitObject(int index) {

@@ -12,6 +12,7 @@ public enum SymbolType
 
 public class SymbolGenerator : MonoBehaviour
 {
+    private const int SLOT_COUNT = 9;
     public static SymbolGenerator instance { get; private set; }
 
     private void Awake()
@@ -87,23 +88,29 @@ public class SymbolGenerator : MonoBehaviour
 
     public SymbolType[] GenerateSymbolsForDeck(Deck deck)
     {
-        if (deck == null) return null;
+        if (deck == null ||
+            deck.GetUnitByPredicate(u => u != null && !u.IsDead()).Count == 0)
+        {
+            Debug.LogWarning("[SymbolGenerator] Enemy deck empty returning EMPTY symbols");
+            return System.Linq.Enumerable.Repeat(SymbolType.EMPTY, SLOT_COUNT).ToArray();
+        }
 
+        // Collect ONLY alive units so dead archetypes are not considered
         HashSet<UnitObject> uniqueUnits = new HashSet<UnitObject>();
         foreach (UnitObject unit in deck)
         {
-            if (unit != null && unit.unitSO != null)
-            {
-                uniqueUnits.Add(unit);
-            }
+            if (unit == null) continue;
+            if (unit.IsDead()) continue;
+
+            uniqueUnits.Add(unit);
         }
 
-        SymbolType[] symbols = new SymbolType[9];
+        SymbolType[] symbols = new SymbolType[SLOT_COUNT];
         
         int currentSlot = 0;
         foreach (UnitObject unit in uniqueUnits)
         {
-            if (currentSlot >= 9) break; 
+            if (currentSlot >= SLOT_COUNT) break; 
 
             switch (unit.unitSO.eUnitArchetype)
             {
@@ -123,7 +130,7 @@ public class SymbolGenerator : MonoBehaviour
             currentSlot++;
         }
 
-        for (int i = currentSlot; i < 9; i++)
+        for (int i = currentSlot; i < SLOT_COUNT; i++)
         {
             if (Random.value < ProbabilityCalculator.instance.GetProbabilityForSymbol(SymbolType.EMPTY))
             {
@@ -156,7 +163,7 @@ public class SymbolGenerator : MonoBehaviour
             }
         }
 
-        for (int i = symbols.Length - 1; i > 0; i--)
+        for (int i = SLOT_COUNT - 1; i > 0; i--)
         {
             int randomIndex = Random.Range(0, i + 1);
             SymbolType temp = symbols[i];
