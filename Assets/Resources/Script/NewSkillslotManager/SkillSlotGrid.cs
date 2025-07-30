@@ -150,8 +150,8 @@ public class SkillSlotGrid : MonoBehaviour
     {
         cachedUnits.Clear();
 
-        // We change deck here    
-        eDeckType deckType = SkillSlotMachine.IsEnemyTurnStatic ? eDeckType.ENEMY : eDeckType.PLAYER;
+        // Always cache from player deck – enemy no longer spins
+        eDeckType deckType = eDeckType.PLAYER;
 
         Debug.Log($"[SkillSlotGrid] Caching units for {deckType} turn");
 

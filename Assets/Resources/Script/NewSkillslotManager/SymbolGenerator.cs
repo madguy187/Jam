@@ -7,7 +7,8 @@ public enum SymbolType
     EMPTY = 0,
     HOLY = 1,
     UNDEAD = 2,
-    ELF = 3
+    ELF = 3,
+    MOB = 4,
 }
 
 public class SymbolGenerator : MonoBehaviour
@@ -58,6 +59,8 @@ public class SymbolGenerator : MonoBehaviour
                 return eUnitArchetype.UNDEAD;
             case SymbolType.ELF:
                 return eUnitArchetype.ELF;
+            case SymbolType.MOB:
+                return eUnitArchetype.MOB;
             default:
                 return eUnitArchetype.NONE;
         }
@@ -123,6 +126,9 @@ public class SymbolGenerator : MonoBehaviour
                 case eUnitArchetype.ELF:
                     symbols[currentSlot] = SymbolType.ELF;
                     break;
+                case eUnitArchetype.MOB:
+                    symbols[currentSlot] = SymbolType.MOB;
+                    break;                    
                 default:
                     symbols[currentSlot] = SymbolType.EMPTY;
                     break;
@@ -152,6 +158,9 @@ public class SymbolGenerator : MonoBehaviour
                     case eUnitArchetype.ELF:
                         symbols[i] = SymbolType.ELF;
                         break;
+                    case eUnitArchetype.MOB:
+                        symbols[i] = SymbolType.MOB;
+                        break;                        
                     default:
                         symbols[i] = SymbolType.EMPTY;
                         break;
