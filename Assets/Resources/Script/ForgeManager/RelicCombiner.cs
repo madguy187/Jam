@@ -3,6 +3,7 @@ using UnityEngine;
 
 public enum ForgeRelicRarity
 {
+    Basic,
     Advanced,
     Legendary
 }
@@ -87,7 +88,7 @@ public class RelicCombiner : MonoBehaviour
         AddComboAndBreak("DemonClaw", "DemonClaw", "BloodrendClaw", ForgeRelicRarity.Advanced);
 
         // Advanced Relics Mixed-Merges
-        AddComboAndBreak("IronShard", "LightFeather", "Executioner’sEdge", ForgeRelicRarity.Advanced);
+        AddComboAndBreak("IronShard", "LightFeather", "ExecutionerEdge", ForgeRelicRarity.Advanced);
         AddComboAndBreak("IronShard", "HardenedShell", "Warplate", ForgeRelicRarity.Advanced);
         AddComboAndBreak("IronShard", "BlessedCharm", "VampiricBrand", ForgeRelicRarity.Advanced);
         AddComboAndBreak("IronShard", "MagicCore", "AssassinSigil", ForgeRelicRarity.Advanced);

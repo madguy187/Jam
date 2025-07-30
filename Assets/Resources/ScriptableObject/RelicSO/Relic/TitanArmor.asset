@@ -20,3 +20,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e06123205a888404b95b1246e6f8daba, type: 2}
   - {fileID: 11400000, guid: 16724be02b3467845b445e7ae2438868, type: 2}
   - {fileID: 11400000, guid: c6163241169d20d4196abb3e605e8ff9, type: 2}
+  rarity: 2
+  listCombination:
+  - Warplate
+  - SteelFrame

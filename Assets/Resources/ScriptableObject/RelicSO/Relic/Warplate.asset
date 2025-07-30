@@ -19,3 +19,7 @@ MonoBehaviour:
   listEffect:
   - {fileID: 11400000, guid: 6af39b04d03489e43a6eefbdf9120e2d, type: 2}
   - {fileID: 11400000, guid: cf4af6db636437743ae3f1079d6c3d33, type: 2}
+  rarity: 1
+  listCombination:
+  - IronShard
+  - HardenedShell

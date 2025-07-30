@@ -19,3 +19,7 @@ MonoBehaviour:
   listEffect:
   - {fileID: 11400000, guid: 7aaccf301efde0a47a086dce0530a037, type: 2}
   - {fileID: 11400000, guid: a4c75095992db6d47a287602d33a5e40, type: 2}
+  rarity: 1
+  listCombination:
+  - HardenedShell
+  - MagicCore
