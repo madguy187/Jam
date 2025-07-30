@@ -18,6 +18,6 @@ MonoBehaviour:
   _eTargetCondition: 7
   _fTargetParam: 1
   _eExecType: 0
-  _effectAffinityType: 2
+  _effectAffinityType: 0
   _effectResolveType: 1
   _fEffectCount: 1

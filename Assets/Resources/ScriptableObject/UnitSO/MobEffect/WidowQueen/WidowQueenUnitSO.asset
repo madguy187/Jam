@@ -16,7 +16,7 @@ MonoBehaviour:
   unitDescription: This is a unit description
   eTier: 2
   eUnitArchetype: 4
-  hp: 100
+  hp: 56
   attack: 7
   shield: 3
   res: 2

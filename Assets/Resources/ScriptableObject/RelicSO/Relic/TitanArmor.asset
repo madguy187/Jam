@@ -15,7 +15,7 @@ MonoBehaviour:
   strRelicName: Titan Armor
   strRelicDescription: Atk +13, Res +15, Shield +14
   relicCost: 0
-  spriteRelic: {fileID: 21300000, guid: a1aea7c48cb5e164ebd5f9669ffb205f, type: 3}
+  spriteRelic: {fileID: -2579154629970623280, guid: b5adc707aeb0d884baeee132623a67d0, type: 3}
   listEffect:
   - {fileID: 11400000, guid: e06123205a888404b95b1246e6f8daba, type: 2}
   - {fileID: 11400000, guid: 16724be02b3467845b445e7ae2438868, type: 2}

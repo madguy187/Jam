@@ -15,7 +15,7 @@ MonoBehaviour:
   strRelicName: Demon Claw
   strRelicDescription: Crit Damage + 10
   relicCost: 0
-  spriteRelic: {fileID: 21300000, guid: 5f56e5a89303678469d021632482a8db, type: 3}
+  spriteRelic: {fileID: 21300000, guid: 2dee2a7b8b206884fbe2de0a6f231b3d, type: 3}
   listEffect:
   - {fileID: 11400000, guid: 6d18c612ae20cd548aa79264c87e62a8, type: 2}
   rarity: 0

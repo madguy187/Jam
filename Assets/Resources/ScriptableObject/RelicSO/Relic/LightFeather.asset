@@ -15,7 +15,7 @@ MonoBehaviour:
   strRelicName: Light Feather
   strRelicDescription: Crit Rate +5%
   relicCost: 0
-  spriteRelic: {fileID: 21300000, guid: a1aea7c48cb5e164ebd5f9669ffb205f, type: 3}
+  spriteRelic: {fileID: 21300000, guid: 417c05dce08e8ba4ead149ac74001a7c, type: 3}
   listEffect:
   - {fileID: 11400000, guid: ad12355225d58b44ca8ea7196489f8f5, type: 2}
   rarity: 0

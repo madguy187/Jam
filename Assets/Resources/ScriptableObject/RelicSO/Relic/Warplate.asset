@@ -15,7 +15,7 @@ MonoBehaviour:
   strRelicName: Warplate
   strRelicDescription: Atk +2, Res +2
   relicCost: 0
-  spriteRelic: {fileID: 21300000, guid: a1aea7c48cb5e164ebd5f9669ffb205f, type: 3}
+  spriteRelic: {fileID: 5321685063536713335, guid: b5adc707aeb0d884baeee132623a67d0, type: 3}
   listEffect:
   - {fileID: 11400000, guid: 6af39b04d03489e43a6eefbdf9120e2d, type: 2}
   - {fileID: 11400000, guid: cf4af6db636437743ae3f1079d6c3d33, type: 2}

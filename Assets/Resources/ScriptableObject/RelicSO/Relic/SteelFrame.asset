@@ -15,7 +15,7 @@ MonoBehaviour:
   strRelicName: Steel Frame
   strRelicDescription: Res +2, Shield +4
   relicCost: 0
-  spriteRelic: {fileID: 21300000, guid: a1aea7c48cb5e164ebd5f9669ffb205f, type: 3}
+  spriteRelic: {fileID: 21300000, guid: e4ce71d631374cc46be5f76f33cb4d22, type: 3}
   listEffect:
   - {fileID: 11400000, guid: 7aaccf301efde0a47a086dce0530a037, type: 2}
   - {fileID: 11400000, guid: a4c75095992db6d47a287602d33a5e40, type: 2}
