@@ -868,7 +868,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 10905, guid: 0000000000000000f000000000000000, type: 0}
+  m_Sprite: {fileID: 1157096351, guid: ff3a13f848717354d9eb56697565c1b1, type: 3}
   m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1971,6 +1971,30 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 137202680}
     m_Modifications:
+    - target: {fileID: 611394346534931826, guid: cf5da4e11af70cc42a9ce50946cc7efc, type: 3}
+      propertyPath: m_Spacing
+      value: 58.54
+      objectReference: {fileID: 0}
+    - target: {fileID: 1087748449425541140, guid: cf5da4e11af70cc42a9ce50946cc7efc, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1087748449425541140, guid: cf5da4e11af70cc42a9ce50946cc7efc, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: be2264a66472e2d4081decf4f03e84dc, type: 3}
+    - target: {fileID: 1087748449425541140, guid: cf5da4e11af70cc42a9ce50946cc7efc, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1087748449425541140, guid: cf5da4e11af70cc42a9ce50946cc7efc, type: 3}
+      propertyPath: m_Color.g
+      value: 0.5220697
+      objectReference: {fileID: 0}
+    - target: {fileID: 1087748449425541140, guid: cf5da4e11af70cc42a9ce50946cc7efc, type: 3}
+      propertyPath: m_Color.r
+      value: 0.1273585
+      objectReference: {fileID: 0}
     - target: {fileID: 2456255055786709832, guid: cf5da4e11af70cc42a9ce50946cc7efc, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2197,11 +2221,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9057409385610914526, guid: cf5da4e11af70cc42a9ce50946cc7efc, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 800
+      value: 1069
       objectReference: {fileID: 0}
     - target: {fileID: 9057409385610914526, guid: cf5da4e11af70cc42a9ce50946cc7efc, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 522.1345
+      value: 689
       objectReference: {fileID: 0}
     - target: {fileID: 9057409385610914526, guid: cf5da4e11af70cc42a9ce50946cc7efc, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2264,6 +2288,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 189044866068453788, guid: 4c677b5e0de257949aeeae46493e2480, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 4238041346871966798, guid: 4c677b5e0de257949aeeae46493e2480, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -2448,8 +2476,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Return To Map
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 17615e8d87f807442b21757e41e01e2b, type: 2}
+  m_sharedMaterial: {fileID: 7620094505547187883, guid: 17615e8d87f807442b21757e41e01e2b, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2473,8 +2501,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 12
+  m_fontSizeBase: 12
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
