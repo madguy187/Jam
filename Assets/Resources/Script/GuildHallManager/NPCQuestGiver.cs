@@ -171,7 +171,7 @@ namespace StoryManager
 
         private void DestroyBackgroundNpcs()
         {
-            var npcs = FindObjectsOfType<MonoBehaviour>();
+            var npcs = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
             foreach (var m in npcs)
             {
                 if (m == null) continue;

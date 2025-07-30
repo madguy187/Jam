@@ -27,6 +27,12 @@ namespace StoryManager
             if (ResourceManager.instance == null) return;
 
             float baseY = fixedY;
+            if (alignToPlayerDeckY && DeckManager.instance != null)
+            {
+                var posArr = DeckManager.instance.GetAllPositionByType(eDeckType.PLAYER);
+                if (posArr.Length > 0)
+                    baseY = posArr[0].transform.position.y;
+            }
 
             for (int row = 0; row < rowCount; row++)
             {
