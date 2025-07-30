@@ -13,6 +13,10 @@ public class UIReturnToMapButton : MonoBehaviour {
     }
 
     private void OnButtonClicked() {
+        if (UIPopUpManager.instance != null)
+        {
+            UIPopUpManager.instance.ClearAllPopUps();
+        }
         SceneManager.LoadScene("Game_Map");
     }
 }

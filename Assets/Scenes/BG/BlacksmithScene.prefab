@@ -7731,6 +7731,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: BlacksmithNPC
       objectReference: {fileID: 0}
+    - target: {fileID: 2466500907249428508, guid: 120cb271fe0e8924c8d17fbabb6e6ea1, type: 3}
+      propertyPath: m_SortingLayer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2466500907249428508, guid: 120cb271fe0e8924c8d17fbabb6e6ea1, type: 3}
+      propertyPath: m_SortingOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2466500907249428509, guid: 120cb271fe0e8924c8d17fbabb6e6ea1, type: 3}
       propertyPath: m_LocalPosition.x
       value: -604.0147

@@ -18,6 +18,8 @@ public class SkillSlotMachine : MonoBehaviour
     [Header("Spin Cost Settings")]
     [SerializeField] private int baseSpinCost = 2;
     private int spinsThisTurn = 0;
+    private bool hasSpunThisTurn = false;
+    public bool CanAttack() => hasSpunThisTurn && !IsRolling();
     private SlotGrid detectorGrid;
     private readonly List<SkillSlotGrid> columns = new List<SkillSlotGrid>();
     private SpinResult lastSpinResult;
@@ -45,6 +47,7 @@ public class SkillSlotMachine : MonoBehaviour
     [SerializeField] private bool previewSpin;
     [SerializeField] private bool playerCombatSpin;
     [SerializeField] private bool fullCombatSpin;
+    private bool victoryPopupShown = false;
 
     private void Awake()
     {
@@ -61,6 +64,18 @@ public class SkillSlotMachine : MonoBehaviour
         InitColumns();
         InitUI();
         InitState();
+        // Initial button state – must spin first
+        if (rerollButton != null) rerollButton.SetInteractable(true);
+        if (attackButton != null) attackButton.SetInteractable(false);
+        Global.DEBUG_PRINT($"[SkillSlotMachine] Awake: attack interactable after disable = {attackButton?.IsInteractable()}");
+    }
+
+    private void Start()
+    {
+        // Initial button state – must spin first
+        Global.DEBUG_PRINT("[SkillSlotMachine] Start called");
+        if (rerollButton != null) rerollButton.SetInteractable(true);
+        if (attackButton != null) attackButton.SetInteractable(false);
     }
 
     private void Update()
@@ -84,6 +99,14 @@ public class SkillSlotMachine : MonoBehaviour
             fullCombatSpin = false;
             spinMode = SpinMode.PlayerAndEnemy;
             Spin();
+        }
+
+        if (CheckAllEnemiesDead())
+        {
+            Global.DEBUG_PRINT("[SkillSlotMachine] All enemies dead, player wins!");
+            GoldManager.instance.OnVictory();
+            SetButtonsInteractable(false);
+            return;
         }
     }
 
@@ -269,6 +292,9 @@ public class SkillSlotMachine : MonoBehaviour
     public void ResetSpinCounter()
     {
         spinsThisTurn = 0;
+        hasSpunThisTurn = false;
+        if (attackButton != null) attackButton.SetInteractable(false);
+        if (rerollButton != null) rerollButton.SetInteractable(true);
     }
 
     // Match detection & rewards 
@@ -276,6 +302,7 @@ public class SkillSlotMachine : MonoBehaviour
     {
         // Reuse persistent detector grid (no allocation each spin)
         detectorGrid.ClearGrid();
+        hasSpunThisTurn = true;
         for (int i = 0; i < 9; i++)
         {
             int row = i / 3;
@@ -304,12 +331,6 @@ public class SkillSlotMachine : MonoBehaviour
         }
 
         lastSpinResult = new SpinResult(matches, totalGold);
-
-        // Update help panel text only during player's turn
-        if (!isEnemyTurn && MatchHelpScreen.instance != null)
-        {
-            MatchHelpScreen.instance.DisplaySpinResults(lastSpinResult);
-        }
 
         // Debug output - , can be removed
         if (matches.Count > 0)
@@ -346,8 +367,18 @@ public class SkillSlotMachine : MonoBehaviour
 
     private void SetButtonsInteractable(bool state)
     {
-        if (rerollButton != null) rerollButton.SetInteractable(state);
-        if (attackButton  != null) attackButton.SetInteractable(state);
+        Global.DEBUG_PRINT($"[SkillSlotMachine] SetButtonsInteractable({state}) called. hasSpunThisTurn={hasSpunThisTurn}");
+        if (rerollButton != null)
+        {
+            rerollButton.SetInteractable(state);
+        }
+
+        if (attackButton != null)
+        {
+            bool attackState = state && hasSpunThisTurn;
+            attackButton.SetInteractable(attackState);
+            Global.DEBUG_PRINT($"[SkillSlotMachine] Attack button interactable set to {attackState}");
+        }
     }
 
     private string PosName(Vector2Int p)
@@ -376,14 +407,6 @@ public class SkillSlotMachine : MonoBehaviour
         ProcessPlayerTurnCombat();
 
         GoldManager.instance.CalculateInterest();
-
-        if (CheckAllEnemiesDead())
-        {
-            Global.DEBUG_PRINT("[SkillSlotMachine] All enemies dead, player wins!");
-            GoldManager.instance.OnVictory();
-            SetButtonsInteractable(false);
-            return;
-        }
 
         isEnemyTurn = true;
         SetButtonsInteractable(false);
@@ -415,6 +438,12 @@ public class SkillSlotMachine : MonoBehaviour
             yield break;
         }
         List<Match> playerMatches = new List<Match>(lastSpinResult.GetAllMatches());
+        
+        // update help panel with player matches for this attack
+        if (MatchHelpScreen.instance != null)
+        {
+            MatchHelpScreen.instance.DisplaySpinResults(new SpinResult(playerMatches,0));
+        }
 
         // 2. generate enemy symbols & matches immediately
         Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
@@ -441,7 +470,10 @@ public class SkillSlotMachine : MonoBehaviour
             yield return null;
 
         spinsThisTurn = 0;
-        SetButtonsInteractable(true);
+        // Enable only reroll; attack needs new spin
+        if (rerollButton != null) rerollButton.SetInteractable(true);
+        if (attackButton != null) attackButton.SetInteractable(false);
+        hasSpunThisTurn = false;
     }
 
     // helper builds matches without side-effects
@@ -481,9 +513,6 @@ public class SkillSlotMachine : MonoBehaviour
             m.SetUnitName(picked);
         }
     }
-
-
-    private bool victoryPopupShown = false;
 
     private bool CheckAllEnemiesDead()
     {

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class UIPopUpManager : MonoBehaviour {
     public static UIPopUpManager instance;
@@ -27,6 +28,7 @@ public class UIPopUpManager : MonoBehaviour {
 
         instance = this;
         DontDestroyOnLoad(gameObject);
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     public void UpdateAllPopUpPosition() {
@@ -77,5 +79,32 @@ public class UIPopUpManager : MonoBehaviour {
         pos.y -= yOffset * index;
 
         return pos;
+    }
+
+    public void ClearAllPopUps()
+    {
+        foreach (var pop in _listCurrentPopUp)
+        {
+            if (pop != null)
+            {
+                Destroy(pop.gameObject);
+            }
+        }
+        _listCurrentPopUp.Clear();
+        _fCurrentTime = 0f;
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        ClearAllPopUps();
+    }
+
+    void OnDestroy()
+    {
+        if (instance == this)
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            instance = null;
+        }
     }
 }

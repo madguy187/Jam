@@ -143,9 +143,6 @@ public class MatchHelpScreen : MonoBehaviour
         resVLG.padding = new RectOffset(0,20,0,0);
         // placeholder initial text
         resultsTextUI = AddText(resultsGO.transform, "LAST SPIN RESULTS", 20, FontStyle.Bold, Color.white, false);
-
-        // hint under patterns column
-        AddText(patternRoot, "(Press H to close)", 14, FontStyle.Italic, Color.gray, false);
     }
 
     void BuildContentInsideExistingPanel(Transform root)
