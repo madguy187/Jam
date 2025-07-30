@@ -69,7 +69,7 @@ public class UnitSettingLayout : MonoBehaviour
 
     void RefreshUI()
     {
-        goldText.text = $"Gold: {inventory.gold}";
+        goldText.text = $"Gold: {GoldManager.instance.GetCurrentGold()}";
         // Always clear tracker counts before repopulating
         tracker.ClearItems();
         ClearTeamUnitButtonsOnly();

@@ -52,7 +52,6 @@ public class ForgeManager : MonoBehaviour
     private RelicScriptableObject forgedResult;
     [SerializeField] private Transform resultSlotContainer;
 
-    private int currentGold = 100;
     private ItemTracker tracker;
 
     private void Awake()
@@ -69,11 +68,6 @@ public class ForgeManager : MonoBehaviour
 
     private void Start()
     {
-        if (MockPlayerInventoryHolder.Instance == null) {
-            Global.DEBUG_PRINT("[ForgeManager::Start] MockPlayerInventoryHolder instance is null!");
-        } else {
-            currentGold = MockPlayerInventoryHolder.Instance.playerInventory.gold;
-        }
         if (ItemTracker.Instance == null) {
             Global.DEBUG_PRINT("[ForgeManager::Start] ItemTracker instance is null!");
         } else {
@@ -126,16 +120,7 @@ public class ForgeManager : MonoBehaviour
 
     void RefreshGoldUI()
     {
-        goldText.text = $"Gold: {currentGold}";
-    }
-
-    void UpdatePlayerGold()
-    {
-        if (MockPlayerInventoryHolder.Instance == null) {
-            Global.DEBUG_PRINT("[ForgeManager::UpdatePlayerGold] MockPlayerInventoryHolder instance is null!");
-        } else {
-            MockPlayerInventoryHolder.Instance.playerInventory.gold = currentGold;
-        }
+        goldText.text = $"Gold: {GoldManager.instance.GetCurrentGold()}";
     }
 
     private void InitMergeUI()
@@ -405,8 +390,7 @@ public class ForgeManager : MonoBehaviour
                 if (relicCombiner.TryCombine(selectedRelic1, selectedRelic2, out var forgedResult))
                 {
                     int cost = relicCombiner.GetCombineCost(selectedRelic1, selectedRelic2);
-                    currentGold -= cost;
-                    UpdatePlayerGold();
+                    GoldManager.instance.SpendGold(cost);
                     RefreshGoldUI();
 
                     playerRelics.Add(forgedResult);
@@ -445,8 +429,7 @@ public class ForgeManager : MonoBehaviour
                 if (relicCombiner.TryBreak(selectedRelic1, out var part1, out var part2))
                 {
                     int cost = relicCombiner.GetBreakCost(selectedRelic1);
-                    currentGold -= cost;
-                    UpdatePlayerGold();
+                    GoldManager.instance.SpendGold(cost);
                     RefreshGoldUI();
 
                     playerRelics.Remove(selectedRelic1);

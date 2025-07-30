@@ -84,12 +84,7 @@ public class StoryTellerManager : MonoBehaviour
                 }
             // For gold
             } else {
-                if (MockPlayerInventoryHolder.Instance == null) {
-                    Global.DEBUG_PRINT("[StoryTellerManager::OnClaimPressed] MockPlayerInventoryHolder instance is null!");
-                } else {
-                    MockPlayerInventoryHolder.Instance.playerInventory.gold += finalGoldAmount;
-                    Global.DEBUG_PRINT($"[StoryTellerManager::OnClaimPressed] Added {finalGoldAmount} gold to inventory.");
-                }
+                GoldManager.instance.AddGold(finalGoldAmount);
             }
         }
         claimButtonText.text = "Claimed!";
