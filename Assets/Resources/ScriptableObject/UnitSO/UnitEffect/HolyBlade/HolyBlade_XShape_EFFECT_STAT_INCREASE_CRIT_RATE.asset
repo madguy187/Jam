@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: HolyBlade_XShape_EFFECT_STAT_INCREASE_CRIT_RATE
   m_EditorClassIdentifier: 
   _eType: 10
-  _fEffectVal: 20
+  _fEffectVal: 50
   _eTargetType: 0
   _eTargetCondition: 0
   _fTargetParam: 0
