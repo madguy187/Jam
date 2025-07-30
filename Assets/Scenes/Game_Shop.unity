@@ -376,8 +376,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 0}
-  m_Type: 0
+  m_Sprite: {fileID: 1157096351, guid: ff3a13f848717354d9eb56697565c1b1, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -450,6 +450,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: ReturnToMapButton
       objectReference: {fileID: 0}
+    - target: {fileID: 5369467160076132049, guid: 0fd80679cefa75141a26d624dc7d13d4, type: 3}
+      propertyPath: m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5369467160076132049, guid: 0fd80679cefa75141a26d624dc7d13d4, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 1157096351, guid: ff3a13f848717354d9eb56697565c1b1, type: 3}
     - target: {fileID: 8412018875514828696, guid: 0fd80679cefa75141a26d624dc7d13d4, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

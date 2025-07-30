@@ -40,6 +40,7 @@ public class ItemTracker : MonoBehaviour {
             return;
         }
         Instance = this;
+        DontDestroyOnLoad(gameObject);
         Global.DEBUG_PRINT("[ItemTracker::Awake] Instance created.");
     }
 
