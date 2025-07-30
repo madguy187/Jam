@@ -26,6 +26,10 @@ public class DeckManager : MonoBehaviour {
             Destroy(gameObject);
         } else {
             instance = this;
+            if (transform.parent != null) {
+                Global.DEBUG_PRINT("Detach from parent to persist scene loads");
+                transform.SetParent(null);
+            }
             DontDestroyOnLoad(gameObject);
         }
     }

@@ -106,7 +106,12 @@ public class Deck : IEnumerable<UnitObject> {
         if (objUnitPrefab == null) {
             return null;
         }
-        
+
+           // Parent under DeckManager so the unit persists across scene loads 
+        if (DeckManager.instance != null) {
+            unit.transform.SetParent(DeckManager.instance.transform, true);
+        }
+
         return AddUnit(objUnitPrefab);
     }
 

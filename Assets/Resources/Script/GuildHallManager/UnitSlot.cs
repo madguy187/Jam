@@ -15,6 +15,8 @@ namespace StoryManager
         [SerializeField] private RectTransform previewAnchor;
         [SerializeField] private RawImage previewImage;
         [SerializeField] private TMP_Text unitNameLabel;
+        [SerializeField] private TMP_Text archetypeLabel;
+        [SerializeField] private TMP_Text statLabel;
 
         [Header("Config")]
         [SerializeField] private int maxRerolls = 3;
@@ -288,11 +290,23 @@ namespace StoryManager
 
         private static void HideHudWidgets(GameObject root)
         {
-            Transform healthBar = root.transform.Find("UIHealthBar(Clone)");
-            if (healthBar != null)
+            Transform hb = root.transform.Find("UIHealthBar(Clone)");
+            if (hb != null)
             {
-                healthBar.gameObject.SetActive(false);
+                hb.gameObject.SetActive(false);
             }
+
+            Transform effectGrid = root.transform.Find("UIEffectGrid(Clone)");
+            if (effectGrid != null)
+            {
+                effectGrid.gameObject.SetActive(false);
+            }
+
+            Transform shieldGrid = root.transform.Find("Shield(Clone)");
+            if (shieldGrid != null)
+            {
+                shieldGrid.gameObject.SetActive(false);
+            }            
         }
 
         private void UpdateRerollUI()
@@ -340,6 +354,25 @@ namespace StoryManager
             }
 
             unitNameLabel.text = string.IsNullOrEmpty(displayName) ? "???" : displayName;
+
+            if (archetypeLabel != null || statLabel != null)
+            {
+                if (currentPrefab != null)
+                {
+                    UnitObject uo = currentPrefab.GetComponent<UnitObject>();
+                    if (uo != null && uo.unitSO != null)
+                    {
+                        if (archetypeLabel != null)
+                        {
+                            archetypeLabel.text = uo.unitSO.eUnitArchetype.ToString();
+                        }
+                        if (statLabel != null)
+                        {
+                            statLabel.text = $"HP {uo.unitSO.hp}\nATK {uo.unitSO.attack}";
+                        }
+                    }
+                }
+            }
         }
     }
 }

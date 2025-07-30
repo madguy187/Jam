@@ -1,49 +1,70 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace StoryManager
 {
-
     public class HallNpcSpawner : MonoBehaviour
     {
-        [Header("Spawn Area (world units)")]
+        [Header("Spawn Settings")]
+        [SerializeField] private int pairCount = 3;
+        [SerializeField] private int rowCount = 2;
+        [SerializeField] private float rowSpacing = 1.2f;
+        [SerializeField] private float rowHeightFactor = 1.6f;
         [SerializeField] private float minX = -6f;
         [SerializeField] private float maxX = 6f;
-        [SerializeField] private float y = 1f;
-        [SerializeField] private float minY = 1f;
-        [SerializeField] private float maxY = 2.5f;
-
-        [Header("Spawn Settings")]
-        [SerializeField, Range(1, 10)] private int pairCount = 3;
-        [SerializeField] private float pairSpacing = 0.8f; 
-        [SerializeField] private float pairPadding = 1f;   
+        [SerializeField] private float spacing = 1.0f;
+        [SerializeField] private bool alignToPlayerDeckY = true;
+        [SerializeField] private float fixedY = -3.8f;
 
         private void Start()
         {
-            float segmentWidth = (maxX - minX) / pairCount;
-            for (int i = 0; i < pairCount; i++)
+            SpawnNpcPairs();
+        }
+
+        private void SpawnNpcPairs()
+        {
+            if (pairCount <= 0 || rowCount <= 0) return;
+            if (ResourceManager.instance == null) return;
+
+            float baseY = fixedY;
+
+            for (int row = 0; row < rowCount; row++)
             {
-                float segStart = minX + i * segmentWidth + pairPadding;
-                float segEnd = minX + (i + 1) * segmentWidth - pairPadding - pairSpacing;
-                if (segEnd <= segStart) continue;
+                float yPos = baseY + rowSpacing * rowHeightFactor * row;
+                float step = (maxX - minX) / Mathf.Max(1, pairCount); 
 
-                float centerX = Random.Range(segStart, segEnd);
-                float yPos = Random.Range(minY, maxY);
+                for (int i = 0; i < pairCount; i++)
+                {
+                    float centreX = minX + step * (i + 0.5f) + Random.Range(-step * 0.3f, step * 0.3f);
+                    float halfGap = spacing * 0.55f; 
 
-                Vector3 leftPos = new Vector3(centerX - pairSpacing * 0.5f, yPos, 0f);
-                Vector3 rightPos = new Vector3(centerX + pairSpacing * 0.5f, yPos, 0f);
+                    // Left NPC faces right
+                    Vector3 leftPos = new Vector3(centreX - halfGap, yPos, 0f);
+                    SpawnSingleNpc(leftPos, faceRight: true);
 
-                Spawn(leftPos, faceRight: true);  
-                Spawn(rightPos, faceRight: false); 
+                    // Right NPC aces left
+                    Vector3 rightPos = new Vector3(centreX + halfGap, yPos, 0f);
+                    SpawnSingleNpc(rightPos, faceRight: false);
+                }
             }
         }
 
-        private void Spawn(Vector3 position, bool faceRight)
+        private void SpawnSingleNpc(Vector3 worldPos, bool faceRight)
         {
-            GameObject go = new GameObject("HallNPC");
-            go.transform.SetParent(transform);
-            go.transform.position = position;
-            var spawn = go.AddComponent<HallNpc>();
-            spawn.faceRight = faceRight;
+            string unitName = ResourceManager.instance.Debug_RandUnit();
+            if (string.IsNullOrEmpty(unitName)) return;
+
+            GameObject prefab = ResourceManager.instance.GetUnit(unitName);
+            if (prefab == null) return;
+
+            UnitObject unit = ResourceManager.instance.CreateUnit(prefab, isEnemy: false);
+            if (unit == null) return;
+
+            unit.transform.position = worldPos;
+            Vector3 scale = unit.transform.localScale;
+            scale.x = Mathf.Abs(scale.x) * (faceRight ? -1f : 1f);
+            unit.transform.localScale = scale;
+            unit.gameObject.AddComponent<HallNpc>();
         }
     }
-} 
+}

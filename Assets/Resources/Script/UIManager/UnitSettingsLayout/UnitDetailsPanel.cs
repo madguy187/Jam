@@ -59,12 +59,42 @@ public class UnitDetailsPanel : MonoBehaviour
     public string GetAnyUnitDetails(UnitObject unit) 
     {
         if (unit == null) return "NULL";
-        return "";
-        // return $"Lv {unit.level}\n" +
-        //        $"HP: {unit.currentHP} / {unit.maxHP}\n" +
-        //        $"ATK: {unit.attack}\n" +
-        //        $"DEF: {unit.defense}\n" +
-        //        $"Relics: {unit.equippedRelics.Count}";
+
+        HashSet<EffectType> uniqueTypes = new HashSet<EffectType>();
+
+        void AddFromList(EffectList list)
+        {
+            if (list == null || !list.IsValid()) return;
+            foreach (EffectScriptableObject eff in list)
+            {
+                if (eff == null) continue;
+                uniqueTypes.Add(eff.GetEffectType());
+            }
+        }
+
+        // Gather from all effect lists defined in UnitObject
+        /*AddFromList(unit._listSingleEffect);
+        AddFromList(unit._listHorizontalEffect);
+        AddFromList(unit._listDiagonalEffect);
+        AddFromList(unit._listZigZagEffect);
+        AddFromList(unit._listXShapeEffect);
+        AddFromList(unit._listFullGridEffect);*/
+
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        foreach (EffectType eType in uniqueTypes)
+        {
+            EffectDetailScriptableObject detail = ResourceManager.instance.GetEffectDetail(eType);
+            if (detail != null && !string.IsNullOrEmpty(detail.strDescription))
+            {
+                sb.AppendLine(detail.strDescription);
+            }
+            else
+            {
+                sb.AppendLine(eType.ToString());
+            }
+        }
+
+        return sb.ToString();
     }
 
     public UnitObject GetCurrentUnit() => currentUnit;

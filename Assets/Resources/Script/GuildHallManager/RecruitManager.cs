@@ -156,8 +156,13 @@ namespace StoryManager
                     continue;
                 }
 
-                if (prefab.GetComponent<UnitObject>() == null)
-                {
+                UnitObject uo = prefab.GetComponent<UnitObject>();
+                if (uo == null) {
+                    continue;
+                }
+
+                // Filter by tier, only tier 1 and 2
+                if (uo.unitSO != null && uo.unitSO.eTier == eUnitTier.STAR_3) {
                     continue; 
                 }
 
