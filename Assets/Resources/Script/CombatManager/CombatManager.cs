@@ -165,6 +165,10 @@ public class CombatManager : MonoBehaviour {
         }
     }
 
+    public bool IsRunning() {
+        return _state != eCombatState.WAIT;
+    }
+
     bool _CanBattle() {
         return _state == eCombatState.WAIT;
     }

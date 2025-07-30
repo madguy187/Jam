@@ -394,22 +394,16 @@ public class SkillSlotMachine : MonoBehaviour
         }
 
         isEnemyTurn = true;
-
-        // Disable buttons during enemy turn
         SetButtonsInteractable(false);
-
-        StartCoroutine(ExecuteEnemyTurn());
+        StartCoroutine(ExecuteFullCombatRoutine());
     }
 
     private void ProcessPlayerTurnCombat()
     {
         if (lastSpinResult == null) return;
-        
-        List<Match> currentMatches = lastSpinResult.GetAllMatches();
-        foreach (Match match in currentMatches)
-        {
-            ExecutePlayerCombat(match);
-        }
+        List<Match> matches = lastSpinResult.GetAllMatches();
+        if (matches.Count == 0) return;
+        CombatManager.instance.StartBattleLoop(matches);
     }
 
     private void ExecutePlayerCombat(Match match)
@@ -436,6 +430,18 @@ public class SkillSlotMachine : MonoBehaviour
         }
     }
 
+    private IEnumerator WaitPlayerCombatThenEnemy()
+    {
+        // Wait until CombatManager finishes current battle loop
+        while (CombatManager.instance != null && CombatManager.instance.IsRunning())
+            yield return null;
+
+        // Small buffer to let animations settle
+        yield return new WaitForSeconds(0.3f);
+
+        yield return ExecuteEnemyTurn();
+    }
+
     private IEnumerator ExecuteEnemyTurn()
     {
         Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
@@ -445,44 +451,116 @@ public class SkillSlotMachine : MonoBehaviour
         SymbolType[] symbols = SymbolGenerator.instance.GenerateSymbolsForDeck(enemyDeck);
 
         SpinMode previousMode = spinMode;
-        // enemy spin should not trigger player combat
-        spinMode = SpinMode.PreviewOnly;
+        spinMode = SpinMode.PreviewOnly;       
 
         if (enemyVisualSpin)
         {
-            // run visual spin with preset symbols
-            yield return SpinWithPresetSymbols(symbols);
+            yield return SpinWithPresetSymbols(symbols);  
         }
         else
         {
-            //  process results immediately without visual spin
-            ProcessSpinResults(symbols);
+            ProcessSpinResults(symbols);                 
         }
 
-        // restore original mode for subsequent player actions
+        // restore player setting
         spinMode = previousMode;
 
-        // Show pop-ups summarising enemy roll
+        // Show pop-ups first (uses lastSpinResult)
         ShowEnemyRollPopups(enemyDeck);
 
-        ProcessEnemyTurnCombat();
+        // Run enemy combat via CombatManager
+        if (lastSpinResult != null && lastSpinResult.GetAllMatches().Count > 0)
+            CombatManager.instance.StartBattleLoop(lastSpinResult.GetAllMatches());
 
-        yield return new WaitForSeconds(1f);
+        // Wait until combat finishes
+        while (CombatManager.instance != null && CombatManager.instance.IsRunning())
+            yield return null;
 
-        isEnemyTurn = false;
+        yield return new WaitForSeconds(0.3f); 
+    }
+
+    public void ExecuteFullCombat()
+    {
+        if (isEnemyTurn || IsRolling()) return;
+        // lock UI immediately
+        SetButtonsInteractable(false);
+        StartCoroutine(ExecuteFullCombatRoutine());
+    }
+
+    // ---------------- NEW Combat coroutine ----------------
+    private IEnumerator ExecuteFullCombatRoutine()
+    {
+        // 1. capture player matches from previous spin
+        if (lastSpinResult == null)
+        {
+            yield break;
+        }
+        List<Match> playerMatches = new List<Match>(lastSpinResult.GetAllMatches());
+
+        // 2. generate enemy symbols & matches immediately
+        Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+        SymbolType[] enemySymbols = SymbolGenerator.instance.GenerateSymbolsForDeck(enemyDeck);
+
+        List<Match> enemyMatches = BuildMatchesFromSymbols(enemySymbols);
+
+        // create a new SpinResult so pop-ups use enemy matches
+        lastSpinResult = new SpinResult(enemyMatches, 0);
+        ShowEnemyRollPopups(enemyDeck);
+
+        // 3. assign UnitName for roll resolution
+        AssignMatchUnitNames(playerMatches, eDeckType.PLAYER);
+        AssignMatchUnitNames(enemyMatches,  eDeckType.ENEMY);
+
+        // 4. merge lists and run single battle loop
+        List<Match> all = new List<Match>(playerMatches.Count + enemyMatches.Count);
+        all.AddRange(playerMatches);
+        all.AddRange(enemyMatches);
+
+        CombatManager.instance.StartBattleLoop(all);
+
+        // 5. wait until combat manager finishes
+        while (CombatManager.instance.IsRunning())
+            yield return null;
+
         spinsThisTurn = 0;
-
-        // Player turn back – enable buttons
         SetButtonsInteractable(true);
     }
 
-    private void ProcessEnemyTurnCombat()
+    // helper builds matches without side-effects
+    private List<Match> BuildMatchesFromSymbols(SymbolType[] symbols)
     {
-        if (lastSpinResult == null) return;
-        List<Match> matches = lastSpinResult.GetAllMatches();
-        foreach (Match match in matches)
+        SlotGrid grid = new SlotGrid(3,3);
+        for (int i = 0; i < 9; i++)
         {
-            ExecuteEnemyCombat(match);
+            int row = i / 3;
+            int col = i % 3;
+            grid.SetSlot(row,col, symbols[i]);
+        }
+        MatchDetector det = new MatchDetector(grid);
+        List<Match> matches = det.DetectMatches();
+        foreach (var m in matches)
+            m.SetArchetype(SymbolGenerator.GetArchetypeForSymbol(m.GetSymbol()));
+        return matches;
+    }
+
+    private void AssignMatchUnitNames(List<Match> matches, eDeckType deckType)
+    {
+        Deck deck = DeckManager.instance.GetDeckByType(deckType);
+        foreach (var m in matches)
+        {
+            string picked = null;
+            foreach (UnitObject u in deck)
+            {
+                if (u == null || u.IsDead()) continue;
+                // fallback first alive
+                if (picked == null) picked = u.unitSO.unitName; 
+                if (u.unitSO.eUnitArchetype == m.GetArchetype())
+                {
+                    picked = u.unitSO.unitName;
+                    break;
+                }
+            }
+            m.SetUnitName(picked);
         }
     }
 
@@ -618,7 +696,7 @@ public class SkillSlotMachine : MonoBehaviour
         ExecuteCombat(false);
     }
 
-    public void ExecuteFullCombat()
+    public void ExecuteFullCombatButton()
     {
         ExecuteCombat(true);
     }
