@@ -94,11 +94,17 @@ public class CombatManager : MonoBehaviour {
         List<UnitObject> listPlayerUnit = DeckHelperFunc.GetAllAliveUnit(DeckManager.instance.GetDeckByType(eDeckType.PLAYER));
         List<UnitObject> listEnemyUnit = DeckHelperFunc.GetAllAliveUnit(DeckManager.instance.GetDeckByType(eDeckType.ENEMY));
         if (listPlayerUnit.Count <= 0) {
+            Deck cPlayerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
+            cPlayerDeck.DestroyAllUnit();
+            Deck cEnemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+            cEnemyDeck.DestroyAllUnit();
             sceneNameOnFinish = "Game_MainMenu";
             UIFade.instance.FadeOut(2.0f);
             UIFade.instance.SetOnFadeFinish(_SceneChangeFunc);
         }
         else if (listEnemyUnit.Count <= 0) {
+            Deck cEnemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+            cEnemyDeck.DestroyAllUnit();
             sceneNameOnFinish = "Game_Map";
             UIFade.instance.SetOnFadeFinish(_SceneChangeFunc);
         }
@@ -399,6 +405,7 @@ public class CombatManager : MonoBehaviour {
         _ActivatePostEffect(cAttackerUnit, fAttack);
 
         ResourceManager.instance.GenerateDynamicText(cDefenderUnit.transform.position, fAttack.ToString());
+        AudioManager.instance.Play("Attack");
 
         Global.DEBUG_PRINT("Final Damage=" + fAttack);
     }

@@ -8,8 +8,8 @@ public class AudioManager : MonoBehaviour
     public static AudioManager instance = null;
 
     public enum EssentialAudio {
-        Alarm,
-        Submarine
+        Main,
+        Combat,
     }
 
     [Serializable]
@@ -144,7 +144,7 @@ public class AudioManager : MonoBehaviour
         }
         m_vecAudioComp.Clear();
 
-        StopEssential(EssentialAudio.Alarm);
-        StopEssential(EssentialAudio.Submarine);
+        StopEssential(EssentialAudio.Main);
+        StopEssential(EssentialAudio.Combat);
     }
 }

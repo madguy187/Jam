@@ -30,8 +30,7 @@ public class DeckManager : MonoBehaviour {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-    {
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
         // This function will be called every time a scene is loaded.
         // You can add logic here based on the loaded scene's name or build index.
         Debug.Log("Scene " + scene.name + " loaded in mode: " + mode);
@@ -40,7 +39,12 @@ public class DeckManager : MonoBehaviour {
 
         // Example: Perform actions only for a specific scene
         if (scene.name == "Game") {
+            AudioManager.instance.StopEssential(AudioManager.EssentialAudio.Main);
+            AudioManager.instance.PlayEssential(AudioManager.EssentialAudio.Combat);
             EnemyManager.instance.PopulateMobBasedOnNodeType();
+        } else {
+            AudioManager.instance.StopEssential(AudioManager.EssentialAudio.Combat);
+            AudioManager.instance.PlayEssential(AudioManager.EssentialAudio.Main);
         }
     }
 

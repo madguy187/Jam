@@ -8,6 +8,7 @@ public class UIMainMenu : MonoBehaviour {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start() {
         btnStart.onClick.AddListener(StartGame);
+        AudioManager.instance.PlayEssential(AudioManager.EssentialAudio.Main);
     }
 
     void StartGame() {
