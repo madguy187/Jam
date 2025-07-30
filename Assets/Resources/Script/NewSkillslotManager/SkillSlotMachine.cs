@@ -47,6 +47,7 @@ public class SkillSlotMachine : MonoBehaviour
     [SerializeField] private bool previewSpin;
     [SerializeField] private bool playerCombatSpin;
     [SerializeField] private bool fullCombatSpin;
+    private bool victoryPopupShown = false;
 
     private void Awake()
     {
@@ -98,6 +99,14 @@ public class SkillSlotMachine : MonoBehaviour
             fullCombatSpin = false;
             spinMode = SpinMode.PlayerAndEnemy;
             Spin();
+        }
+
+        if (CheckAllEnemiesDead())
+        {
+            Global.DEBUG_PRINT("[SkillSlotMachine] All enemies dead, player wins!");
+            GoldManager.instance.OnVictory();
+            SetButtonsInteractable(false);
+            return;
         }
     }
 
@@ -399,14 +408,6 @@ public class SkillSlotMachine : MonoBehaviour
 
         GoldManager.instance.CalculateInterest();
 
-        if (CheckAllEnemiesDead())
-        {
-            Global.DEBUG_PRINT("[SkillSlotMachine] All enemies dead, player wins!");
-            GoldManager.instance.OnVictory();
-            SetButtonsInteractable(false);
-            return;
-        }
-
         isEnemyTurn = true;
         SetButtonsInteractable(false);
         StartCoroutine(ExecuteFullCombatRoutine());
@@ -512,9 +513,6 @@ public class SkillSlotMachine : MonoBehaviour
             m.SetUnitName(picked);
         }
     }
-
-
-    private bool victoryPopupShown = false;
 
     private bool CheckAllEnemiesDead()
     {
