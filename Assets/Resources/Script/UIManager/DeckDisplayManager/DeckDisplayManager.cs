@@ -11,6 +11,8 @@ public class DeckDisplayManager : MonoBehaviour
 
     private List<UnitObject> lastUnits = new List<UnitObject>();
     private List<GameObject> deckBoxes = new List<GameObject>();
+    private List<RenderTexture> deckTextures = new List<RenderTexture>();
+    private List<GameObject> deckCameras = new List<GameObject>(); // Store camera objects
 
     void Awake() 
     {
@@ -56,6 +58,24 @@ public class DeckDisplayManager : MonoBehaviour
             deckBoxes.Clear();
         }
 
+        if (deckTextures != null) {
+            foreach (var tex in deckTextures) {
+                if (tex != null) {
+                    tex.Release();
+                    Destroy(tex);
+                }
+            }
+            deckTextures.Clear();
+        }
+
+        if (deckCameras != null) {
+            foreach (var camObj in deckCameras) {
+                if (camObj != null)
+                    Destroy(camObj);
+            }
+            deckCameras.Clear();
+        }
+
         if (units != null) {
             foreach (UnitObject unit in units) {
                 if (unit == null) { continue; }
@@ -63,9 +83,18 @@ public class DeckDisplayManager : MonoBehaviour
                 GameObject box = Instantiate(deckBoxPrefab, deckPanel);
                 if (box == null) { continue; }
 
-                Image rawImg = box.GetComponent<Image>();
+                RawImage rawImg = box.GetComponent<RawImage>();
                 if (rawImg != null) {
-                    rawImg.sprite = RenderUnitToSprite(unit);
+                    RenderTexture tex;
+                    GameObject camObj;
+                    (tex, camObj) = RenderUnitToTexture(unit);
+                    if (tex != null) {
+                        rawImg.texture = tex;
+                        deckTextures.Add(tex);
+                    }
+                    if (camObj != null) {
+                        deckCameras.Add(camObj);
+                    }
                 }
                 deckBoxes.Add(box);
             }
@@ -74,19 +103,67 @@ public class DeckDisplayManager : MonoBehaviour
 
     public static Sprite RenderUnitToSprite(UnitObject unit) 
     {
-        RenderTexture tex;
-        GameObject camObj;
-        var unitRoot = unit.transform.Find("UnitRoot");
-        if (unitRoot == null) {
-            Global.DEBUG_PRINT("[DeckDisplayManager::GetUnitSprite] UnitRoot not found on unitPrefab!");
-            GameObject.DestroyImmediate(unit);
-            return null; // Or handle error properly
-        }
-        (tex, camObj) = RenderUtilities.RenderUnitToTexture(unitRoot.gameObject, 1.0f);
-        Sprite sprite = RenderUtilities.ConvertRenderTextureToSprite(tex);
-        Destroy(camObj);
-        Destroy(tex);
+        var (rt, cam) = RenderUnitToTexture(unit);
+        Texture2D tex = rt.ToTexture2D();
+        Sprite sprite = Sprite.Create(tex, new Rect(0, 0, rt.width, rt.height), new Vector2(0.5f, 0.5f));
+
+        // Clean up render texture
+        rt.Release();
+        Destroy(rt);
+        Destroy(cam);
+
         return sprite;
+    }
+
+    // Return both RenderTexture and camera GameObject
+    public static (RenderTexture, GameObject) RenderUnitToTexture(UnitObject unit) 
+    {
+        // Create a preview layer (e.g., Layer 31 in Unity)
+        int previewLayer = 31; // Make sure this layer exists in your project
+
+        var unitRoot = unit.transform.Find("UnitRoot");
+        var unitRootGameObject = unitRoot != null ? unitRoot.gameObject : unit.gameObject;
+
+        // Store original layer
+        int originalLayer = unitRootGameObject.layer;
+
+        // Set unit and all children to preview layer
+        SetLayerRecursively(unitRootGameObject, previewLayer);
+
+        GameObject camObj = new GameObject("UnitPreviewCamera");
+        Camera cam = camObj.AddComponent<Camera>();
+        cam.clearFlags = CameraClearFlags.Color;
+        cam.backgroundColor = Color.clear;
+        cam.orthographic = true;
+
+        RenderTexture rt = new RenderTexture(256, 256, 16);
+        cam.targetTexture = rt;
+
+        cam.transform.position = unit.transform.position + new Vector3(0, 0, -10);
+        cam.orthographicSize = 1.5f;
+
+        // Only render the preview layer
+        cam.cullingMask = 1 << previewLayer;
+
+        cam.Render();
+
+        // Restore original layer
+        SetLayerRecursively(unitRootGameObject, originalLayer);
+
+        cam.enabled = false;
+        camObj.SetActive(false);
+
+        return (rt, camObj);
+    }
+
+    // Helper to set layer recursively
+    static void SetLayerRecursively(GameObject obj, int newLayer)
+    {
+        obj.layer = newLayer;
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, newLayer);
+        }
     }
 
     // Uncomment if you want to use individual sprite logic (e.g. Head sprite)
