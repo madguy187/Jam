@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unitName: Paladin
   unitDescription: This is a unit description
-  unitCost: 0
   eTier: 0
   eUnitArchetype: 1
   hp: 48

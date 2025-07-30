@@ -18,3 +18,5 @@ MonoBehaviour:
   spriteRelic: {fileID: 21300000, guid: cca135a9c83c74e40a8fd94e124c09a2, type: 3}
   listEffect:
   - {fileID: 11400000, guid: 2cd5e4fdb1e35ce449f1744256d30327, type: 2}
+  rarity: 0
+  listCombination: []

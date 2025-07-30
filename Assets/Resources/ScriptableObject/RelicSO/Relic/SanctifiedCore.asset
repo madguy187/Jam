@@ -19,3 +19,7 @@ MonoBehaviour:
   listEffect:
   - {fileID: 11400000, guid: 01592fc07ffe64f4eb4607c430ace46a, type: 2}
   - {fileID: 11400000, guid: 4c3fe387db87c774daaba7673947e1b9, type: 2}
+  rarity: 2
+  listCombination:
+  - ProtectivePulse
+  - ReinforcedBattery

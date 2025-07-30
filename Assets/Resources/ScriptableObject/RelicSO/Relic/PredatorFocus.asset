@@ -19,3 +19,7 @@ MonoBehaviour:
   listEffect:
   - {fileID: 11400000, guid: 723a16632efc54d4bb4c9070dc92d71a, type: 2}
   - {fileID: 11400000, guid: 2599b7b3799bfa3429e604ad7e0bf555, type: 2}
+  rarity: 1
+  listCombination:
+  - LightFeather
+  - MagicCore

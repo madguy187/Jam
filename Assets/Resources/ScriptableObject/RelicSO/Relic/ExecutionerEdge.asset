@@ -19,3 +19,7 @@ MonoBehaviour:
   listEffect:
   - {fileID: 11400000, guid: 3be051f45d3eeca45be32a380d5fbb3e, type: 2}
   - {fileID: 11400000, guid: 2458f7a3c29bf0846ab69686ae95cf68, type: 2}
+  rarity: 1
+  listCombination:
+  - IronShard
+  - LightFeather
