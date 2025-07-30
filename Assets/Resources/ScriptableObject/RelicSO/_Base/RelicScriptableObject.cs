@@ -37,9 +37,15 @@ public class RelicScriptableObject : ScriptableObject, IEnumerable<EffectScripta
         return spriteRelic;
     }
 
-    public int GetRelicCost() 
-    {
-        return relicCost;
+    public int GetRelicCost() {
+        switch (GetRarity()) {
+            case ForgeRelicRarity.Basic:
+                return 8;
+            case ForgeRelicRarity.Advanced:
+                return 15;
+        }
+
+        return 0;
     }
 
     public ForgeRelicRarity GetRarity() {

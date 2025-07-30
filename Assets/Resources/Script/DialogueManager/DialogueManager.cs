@@ -27,6 +27,7 @@ public class DialogueManager : MonoBehaviour
         foreach (char c in lines[currentLine])
         {
             dialogueText.text += c;
+            AudioManager.instance.Play("Typing");
             yield return new WaitForSeconds(typingSpeed);
         }
     }

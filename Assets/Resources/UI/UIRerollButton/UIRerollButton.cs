@@ -32,10 +32,10 @@ public class UIRerollButton : MonoBehaviour
             button.onClick.RemoveListener(OnClick);
         }
     }
-    
-    private void OnClick()
-    {
+
+    private void OnClick() {
         SkillSlotMachine.instance.TriggerPreviewSpin();
+        AudioManager.instance.Play("SpinSound");
     }
     
     public void TriggerRoll()
