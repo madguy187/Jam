@@ -104,7 +104,7 @@ public class SkillSlotGrid : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log("[SkillSlotGrid] Starting initialization");
+        Global.DEBUG_PRINT("[SkillSlotGrid] Starting initialization");
         
         if (slotColumnContainer == null)
         {
@@ -127,7 +127,7 @@ public class SkillSlotGrid : MonoBehaviour
             return;
         }
         slotImages.AddRange(images);
-        Debug.Log($"[SkillSlotGrid] Found {slotImages.Count} slot images");
+        Global.DEBUG_PRINT($"[SkillSlotGrid] Found {slotImages.Count} slot images");
 
         // distance from centre of one slot to the next
         slotSpacing      = slotHeight + spacing;        
@@ -153,7 +153,7 @@ public class SkillSlotGrid : MonoBehaviour
         // Always cache from player deck – enemy no longer spins
         eDeckType deckType = eDeckType.PLAYER;
 
-        Debug.Log($"[SkillSlotGrid] Caching units for {deckType} turn");
+        Global.DEBUG_PRINT($"[SkillSlotGrid] Caching units for {deckType} turn");
 
         Deck deck = DeckManager.instance.GetDeckByType(deckType);
         if (deck == null)
@@ -168,11 +168,11 @@ public class SkillSlotGrid : MonoBehaviour
             if (unit != null && !unit.IsDead())
             {
                 cachedUnits.Add(unit);
-                // Debug.Log($"[SkillSlotGrid] Added unit to cache: {unit.unitSO.unitName}");
+                // Global.DEBUG_PRINT($"[SkillSlotGrid] Added unit to cache: {unit.unitSO.unitName}");
             }
         }
 
-        // Debug.Log($"[SkillSlotGrid] Cached {cachedUnits.Count} units for {deckType}");
+        // Global.DEBUG_PRINT($"[SkillSlotGrid] Cached {cachedUnits.Count} units for {deckType}");
         return cachedUnits.Count > 0;
     }
 

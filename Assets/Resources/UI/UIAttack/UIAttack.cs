@@ -21,17 +21,25 @@ public class UIAttack : MonoBehaviour
         }
 
         button.onClick.AddListener(OnAttackClicked);
+        Debug.Log($"[UIAttack] Awake. Initial button interactable = {button.interactable}");
     }
 
     private void OnAttackClicked()
     {
-        SkillSlotMachine.instance.ExecuteFullCombatButton();
+        var sm = SkillSlotMachine.instance;
+        if (sm == null) return;
+        if (!sm.CanAttack()) return;
+        sm.ExecuteFullCombatButton();
     }
 
     public void SetInteractable(bool interactable)
     {
+        if (button == null) return;
         button.interactable = interactable;
+        Debug.Log($"[UIAttack] SetInteractable({interactable}) called. Button state now: {button.interactable}");
     }
+
+    public bool IsInteractable() => button != null && button.interactable;
 
     private void OnDestroy()
     {
