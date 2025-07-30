@@ -67,7 +67,7 @@ public class SymbolGenerator : MonoBehaviour
     {
         if (grid == null) return;
         
-        Debug.Log("[SymbolGenerator] Starting to fill grid with random symbols");
+        Global.DEBUG_PRINT("[SymbolGenerator] Starting to fill grid with random symbols");
         
         UpdateProbabilities();
         
@@ -78,12 +78,12 @@ public class SymbolGenerator : MonoBehaviour
             for (int col = 0; col < 3; col++) 
             {
                 SymbolType symbol = GenerateRandomSymbol();
-                Debug.Log($"[SymbolGenerator] Setting position ({row}, {col}) to {symbol}");
+                Global.DEBUG_PRINT($"[SymbolGenerator] Setting position ({row}, {col}) to {symbol}");
                 grid.SetSlot(row, col, symbol);
             }
         }
 
-        Debug.Log("[SymbolGenerator] Finished filling grid");
+        Global.DEBUG_PRINT("[SymbolGenerator] Finished filling grid");
     }
 
     public SymbolType[] GenerateSymbolsForDeck(Deck deck)
