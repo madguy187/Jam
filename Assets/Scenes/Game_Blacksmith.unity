@@ -1569,6 +1569,7 @@ MonoBehaviour:
   bagContainer: {fileID: 1975973305}
   bagSlotPrefab: {fileID: 9127127546863566636, guid: 38869c19c1bd6c743bbcd939e66d25a1, type: 3}
   relicItemPrefab: {fileID: 3687713428111328508, guid: 1db7df42425398142be8aa407cc0f50f, type: 3}
+  resultItemPrefab: {fileID: 3687713428111328508, guid: 2b30bc0100f279141a6524a50c46b793, type: 3}
   bagSize: 100
   goldText: {fileID: 1845646797}
   forgeArea: {fileID: 2011510964}
