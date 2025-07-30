@@ -232,6 +232,7 @@ public class ForgeManager : MonoBehaviour
 
             var image = relicGO.transform.Find("RelicImage").GetComponent<Image>();
             var label = relicGO.transform.Find("RelicNameText").GetComponent<TMP_Text>();
+            relicGO.GetComponent<ToolTipDetails>().Init(relicData.GetRelicName(), relicData.GetRelicDescription());
             image.sprite = relicData.GetRelicSprite();
             label.text = relicData.GetRelicName();
             relicGO.GetComponent<DraggableRelic>().relicData = relicData;

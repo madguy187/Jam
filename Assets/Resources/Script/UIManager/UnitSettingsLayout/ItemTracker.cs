@@ -16,7 +16,7 @@ public class ItemTracker : MonoBehaviour {
     [Header("Limits")]
     [SerializeField] public int maxUnits = 5; // For UnitContainer
     [SerializeField] public int maxRelics = 15; // For RelicContainer
-    [SerializeField] public int maxItems = 40; // For BagContainer (combined units + relics)
+    [SerializeField] public int maxItems = 100; // For BagContainer (combined units + relics)
     [SerializeField] public int maxRevive = 1; // For revival (units)
 
     [Header("Debug Info")]
