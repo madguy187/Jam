@@ -216,23 +216,37 @@ public class PanelManager : MonoBehaviour
     private void UpdateSkillBoxes(UnitObject unit)
     {
         if (skillBoxes == null || skillBoxes.Length == 0) return;
-        if (unit?.unitSO == null) return;
+        if (unit == null) return;
 
         foreach (var skillBox in skillBoxes)
         {
-            if (skillBox != null)
+            if (skillBox == null) continue;
+
+            MatchType mt = skillBox.GetMatchType();
+            EffectList list = unit.GetRollEffectList(mt);
+
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            if (list != null && list.IsValid())
             {
-                string description = unit.unitSO.GetSkillDescription(skillBox.GetMatchType());
-                if (!string.IsNullOrEmpty(description))
+                HashSet<EffectType> unique = new HashSet<EffectType>();
+                foreach (EffectScriptableObject eff in list)
                 {
-                    skillBox.SetupForUnit(description, 0);
-                    skillBox.gameObject.SetActive(true);
+                    if (eff == null) continue;
+                    unique.Add(eff.GetEffectType());
                 }
-                else
+
+                foreach (EffectType et in unique)
                 {
-                    skillBox.gameObject.SetActive(false);
+                    EffectDetailScriptableObject detail = ResourceManager.instance.GetEffectDetail(et);
+                    sb.AppendLine(detail != null && !string.IsNullOrEmpty(detail.strDescription)
+                        ? detail.strDescription
+                        : et.ToString());
                 }
             }
+
+            string desc = sb.Length > 0 ? sb.ToString() : "—";
+            skillBox.SetupForUnit(desc, 0);
+            skillBox.gameObject.SetActive(true);
         }
     }
 
