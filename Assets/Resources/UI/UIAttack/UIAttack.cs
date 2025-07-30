@@ -23,8 +23,7 @@ public class UIAttack : MonoBehaviour
         button.onClick.AddListener(OnAttackClicked);
     }
 
-    private void OnAttackClicked()
-    {
+    private void OnAttackClicked() {
         SkillSlotMachine.instance.ExecuteFullCombatButton();
     }
 
