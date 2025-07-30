@@ -19,3 +19,7 @@ MonoBehaviour:
   listEffect:
   - {fileID: 11400000, guid: 86cf1a5ee9778e04387b610af462134d, type: 2}
   - {fileID: 11400000, guid: b20a203df7964794192ed2a2e26535e6, type: 2}
+  rarity: 1
+  listCombination:
+  - IronShard
+  - DemonClaw

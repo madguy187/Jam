@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro; // At the top
 
 public enum ForgeRelicRarity
 {
+    Basic,
     Advanced,
     Legendary
 }
@@ -13,6 +15,8 @@ public class RelicCombiner : MonoBehaviour
     private Dictionary<RelicScriptableObject, (RelicScriptableObject part1, RelicScriptableObject part2, ForgeRelicRarity rarity)> breakMap;
 
     [SerializeField] private IReadOnlyDictionary<string, RelicScriptableObject> referenceRelics;
+
+    public TMP_Text forgeInfoTextUI;
 
     private class RelicPairComparer : IEqualityComparer<(RelicScriptableObject, RelicScriptableObject)>
     {
@@ -34,10 +38,11 @@ public class RelicCombiner : MonoBehaviour
         referenceRelics = ResourceManager.instance?.RelicSOMap;
         if (referenceRelics == null)
         {
-            Debug.LogError("Reference relics not found in ResourceManager.");
+            Global.DEBUG_PRINT("Reference relics not found in ResourceManager.");
             return;
         }
         BuildCombinationMap();
+        DisplayForgeInfo();
     }
 
     void BuildCombinationMap()
@@ -45,26 +50,21 @@ public class RelicCombiner : MonoBehaviour
         combinationMap = new Dictionary<(RelicScriptableObject, RelicScriptableObject), (RelicScriptableObject result, ForgeRelicRarity rarity)>(new RelicPairComparer());
         breakMap = new Dictionary<RelicScriptableObject, (RelicScriptableObject part1, RelicScriptableObject part2, ForgeRelicRarity rarity)>();
 
-        // foreach (var key in referenceRelics.Keys)
-        // {
-        //     Debug.Log("Loaded relic: " + key);
-        // }
-
         void AddComboAndBreak(string nameA, string nameB, string resultName, ForgeRelicRarity rarity)
         {
             if (!referenceRelics.ContainsKey(nameA))
             {
-                Debug.LogWarning($"[RelicCombiner::BuildCombinationMap] Missing relic from Resource Manager: {nameA}");
+                Global.DEBUG_PRINT($"[RelicCombiner::BuildCombinationMap] Missing relic from Resource Manager: {nameA}");
                 return;
             }
             if (!referenceRelics.ContainsKey(nameB))
             {
-                Debug.LogWarning($"[RelicCombiner::BuildCombinationMap] Missing relic from Resource Manager: {nameB}");
+                Global.DEBUG_PRINT($"[RelicCombiner::BuildCombinationMap] Missing relic from Resource Manager: {nameB}");
                 return;
             }
             if (!referenceRelics.ContainsKey(resultName))
             {
-                Debug.LogWarning($"[RelicCombiner::BuildCombinationMap] Missing relic from Resource Manager: {resultName}");
+                Global.DEBUG_PRINT($"[RelicCombiner::BuildCombinationMap] Missing relic from Resource Manager: {resultName}");
                 return;
             }
 
@@ -87,7 +87,7 @@ public class RelicCombiner : MonoBehaviour
         AddComboAndBreak("DemonClaw", "DemonClaw", "BloodrendClaw", ForgeRelicRarity.Advanced);
 
         // Advanced Relics Mixed-Merges
-        AddComboAndBreak("IronShard", "LightFeather", "Executioner’sEdge", ForgeRelicRarity.Advanced);
+        AddComboAndBreak("IronShard", "LightFeather", "ExecutionerEdge", ForgeRelicRarity.Advanced);
         AddComboAndBreak("IronShard", "HardenedShell", "Warplate", ForgeRelicRarity.Advanced);
         AddComboAndBreak("IronShard", "BlessedCharm", "VampiricBrand", ForgeRelicRarity.Advanced);
         AddComboAndBreak("IronShard", "MagicCore", "AssassinSigil", ForgeRelicRarity.Advanced);
@@ -115,6 +115,40 @@ public class RelicCombiner : MonoBehaviour
         AddComboAndBreak("NullField", "GreaterBlessing", "BlessedCircuit", ForgeRelicRarity.Legendary);
     }
 
+    public List<string> GetAllCombinationDescriptions()
+    {
+        List<string> descriptions = new List<string>();
+
+        foreach (var kvp in combinationMap)
+        {
+            var (a, b) = kvp.Key;
+            var (result, rarity) = kvp.Value;
+
+            // To prevent duplicate mirrored entries (A+B and B+A), only list when a name is lexicographically smaller
+            if (string.Compare(a.name, b.name) <= 0)
+            {
+                descriptions.Add($"{a.name} + {b.name} → {result.name} ({rarity})");
+            }
+        }
+
+        return descriptions;
+    }
+
+    public List<string> GetAllBreakDescriptions()
+    {
+        List<string> descriptions = new List<string>();
+
+        foreach (var kvp in breakMap)
+        {
+            var result = kvp.Key;
+            var (part1, part2, rarity) = kvp.Value;
+
+            descriptions.Add($"{result.name} → {part1.name} + {part2.name} ({rarity})");
+        }
+
+        return descriptions;
+    }
+
     public bool TryCombine(RelicScriptableObject a, RelicScriptableObject b, out RelicScriptableObject result)
     {
         if (combinationMap.TryGetValue((a, b), out var data))
@@ -124,6 +158,29 @@ public class RelicCombiner : MonoBehaviour
         }
         result = null;
         return false;
+    }
+
+    public void DisplayForgeInfo()
+    {
+        if (forgeInfoTextUI == null)
+        {
+            Global.DEBUG_PRINT("ForgeInfoTextUI not assigned.");
+            return;
+        }
+
+        var sb = new System.Text.StringBuilder();
+
+        sb.AppendLine("<b><size=24>Merge Combinations</size></b>");
+        foreach (var combo in GetAllCombinationDescriptions())
+            sb.AppendLine("• " + combo);
+
+        sb.AppendLine(); // Spacer
+
+        sb.AppendLine("<b><size=24>Break Combinations</size></b>");
+        foreach (var br in GetAllBreakDescriptions())
+            sb.AppendLine("• " + br);
+
+        forgeInfoTextUI.text = sb.ToString();
     }
 
     public ForgeRelicRarity? GetCombineRarity(RelicScriptableObject a, RelicScriptableObject b)

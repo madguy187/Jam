@@ -41,7 +41,7 @@ namespace Map
         {
             Map map = MapGenerator.GetMap(config);
             CurrentMap = map;
-            Debug.Log(map.ToJson());
+            Global.DEBUG_PRINT(map.ToJson());
             view.ShowMap(map);
         }
 

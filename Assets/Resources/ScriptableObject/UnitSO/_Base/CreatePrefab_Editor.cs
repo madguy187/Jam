@@ -33,6 +33,9 @@ public class CreatePrefabFromMenu {
 
     const string FOLDER_SEPARATOR = "/";
 
+    static Dictionary<string, List<string>> mapCombination = new Dictionary<string, List<string>>();
+    static Dictionary<string, ForgeRelicRarity> mapRarity = new Dictionary<string, ForgeRelicRarity>();
+
     [MenuItem("Assets/Create/Scriptable Object/LoadAll", priority = 11)]
     public static void LoadAllSO() {
         string[] folders = AssetDatabase.GetSubFolders(UNIT_SCRIPTABLE_FULL_PATH);
@@ -55,8 +58,6 @@ public class CreatePrefabFromMenu {
         foreach (string path in folders) {
             CreateRelic(Path.GetFileName(path));
         }
-
-        AssetDatabase.SaveAssets(); // Ensure changes are saved
         AssetDatabase.Refresh(); // Refresh the Project window to show the new asset
     }
 
@@ -224,9 +225,115 @@ public class CreatePrefabFromMenu {
         List<EffectScriptableObject> effects = Resources.LoadAll<EffectScriptableObject>(relic_effect_path).ToList();
         relicSO.SetEffectList(effects);
 
+        ForgeRelicRarity rarity = GetRarity(relicName);
+        relicSO.SetRarity(rarity);
+        if (rarity != ForgeRelicRarity.Basic) {
+            relicSO.SetListCombination(GetCombination(relicName));
+        }
+
         EditorUtility.SetDirty(relicSO);
+        AssetDatabase.SaveAssets(); // Ensure changes are saved
     }
 
+    static List<string> GetCombination(string relicName) {
+        if (mapCombination.Count <= 0) {
+            mapCombination = new Dictionary<string, List<string>>() {
+                { "SharpenedBlade", new List<string>() { "IronShard", "IronShard" } },
+                { "SkyDagger", new List<string>() { "LightFeather", "LightFeather" } },
+                { "ReflectiveCore", new List<string>() { "HardenedShell", "HardenedShell" } },
+                { "ReinforcedBattery", new List<string>() { "MagicCore", "MagicCore" } },
+                { "GreaterBlessing", new List<string>() { "BlessedCharm", "BlessedCharm" } },
+                { "TrueInvisibility", new List<string>() { "PhantomInk", "PhantomInk" } },
+                { "BloodrendClaw", new List<string>() { "DemonClaw", "DemonClaw" } },
+                { "ExecutionerEdge", new List<string>() { "IronShard", "LightFeather" } },
+                { "Warplate", new List<string>() { "IronShard", "HardenedShell" } },
+                { "VampiricBrand", new List<string>() { "IronShard", "BlessedCharm" } },
+                { "AssassinSigil", new List<string>() { "IronShard", "MagicCore" } },
+                { "BrutalSaber", new List<string>() { "IronShard", "DemonClaw" } },
+                { "BlessedFang", new List<string>() { "LightFeather", "BlessedCharm" } },
+                { "ShadowWings", new List<string>() { "LightFeather", "PhantomInk" } },
+                { "PredatorFocus", new List<string>() { "LightFeather", "MagicCore" } },
+                { "SteelFrame", new List<string>() { "HardenedShell", "MagicCore" } },
+                { "IronVeil", new List<string>() { "HardenedShell", "PhantomInk" } },
+                { "CrimsonPlating", new List<string>() { "HardenedShell", "DemonClaw" } },
+                { "ProtectivePulse", new List<string>() { "MagicCore", "BlessedCharm" } },
+                { "NullField", new List<string>() { "MagicCore", "PhantomInk" } },
+                { "SoulCloak", new List<string>() { "BlessedCharm", "PhantomInk" } },
+                { "DivineHalo", new List<string>() { "GreaterBlessing", "SoulCloak" } },
+                { "TitanArmor", new List<string>() { "Warplate", "SteelFrame" } },
+                { "StormPike", new List<string>() { "OverclockGauntlet", "SharpenedBlade" } },
+                { "SanctifiedCore", new List<string>() { "ProtectivePulse", "ReinforcedBattery" } },
+                { "BloodruneClaws", new List<string>() { "PredatorFocus", "VampiricBrand" } },
+                { "CrimsonFortress", new List<string>() { "IronVeil", "ReflectiveCore" } },
+                { "SkyhammerCannon", new List<string>() { "SkyDagger", "SteelFrame" } },
+                { "BlessedCircuit", new List<string>() { "NullField", "GreaterBlessing" } },
+                { "DaggerOfJudgment", new List<string>() { "ExecutionerEdge", "BrutalSaber" } },
+                { "ExecutionerBrand", new List<string>() { "BlessedFang", "ExecutionerEdge" } },
+            };
+        }
+        
+        if (mapCombination.ContainsKey(relicName)) {
+            return mapCombination[relicName];
+        }
+
+        Debug.Log("cannot find combination for relic: " + relicName);
+
+        return new List<string>();
+    }
+
+    static ForgeRelicRarity GetRarity(string relicName) {
+        if (mapRarity.Count <= 0) {
+            mapRarity = new Dictionary<string, ForgeRelicRarity>() {
+                { "IronShard", ForgeRelicRarity.Basic },
+                { "LightFeather", ForgeRelicRarity.Basic },
+                { "HardenedShell", ForgeRelicRarity.Basic },
+                { "MagicCore", ForgeRelicRarity.Basic },
+                { "BlessedCharm", ForgeRelicRarity.Basic },
+                { "PhantomInk", ForgeRelicRarity.Basic },
+                { "DemonClaw", ForgeRelicRarity.Basic },
+                { "SharpenedBlade", ForgeRelicRarity.Advanced },
+                { "SkyDagger", ForgeRelicRarity.Advanced },
+                { "ReflectiveCore", ForgeRelicRarity.Advanced },
+                { "ReinforcedBattery", ForgeRelicRarity.Advanced },
+                { "GreaterBlessing", ForgeRelicRarity.Advanced },
+                { "TrueInvisibility", ForgeRelicRarity.Advanced },
+                { "BloodrendClaw", ForgeRelicRarity.Advanced },
+                { "ExecutionerEdge", ForgeRelicRarity.Advanced },
+                { "Warplate", ForgeRelicRarity.Advanced },
+                { "VampiricBrand", ForgeRelicRarity.Advanced },
+                { "AssassinSigil", ForgeRelicRarity.Advanced },
+                { "BrutalSaber", ForgeRelicRarity.Advanced },
+                { "BlessedFang", ForgeRelicRarity.Advanced },
+                { "ShadowWings", ForgeRelicRarity.Advanced },
+                { "PredatorFocus", ForgeRelicRarity.Advanced },
+                { "SteelFrame", ForgeRelicRarity.Advanced },
+                { "IronVeil", ForgeRelicRarity.Advanced },
+                { "CrimsonPlating", ForgeRelicRarity.Advanced },
+                { "ProtectivePulse", ForgeRelicRarity.Advanced },
+                { "NullField", ForgeRelicRarity.Advanced },
+                { "SoulCloak", ForgeRelicRarity.Advanced },
+                { "DivineHalo", ForgeRelicRarity.Legendary },
+                { "TitanArmor", ForgeRelicRarity.Legendary },
+                { "StormPike", ForgeRelicRarity.Legendary },
+                { "SanctifiedCore", ForgeRelicRarity.Legendary },
+                { "BloodruneClaws", ForgeRelicRarity.Legendary },
+                { "CrimsonFortress", ForgeRelicRarity.Legendary },
+                { "SkyhammerCannon", ForgeRelicRarity.Legendary },
+                { "BlessedCircuit", ForgeRelicRarity.Legendary },
+                { "DaggerOfJudgment", ForgeRelicRarity.Legendary },
+                { "ExecutionerBrand", ForgeRelicRarity.Legendary },
+            };
+        }
+
+        if (mapRarity.ContainsKey(relicName)) {
+            return mapRarity[relicName];
+        }
+
+        Debug.Log("cannot find rarity for relic: " + relicName);
+
+        return ForgeRelicRarity.Basic;
+
+    }
     static bool CheckIfPrefabExist(string prefabPath, string unitName) {
         GameObject prefab = Resources.Load<GameObject>(prefabPath + FOLDER_SEPARATOR + unitName);
         if (prefab == null) {

@@ -31,7 +31,6 @@ public class UnitScriptableObject : ScriptableObject {
     [SerializeField] public string unitName = "";
     [SerializeField] public string unitDescription = "This is a unit description";
     // [SerializeField] Sprite spriteRelic = null;  // Can't have this as it unit contains multiple sprites
-    [SerializeField] public int unitCost = 0;
     
 
     [Header("Unit Stat")]
@@ -74,9 +73,17 @@ public class UnitScriptableObject : ScriptableObject {
         return unitDescription;
     }
 
-    public int GetUnitCost() 
-    {
-        return unitCost;
+    public int GetUnitCost() {
+        switch (eTier) {
+            case eUnitTier.STAR_1:
+                return 1;
+            case eUnitTier.STAR_2:
+                return 3;
+            case eUnitTier.STAR_3:
+                return 5;
+        }
+        
+        return 0;
     }
 
     public string GetSkillDescription(MatchType matchType)
