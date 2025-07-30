@@ -249,6 +249,8 @@ public class SkillSlotMachine : MonoBehaviour
                 return SymbolType.UNDEAD;
             case eUnitArchetype.ELF:
                 return SymbolType.ELF;
+            case eUnitArchetype.MOB:
+                return SymbolType.MOB;               
             default:
                 return SymbolType.EMPTY;
         }
@@ -396,9 +398,6 @@ public class SkillSlotMachine : MonoBehaviour
         CombatManager.instance.StartBattleLoop(matches);
     }
 
-
-
-
     public void ExecuteFullCombat()
     {
         if (isEnemyTurn || IsRolling()) return;
@@ -420,12 +419,11 @@ public class SkillSlotMachine : MonoBehaviour
         // 2. generate enemy symbols & matches immediately
         Deck enemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
         SymbolType[] enemySymbols = SymbolGenerator.instance.GenerateSymbolsForDeck(enemyDeck);
-
         List<Match> enemyMatches = BuildMatchesFromSymbols(enemySymbols);
 
         // create a new SpinResult so pop-ups use enemy matches
         lastSpinResult = new SpinResult(enemyMatches, 0);
-        ShowEnemyRollPopups(enemyDeck);
+        ShowEnemyRollPopups(enemyMatches, enemyDeck);
 
         // 3. assign UnitName for roll resolution
         AssignMatchUnitNames(playerMatches, eDeckType.PLAYER);
@@ -601,11 +599,11 @@ public class SkillSlotMachine : MonoBehaviour
     }
 
     // UI helpers
-    void ShowEnemyRollPopups(Deck enemyDeck)
+    void ShowEnemyRollPopups(List<Match> matches, Deck enemyDeck)
     {
-        if (UIPopUpManager.instance == null || lastSpinResult == null) return;
+        int matchCount = matches?.Count ?? 0;
 
-        foreach (Match m in lastSpinResult.GetAllMatches())
+        foreach (Match m in matches)
         {
             // Find an alive unit of the same archetype for the icon
             UnitObject matchUnit = null;
@@ -623,9 +621,13 @@ public class SkillSlotMachine : MonoBehaviour
 
             string popupText = $"{m.GetMatchType()} {m.GetArchetype()}";
             if (iconSprite != null)
+            {
                 UIPopUpManager.instance.CreatePopUp(popupText, iconSprite);
+            }
             else
+            {
                 UIPopUpManager.instance.CreatePopUp(popupText);
+            }
         }
     }
 } 

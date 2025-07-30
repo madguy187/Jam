@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 public class ProbabilityCalculator : MonoBehaviour
 {
@@ -48,6 +49,7 @@ public class ProbabilityCalculator : MonoBehaviour
         currentProbabilities[SymbolType.HOLY] = 0f;
         currentProbabilities[SymbolType.UNDEAD] = 0f;
         currentProbabilities[SymbolType.ELF] = 0f;
+        currentProbabilities[SymbolType.MOB] = 0f;
     }
 
     public float GetEmptyProbability()
@@ -188,6 +190,8 @@ public class ProbabilityCalculator : MonoBehaviour
                 return SymbolType.UNDEAD;
             case eUnitArchetype.ELF:
                 return SymbolType.ELF;
+            case eUnitArchetype.MOB:
+                return SymbolType.MOB;
             default:
                 return SymbolType.EMPTY;
         }
