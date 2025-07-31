@@ -103,7 +103,7 @@ public class ShopManager : MonoBehaviour
     
             var shopItem = new ShopItem(
                 so.GetUnitName(),
-                so.GetUnitDescription(),
+                so.GetUnitTierString(),
                 ShopItemType.Unit,
                 so.GetUnitCost(),
                 unitIcon

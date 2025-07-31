@@ -143,7 +143,7 @@ public class StoryTellerManager : MonoBehaviour
             Sprite unitIcon = GetUnitSprite(unitInstance);
             RewardItem unitReward = new RewardItem(
                 so.GetUnitName(),
-                so.GetUnitDescription(),
+                so.GetUnitTierString(),
                 RewardItemType.Unit,
                 so.GetUnitCost(),
                 unitIcon
