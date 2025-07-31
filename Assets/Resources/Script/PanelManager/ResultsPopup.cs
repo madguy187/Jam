@@ -52,12 +52,20 @@ public class ResultPopup : MonoBehaviour
     public void ShowDefeat(IEnumerable<UnitObject> playerUnits, string sceneName = "Game_MainMenu")
     {
         if (returnButtonText != null) returnButtonText.text = "Return to Main Menu";
+        GoldManager.instance.ResetGold();
+        MockPlayerInventoryHolder.Instance.ClearInventory();
+        Map.MapPlayerTracker.Instance.CleanUpMap();
+        DeckManager.instance.Clear();
         ShowInternal(playerUnits, "D E F E A T", sceneName);
     }
 
     public void ShowDefeat(string sceneName = "Game_MainMenu")
     {
         if (returnButtonText != null) returnButtonText.text = "Return to Main Menu";
+        GoldManager.instance.ResetGold();
+        MockPlayerInventoryHolder.Instance.ClearInventory();
+        Map.MapPlayerTracker.Instance.CleanUpMap();
+        DeckManager.instance.Clear();
         ShowInternal(null, "D E F E A T", sceneName);
     }
 
