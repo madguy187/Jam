@@ -185,7 +185,7 @@ public class Deck : IEnumerable<UnitObject> {
             if (unit.IsDead()) {
                 continue;
             }
-            
+
             unit.Resolve(EffectResolveType.RESOLVE_TURN);
         }
     }
