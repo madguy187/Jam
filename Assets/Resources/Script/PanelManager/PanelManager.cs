@@ -228,19 +228,55 @@ public class PanelManager : MonoBehaviour
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             if (list != null && list.IsValid())
             {
+                // Build a map of EffectType -> total value for quick lookup
+                Dictionary<EffectType, float> effectValMap = new Dictionary<EffectType, float>();
                 HashSet<EffectType> unique = new HashSet<EffectType>();
                 foreach (EffectScriptableObject eff in list)
                 {
                     if (eff == null) continue;
-                    unique.Add(eff.GetEffectType());
+                    EffectType et = eff.GetEffectType();
+                    unique.Add(et);
+
+                    if (effectValMap.ContainsKey(et))
+                    {
+                        effectValMap[et] += eff.GetEffectVal();
+                    }
+                    else
+                    {
+                        effectValMap[et] = eff.GetEffectVal();
+                    }
                 }
 
+                const string KEYWORD_PARAM = "%param%";
                 foreach (EffectType et in unique)
                 {
                     EffectDetailScriptableObject detail = ResourceManager.instance.GetEffectDetail(et);
-                    sb.AppendLine(detail != null && !string.IsNullOrEmpty(detail.strDescription)
+
+                    string effectName = (detail != null && !string.IsNullOrEmpty(detail.strEffectName))
+                        ? detail.strEffectName
+                        : et.ToString();
+
+                    string description = (detail != null && !string.IsNullOrEmpty(detail.strDescription))
                         ? detail.strDescription
-                        : et.ToString());
+                        : et.ToString();
+
+                    if (description.Contains(KEYWORD_PARAM))
+                    {
+                        float paramVal = 0f;
+                        if (!unit.GetEffectParam(et, out paramVal))
+                        {
+                            // Fallback to static value from scriptable object list
+                            if (!effectValMap.TryGetValue(et, out paramVal))
+                            {
+                                paramVal = 0f;
+                            }
+                        }
+                        description = description.Replace(KEYWORD_PARAM, paramVal.ToString());
+                    }
+
+                    sb.AppendLine($"Effect: {effectName}");
+                    sb.AppendLine(); 
+                    sb.AppendLine($"Description: {description}");
                 }
             }
 
