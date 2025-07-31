@@ -15,15 +15,7 @@ public class ResourceManager : MonoBehaviour {
     Dictionary<string, eUnitTier> _mapMobTier = new Dictionary<string, eUnitTier>();
 
     [SerializeField] Sprite spriteDefault = null;
-    public Sprite GetDefaultEffectSprite()
-    {
-        // Lazy-load a fallback sprite if none is wired in the inspector
-        if (spriteDefault == null)
-        {
-            spriteDefault = Resources.Load<Sprite>("Sprites/grey_square");
-        }
-        return spriteDefault;
-    }
+    public Sprite GetDefaultEffectSprite() { return spriteDefault; }
 
     [SerializeField] GameObject prefabDynamicText = null;
 
