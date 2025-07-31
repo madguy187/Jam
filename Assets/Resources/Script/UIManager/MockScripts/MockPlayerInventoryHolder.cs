@@ -36,4 +36,11 @@ public class MockPlayerInventoryHolder : MonoBehaviour
         };
         ItemTracker.Instance.AddOnRemove(TrackerType.BagContainer, onRemoveAction);
     }
+
+    public void ClearInventory()
+    {
+        playerInventory.bagItems.Clear();
+        ItemTracker.Instance.ClearItems();
+        Global.DEBUG_PRINT("[MockPlayerInventoryHolder::ClearInventory] Cleared player inventory and ITEM TRACKER.");
+    }
 }

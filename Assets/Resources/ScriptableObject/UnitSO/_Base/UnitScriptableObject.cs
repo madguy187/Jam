@@ -73,6 +73,11 @@ public class UnitScriptableObject : ScriptableObject {
         return unitDescription;
     }
 
+    public string GetUnitTierString() 
+    {
+        return eTier.ToString();
+    }
+
     public int GetUnitCost() {
         switch (eTier) {
             case eUnitTier.STAR_1:

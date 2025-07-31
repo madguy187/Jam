@@ -35,7 +35,7 @@ public class Deck : IEnumerable<UnitObject> {
     }
 
     public void RemoveUnit(UnitObject unit) {
-        if (!IsValidUnitIndex(unit.index)) {
+        if (!IsValidUnitIndex(unit.index) || _vecUnit.Contains(unit) == false) {
             return;
         }
 

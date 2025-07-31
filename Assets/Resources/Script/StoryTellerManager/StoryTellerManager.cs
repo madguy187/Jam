@@ -134,8 +134,10 @@ public class StoryTellerManager : MonoBehaviour
             }
             // Instantiate unit temporarily in the scene
             GameObject unitInstance = GameObject.Instantiate(unitPrefab);
+            unitInstance.transform.position = new Vector3(0.0f, -170.0f, 0.0f);
             unitInstance.SetActive(true);
             UnitObject unitObj = unitInstance.GetComponent<UnitObject>();
+            unitObj.Init();
             var so = unitObj.unitSO;
             finalUnitObject = unitObj;
             Sprite unitIcon = GetUnitSprite(unitInstance);
