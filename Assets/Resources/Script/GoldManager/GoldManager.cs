@@ -8,7 +8,7 @@ public class GoldManager : MonoBehaviour
     [SerializeField] private GoldConfig config;
     
     [Header("Gold Settings")]
-    [SerializeField] private int currentGold = 40;
+    [SerializeField] private int currentGold = 15;
 
     private void Awake()
     {
@@ -27,6 +27,12 @@ public class GoldManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    public void ResetGold()
+    {
+        currentGold = 15; // Reset to default value
+        Global.DEBUG_PRINT("[GoldManager] Gold reset to default: " + currentGold);
     }
 
     void Start()
