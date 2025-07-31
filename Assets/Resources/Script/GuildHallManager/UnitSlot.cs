@@ -4,6 +4,7 @@ using TMPro;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
+using System.Text;
 
 namespace StoryManager
 {
@@ -17,7 +18,7 @@ namespace StoryManager
         [SerializeField] private RawImage previewImage;
         [SerializeField] private TMP_Text unitNameLabel;
         [SerializeField] private TMP_Text archetypeLabel;
-        [SerializeField] private TMP_Text statLabel;
+        [SerializeField] private TMP_Text effectLabel;
 
         [Header("Config")]
         [SerializeField] private int maxRerolls = 3;
@@ -365,7 +366,7 @@ namespace StoryManager
 
             unitNameLabel.text = string.IsNullOrEmpty(displayName) ? "???" : displayName;
 
-            if (archetypeLabel != null || statLabel != null)
+            if (archetypeLabel != null || effectLabel != null)
             {
                 if (currentPrefab != null)
                 {
@@ -376,13 +377,33 @@ namespace StoryManager
                         {
                             archetypeLabel.text = uo.unitSO.eUnitArchetype.ToString();
                         }
-                        if (statLabel != null)
+                        
+                        if (effectLabel != null)
                         {
-                            statLabel.text = $"HP {uo.unitSO.hp}\nATK {uo.unitSO.attack}";
+                            effectLabel.text = GetFirstFullGridEffectName(uo);
                         }
                     }
                 }
             }
+        }
+        private static string GetFirstFullGridEffectName(UnitObject unit)
+        {
+            if (unit == null) return "—";
+
+            // Simplified: only need first FULLGRID effect name
+            // Only look at FULLGRID effects and take the first one
+            EffectList list = unit.GetRollEffectList(MatchType.FULLGRID);
+            if (list == null || !list.IsValid()) return "—";
+
+            foreach (EffectScriptableObject eff in list)
+            {
+                if (eff == null) continue;
+                EffectType et = eff.GetEffectType();
+                EffectDetailScriptableObject detail = ResourceManager.instance.GetEffectDetail(et);
+                string effectName = (detail != null && !string.IsNullOrEmpty(detail.strEffectName)) ? detail.strEffectName : et.ToString();
+                return $"Effect: {effectName}";
+            }
+            return "—";
         }
     }
 }

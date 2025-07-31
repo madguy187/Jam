@@ -5133,7 +5133,7 @@ MonoBehaviour:
   previewImage: {fileID: 2330064327200280824}
   unitNameLabel: {fileID: 2540924114383487869}
   archetypeLabel: {fileID: 7353302947838922599}
-  statLabel: {fileID: 4961158342035740029}
+  effectLabel: {fileID: 4961158342035740029}
   maxRerolls: 3
   cameraSize: 0.6
   renderOffset: {x: 0, y: -0.3}
@@ -5729,8 +5729,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 22
-  m_fontSizeBase: 22
+  m_fontSize: 17
+  m_fontSizeBase: 17
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -5878,7 +5878,7 @@ MonoBehaviour:
   previewImage: {fileID: 1000366220901939563}
   unitNameLabel: {fileID: 7098172750663048243}
   archetypeLabel: {fileID: 239338940148044297}
-  statLabel: {fileID: 8345523490674441884}
+  effectLabel: {fileID: 8345523490674441884}
   maxRerolls: 3
   cameraSize: 0.6
   renderOffset: {x: 0, y: -0.3}
@@ -6053,8 +6053,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 22
-  m_fontSizeBase: 22
+  m_fontSize: 17
+  m_fontSizeBase: 17
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -21300,8 +21300,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 22
-  m_fontSizeBase: 22
+  m_fontSize: 17
+  m_fontSizeBase: 17
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -26839,7 +26839,7 @@ MonoBehaviour:
   previewImage: {fileID: 4386723076839215057}
   unitNameLabel: {fileID: 2419644516513871097}
   archetypeLabel: {fileID: 5896238028392134975}
-  statLabel: {fileID: 6889852215597981765}
+  effectLabel: {fileID: 6889852215597981765}
   maxRerolls: 3
   cameraSize: 0.6
   renderOffset: {x: 0, y: -0.3}
