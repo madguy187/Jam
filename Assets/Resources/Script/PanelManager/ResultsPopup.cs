@@ -70,6 +70,7 @@ public class ResultPopup : MonoBehaviour
             GoldManager.instance.ResetGold();
             MockPlayerInventoryHolder.Instance.ClearInventory();
             Map.MapPlayerTracker.Instance.CleanUpMap();
+            DeckManager.instance.Clear();
 
             Debug.Log("Defeated final boss");
 

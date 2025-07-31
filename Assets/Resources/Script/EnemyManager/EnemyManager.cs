@@ -164,7 +164,7 @@ public class EnemyManager : MonoBehaviour {
 
     public float GetDifficultyHealthPercent(bool isBoss = false) {
         if (isBoss) {
-            return 0.0f;
+            return 1.0f;
         }
 
         return (Global.PERCENTAGE_CONSTANT + node_count * nDifficultyHealthPercent) / Global.PERCENTAGE_CONSTANT;

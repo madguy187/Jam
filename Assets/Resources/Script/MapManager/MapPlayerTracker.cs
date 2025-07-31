@@ -120,7 +120,7 @@ namespace Map
             switch (mapNode.Node.nodeType) {
                 case NodeType.Enemy:
                     mapManager.SaveMap();
-                    EnemyManager.instance.nodeType = NodeType.MajorBoss;
+                    EnemyManager.instance.nodeType = mapNode.Node.nodeType;
                     EnemyManager.instance.PopulateMobBasedOnNodeType();
                     SceneManager.LoadScene("Game");
                     break;

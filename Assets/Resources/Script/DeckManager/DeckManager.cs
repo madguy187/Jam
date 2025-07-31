@@ -30,6 +30,12 @@ public class DeckManager : MonoBehaviour {
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    public void Clear() 
+    {
+        cPlayerDeck.DestroyAllUnit();
+        cEnemyDeck.DestroyAllUnit();
+    }
+    
     void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
         // This function will be called every time a scene is loaded.
         // You can add logic here based on the loaded scene's name or build index.
