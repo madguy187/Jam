@@ -648,7 +648,16 @@ public class SkillSlotMachine : MonoBehaviour
 
             Sprite iconSprite = matchUnit != null ? RenderUtilities.RenderUnitHeadSprite(matchUnit) : null;
 
-            string popupText = $"{m.GetMatchType()} {m.GetArchetype()}";
+            string popupText;
+            if (matchUnit != null && matchUnit.unitSO != null)
+            {
+                popupText = $"{m.GetMatchType()} {matchUnit.unitSO.unitName}";
+            }
+            else
+            {
+                popupText = $"{m.GetMatchType()} {m.GetArchetype()}";
+            }
+
             if (iconSprite != null)
             {
                 UIPopUpManager.instance.CreatePopUp(popupText, iconSprite);

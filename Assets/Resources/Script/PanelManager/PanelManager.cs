@@ -238,6 +238,13 @@ public class PanelManager : MonoBehaviour
             if (skillBox == null) continue;
 
             MatchType mt = skillBox.GetMatchType();
+
+            // Skip SINGLE (no description) and duplicate VERTICAL (handled by HORIZONTAL)
+            if (mt == MatchType.SINGLE || mt == MatchType.VERTICAL)
+            {
+                skillBox.gameObject.SetActive(false);
+                continue;
+            }
             EffectList list = unit.GetRollEffectList(mt);
 
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
@@ -292,7 +299,7 @@ public class PanelManager : MonoBehaviour
                     string symbolHeader = GetMatchTypeDisplay(mt);
                     sb.AppendLine($"{symbolHeader}: {effectName}");
                     sb.AppendLine(); 
-                    sb.AppendLine($"Description: {description}");
+                    sb.AppendLine($"Desc: {description}");
                 }
             }
 

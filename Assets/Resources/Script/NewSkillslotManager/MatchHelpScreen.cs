@@ -230,7 +230,6 @@ public class MatchHelpScreen : MonoBehaviour
     {
         return new List<PatternDef>
         {
-            new PatternDef{ title="Single",     description="Any first unique single matching symbol.", activeCells=new List<(int,int)>{(1,1)}},
             new PatternDef{ title="Horizontal", description="3 matching symbols in any full row.",       activeCells=new List<(int,int)>{(0,0),(0,1),(0,2)}},
             new PatternDef{ title="Vertical",   description="3 matching symbols in any full column.",    activeCells=new List<(int,int)>{(0,0),(1,0),(2,0)}},
             new PatternDef{ title="Diagonal",   description="3 matching symbols along either main diagonal.", activeCells=new List<(int,int)>{(0,0),(1,1),(2,2)}},
