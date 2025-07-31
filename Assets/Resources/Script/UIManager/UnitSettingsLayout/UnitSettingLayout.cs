@@ -3,6 +3,7 @@ using TMPro;
 using Map;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public class UnitSettingLayout : MonoBehaviour 
 {
@@ -39,8 +40,16 @@ public class UnitSettingLayout : MonoBehaviour
         instance = this;
     }
 
-    public void Init() 
-    {
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+        // Example: Perform actions only for a specific scene
+        if (scene.name == "Game_Necromancer") {
+            OpenLayout();
+        } else {
+            CloseLayout();
+        }
+    }
+
+    public void Init() {
         if (ItemTracker.Instance == null) {
             Global.DEBUG_PRINT("[UnitSettingsLayout::Init] ItemTracker instance is null!");
             tracker = new ItemTracker(); // Create a new instance if it doesn't exist

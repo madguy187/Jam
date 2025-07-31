@@ -67,9 +67,9 @@ namespace Map
                 Vector2Int currentPoint = mapManager.CurrentMap.path[mapManager.CurrentMap.path.Count - 1];
                 Node currentNode = mapManager.CurrentMap.GetNode(currentPoint);
 
-                if (currentNode.nodeType == NodeType.Enemy ||
-                    currentNode.nodeType == NodeType.MajorBoss ||
-                    currentNode.nodeType == NodeType.MiniBoss)
+                if (mapNode.Node.nodeType == NodeType.Enemy ||
+                    mapNode.Node.nodeType == NodeType.MajorBoss ||
+                    mapNode.Node.nodeType == NodeType.MiniBoss)
                 {
                     Deck cPlayerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
                         List<UnitObject> listAlive = DeckHelperFunc.GetAllAliveUnit(cPlayerDeck);
