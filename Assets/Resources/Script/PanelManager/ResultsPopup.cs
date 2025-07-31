@@ -63,8 +63,25 @@ public class ResultPopup : MonoBehaviour
 
     public void ShowVictory(IEnumerable<UnitObject> playerUnits, string sceneName = "Game_Map")
     {
-        if (returnButtonText != null) returnButtonText.text = "Return to Map";
-        ShowInternal(playerUnits, "V I C T O R Y", sceneName);
+        // Determine if we defeated the final boss
+        string targetScene = sceneName;
+        if (EnemyManager.instance.nodeType == Map.NodeType.MajorBoss)
+        {
+            GoldManager.instance.ResetGold();
+            MockPlayerInventoryHolder.Instance.ClearInventory();
+            Map.MapPlayerTracker.Instance.CleanUpMap();
+
+            Debug.Log("Defeated final boss");
+
+            targetScene = "Game_MainMenu";
+            if (returnButtonText != null) returnButtonText.text = "Return to Main Menu";
+        }
+        else
+        {
+            if (returnButtonText != null) returnButtonText.text = "Return to Map";
+        }
+
+        ShowInternal(playerUnits, "V I C T O R Y", targetScene);
     }
 
     // Core display logic
