@@ -118,7 +118,7 @@ MonoBehaviour:
   transDefault: {fileID: 1613227002553208978}
   prefabPopUp: {fileID: 5020381485687806377, guid: cf1306464dbfe054db9b938c8ec6bf98, type: 3}
   fGap: -5
-  fLifeTime: 3
+  fLifeTime: 1
   popupHeight: 40
 --- !u!1 &8136036604637149176
 GameObject:
