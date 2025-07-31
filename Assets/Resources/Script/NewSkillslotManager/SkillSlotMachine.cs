@@ -23,7 +23,8 @@ public class SkillSlotMachine : MonoBehaviour
     private SlotGrid detectorGrid;
     private readonly List<SkillSlotGrid> columns = new List<SkillSlotGrid>();
     private SpinResult lastSpinResult;
-
+    private bool victoryProcessed = false;
+    
     [Header("UI References")]
     [SerializeField] private UIRerollButton rerollButton;
     [SerializeField] private UIAttack       attackButton;
@@ -101,10 +102,11 @@ public class SkillSlotMachine : MonoBehaviour
             Spin();
         }
 
-        if (CheckAllEnemiesDead())
+        if (!victoryProcessed && CheckAllEnemiesDead())
         {
             Global.DEBUG_PRINT("[SkillSlotMachine] All enemies dead, player wins!");
             GoldManager.instance.OnVictory();
+            victoryProcessed = true;
             SetButtonsInteractable(false);
             return;
         }

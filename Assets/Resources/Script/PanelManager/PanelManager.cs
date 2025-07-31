@@ -213,6 +213,21 @@ public class PanelManager : MonoBehaviour
         OnUnitSelected?.Invoke(unit);
     }
 
+    private static string GetMatchTypeDisplay(MatchType mt)
+    {
+        switch (mt)
+        {
+            case MatchType.SINGLE:     return "SINGLE";
+            case MatchType.HORIZONTAL: return "HORIZONTAL";
+            case MatchType.VERTICAL:   return "VERTICAL";
+            case MatchType.DIAGONAL:   return "DIAGONAL";
+            case MatchType.ZIGZAG:     return "ZIGZAG";
+            case MatchType.XSHAPE:     return "X-GRID";
+            case MatchType.FULLGRID:   return "FULL-GRID";
+            default:                   return mt.ToString();
+        }
+    }
+
     private void UpdateSkillBoxes(UnitObject unit)
     {
         if (skillBoxes == null || skillBoxes.Length == 0) return;
@@ -274,7 +289,8 @@ public class PanelManager : MonoBehaviour
                         description = description.Replace(KEYWORD_PARAM, paramVal.ToString());
                     }
 
-                    sb.AppendLine($"Effect: {effectName}");
+                    string symbolHeader = GetMatchTypeDisplay(mt);
+                    sb.AppendLine($"{symbolHeader}: {effectName}");
                     sb.AppendLine(); 
                     sb.AppendLine($"Description: {description}");
                 }

@@ -3877,8 +3877,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb88df40e36454fcea993ecdc50dce91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseEmptyProbability: 0.3
-  minArchetypeProbability: 0.3
+  baseEmptyProbability: 0.4
+  minArchetypeProbability: 0.2
 --- !u!1 &1511133264
 GameObject:
   m_ObjectHideFlags: 0
