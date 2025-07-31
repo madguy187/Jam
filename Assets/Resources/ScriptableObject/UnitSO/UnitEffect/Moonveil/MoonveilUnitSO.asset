@@ -17,7 +17,7 @@ MonoBehaviour:
   eTier: 2
   eUnitArchetype: 3
   hp: 38
-  attack: 50
+  attack: 2
   shield: 1
   res: 2
   critRate: 10
