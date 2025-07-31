@@ -24,7 +24,7 @@ public class SkillSlotMachine : MonoBehaviour
     private readonly List<SkillSlotGrid> columns = new List<SkillSlotGrid>();
     private SpinResult lastSpinResult;
     private bool victoryProcessed = false;
-    
+
     [Header("UI References")]
     [SerializeField] private UIRerollButton rerollButton;
     [SerializeField] private UIAttack       attackButton;
@@ -543,22 +543,7 @@ public class SkillSlotMachine : MonoBehaviour
             return false;
         }
 
-        if (!victoryPopupShown)
-        {
-            victoryPopupShown = true;
-            StartCoroutine(ShowVictoryAfterDelay(1f));
-        }
         return true;
-    }
-
-    private IEnumerator ShowVictoryAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);
-        if (ResultPopup.instance != null)
-        {
-            Deck playerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
-            ResultPopup.instance.ShowVictory(playerDeck);
-        }
     }
 
     // Public helpers

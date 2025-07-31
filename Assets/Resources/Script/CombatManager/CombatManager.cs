@@ -93,9 +93,9 @@ public class CombatManager : MonoBehaviour {
     void _CheckEnd() {
         List<UnitObject> listPlayerUnit = DeckHelperFunc.GetAllAliveUnit(DeckManager.instance.GetDeckByType(eDeckType.PLAYER));
         List<UnitObject> listEnemyUnit = DeckHelperFunc.GetAllAliveUnit(DeckManager.instance.GetDeckByType(eDeckType.ENEMY));
+        Deck cPlayerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);      
         if (listPlayerUnit.Count <= 0) {
             // All player units dead – show defeat popup.
-            Deck cPlayerDeck = DeckManager.instance.GetDeckByType(eDeckType.PLAYER);
             ResultPopup.instance.ShowDefeat(cPlayerDeck);
             cPlayerDeck.DestroyAllUnit();
             Deck cEnemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
@@ -103,6 +103,7 @@ public class CombatManager : MonoBehaviour {
         }
         else if (listEnemyUnit.Count <= 0) {
             Deck cEnemyDeck = DeckManager.instance.GetDeckByType(eDeckType.ENEMY);
+            ResultPopup.instance.ShowVictory(cPlayerDeck);
             cEnemyDeck.DestroyAllUnit();
             sceneNameOnFinish = "Game_Map";
             UIFade.instance.SetOnFadeFinish(_SceneChangeFunc);
