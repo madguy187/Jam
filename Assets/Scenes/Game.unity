@@ -222,7 +222,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4842413331601793022, guid: 224a2f67b4c1b6342adb17a3eacf98ea, type: 3}
       propertyPath: vecEssential.Array.size
-      value: 4
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4842413331601793022, guid: 224a2f67b4c1b6342adb17a3eacf98ea, type: 3}
       propertyPath: vecEssential.Array.data[2].clip
