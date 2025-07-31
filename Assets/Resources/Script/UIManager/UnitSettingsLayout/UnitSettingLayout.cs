@@ -209,7 +209,6 @@ public class UnitSettingLayout : MonoBehaviour
                 }
                 GameObject unitGO = Instantiate(unitButtonPrefab, slot);
                 var unitItem = new MockInventoryItem(unit);
-                //unit.uiGameObject = unitGO; // nico: what is this?
                 unitGO.GetComponent<UnitButton>().Init(unit, unitItem, ShowDetails);
                 unitGO.GetComponent<DragHandler>().Init(unitItem);
                 unitGO.GetComponent<ToolTipDetails>().Init(unitDetailsPanel.GetAnyUnitName(unit), unitDetailsPanel.GetAnyUnitDetails(unit));
@@ -242,7 +241,8 @@ public class UnitSettingLayout : MonoBehaviour
         Global.DEBUG_PRINT($"[UnitSettingsLayout::GenerateFixedBagSlots] BagContainer has {tracker.maxItems} slots");
     }
 
-    private void PopulateBagItems() {
+    private void PopulateBagItems() 
+    {
         for (int i = 0; i < bagContainer.childCount; i++) {
             if (i >= inventory.bagItems.Count)
                 break;
@@ -257,6 +257,7 @@ public class UnitSettingLayout : MonoBehaviour
                 unitBtn.Init(item.unitData, item, ShowDetails);
                 unitBtn.boundItem = item;
                 unitBtn.GetComponent<DragHandler>().Init(item);
+                unitBtn.GetComponent<ToolTipDetails>().Init(unitDetailsPanel.GetAnyUnitName(item.unitData), unitDetailsPanel.GetAnyUnitDetails(item.unitData));
             } else // Relic
               {
                 go = Instantiate(relicButtonPrefab, slot);
@@ -289,7 +290,8 @@ public class UnitSettingLayout : MonoBehaviour
         }
     }
 
-    private void PopulateUnitRelics(UnitObject unit) {
+    private void PopulateUnitRelics(UnitObject unit) 
+    {
         int relicIndex = 0;
         List<RelicScriptableObject> listRelic = unit.GetRelic();
         for (int i = 0; i < relicContainer.childCount; i++) {
@@ -304,7 +306,6 @@ public class UnitSettingLayout : MonoBehaviour
 
             go.GetComponent<RelicButton>().Init(relic, relicItem);
             go.GetComponent<DragHandler>().Init(relicItem);
-            //ItemTracker.Instance.AddItem(TrackerType.RelicContainer, MockItemType.Relic);
             // Stretch to fit
             RectTransform rt = go.GetComponent<RectTransform>();
             rt.anchorMin = Vector2.zero;
