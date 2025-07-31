@@ -113,7 +113,7 @@ namespace Map
         /// Handles the logic for entering a node, such as loading a new scene or triggering events based on node type
         private void EnterNode(MapNode mapNode) 
         {
-            // We have access to blueprint name here as well
+            // We have access to blueprint name here as well.
             Global.DEBUG_PRINT("[MapPlayerTracker::EnterNode] Entering node: " + mapNode.Node.blueprintName + " of type: " + mapNode.Node.nodeType);
             // Load appropriate scene with context based on nodeType:
             // If choose to show GUI in some of these cases, do not forget to set "Locked" in MapPlayerTracker back to false
