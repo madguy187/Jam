@@ -82,6 +82,10 @@ public class TooltipSystem : MonoBehaviour
         tooltipText.text = content;
         tooltipContainer.SetActive(true);
 
+        // Ensure the layout updates so container resizes to fit the new text
+        Canvas.ForceUpdateCanvases();
+        UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(containerRect);
+
         Vector2 screenPoint = CalculateTooltipPosition(position);
         containerRect.position = screenPoint;
     }

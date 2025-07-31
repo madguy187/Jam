@@ -249,21 +249,23 @@ public class CreateEffectSO_Editor {
         string effect_description_path = EFFECT_DESCRIPTION_PATH.Substring(0, EFFECT_DESCRIPTION_PATH.LastIndexOf("/"));
         string effect_description_folder_name = EFFECT_DESCRIPTION_PATH.Substring(EFFECT_DESCRIPTION_PATH.LastIndexOf("/") + 1);
 
-        if (AssetDatabase.IsValidFolder(EFFECT_PATH)) {
-            AssetDatabase.DeleteAsset(EFFECT_PATH);
-        }
+        // Disabled automatic deletion to preserve existing assets and their GUIDs.
+        // if (AssetDatabase.IsValidFolder(EFFECT_PATH)) {
+        //     AssetDatabase.DeleteAsset(EFFECT_PATH);
+        // }
 
-        if (AssetDatabase.IsValidFolder(EFFECT_PATH_MOB)) {
-            AssetDatabase.DeleteAsset(EFFECT_PATH_MOB);
-        }
+        // if (AssetDatabase.IsValidFolder(EFFECT_PATH_MOB)) {
+        //     AssetDatabase.DeleteAsset(EFFECT_PATH_MOB);
+        // }
 
-        if (AssetDatabase.IsValidFolder(RELIC_EFFECT_PATH)) {
-            AssetDatabase.DeleteAsset(RELIC_EFFECT_PATH);
-        }
+        // if (AssetDatabase.IsValidFolder(RELIC_EFFECT_PATH)) {
+        //     AssetDatabase.DeleteAsset(RELIC_EFFECT_PATH);
+        // }
 
-        if (AssetDatabase.IsValidFolder(EFFECT_DESCRIPTION_PATH)) {
-            AssetDatabase.DeleteAsset(EFFECT_DESCRIPTION_PATH);
-        }
+        // Keep EffectDescription folder to preserve GUIDs
+        // if (AssetDatabase.IsValidFolder(EFFECT_DESCRIPTION_PATH)) {
+        //     AssetDatabase.DeleteAsset(EFFECT_DESCRIPTION_PATH);
+        // }
 
         CreateFolder(effect_parent_path, effect_folder_name);
         CreateFolder(relic_parent_path, relic_folder_name);
