@@ -72,6 +72,7 @@ public class UIRevive : MonoBehaviour {
 
         GoldManager.instance.SpendGold(cost);
         _unit.Revive();
+        _unit._currentHealth.SetVal(_unit._currentHealth.GetMax());
     }
 
     int GetCost() {
