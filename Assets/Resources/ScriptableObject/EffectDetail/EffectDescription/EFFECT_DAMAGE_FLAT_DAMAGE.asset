@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e6c0d2d182458c4786d479368332411, type: 3}
+  m_Name: EFFECT_DAMAGE_FLAT_DAMAGE
+  m_EditorClassIdentifier: 
+  eEffectType: 17
+  strEffectName: Flat Damage Given
+  strDescription: Deals %param% damage
+  sprite: {fileID: 21300000, guid: 478c2e21d653ec943941603b31689987, type: 3}

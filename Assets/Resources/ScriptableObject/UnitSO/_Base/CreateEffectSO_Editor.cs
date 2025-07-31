@@ -261,9 +261,10 @@ public class CreateEffectSO_Editor {
             AssetDatabase.DeleteAsset(RELIC_EFFECT_PATH);
         }
 
-        if (AssetDatabase.IsValidFolder(EFFECT_DESCRIPTION_PATH)) {
-            AssetDatabase.DeleteAsset(EFFECT_DESCRIPTION_PATH);
-        }
+        // Keep EffectDescription folder to preserve GUIDs
+        // if (AssetDatabase.IsValidFolder(EFFECT_DESCRIPTION_PATH)) {
+        //     AssetDatabase.DeleteAsset(EFFECT_DESCRIPTION_PATH);
+        // }
 
         CreateFolder(effect_parent_path, effect_folder_name);
         CreateFolder(relic_parent_path, relic_folder_name);
