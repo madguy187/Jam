@@ -20,8 +20,6 @@ public class GoldManager : MonoBehaviour
             
             if (config == null)
             {
-                Debug.LogWarning("[GoldManager] Gold configuration is missing");
-            }
         }
         else
         {
